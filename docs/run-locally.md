@@ -8,7 +8,9 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 1 status:** the database, entities and search query are done and tested. The web pages arrive in Phase 2, so http://localhost:8080 shows an error page for now. That is expected.
+> **Phase 1 status:** http://localhost:8080 opens a temporary **Phase 1 checkpoint page** (`/phase-1`). It shows the database connection, how many clubs and categories are loaded, and a working search with one-click buttons for TC-01 to TC-05. The real student pages replace it in Phase 2.
+>
+> ![Phase 1 checkpoint page](screenshots/phase1-search-robotics.png)
 
 ---
 
@@ -77,7 +79,7 @@ $env:DB_PASSWORD="pick-a-local-password"
 ./mvnw spring-boot:run
 ```
 
-On Windows: `mvnw.cmd spring-boot:run`. Wait for `Started SpartanClubApplication`, then open http://localhost:8080. From Phase 3 on, also start Mailpit first (run `mailpit` in another terminal).
+On Windows: `mvnw.cmd spring-boot:run`. Wait for `Started SpartanClubApplication`, then open http://localhost:8080 (it goes to the Phase 1 checkpoint page). Stop the app with **Ctrl+C**. From Phase 3 on, also start Mailpit first (run `mailpit` in another terminal).
 
 ## 5. Run the tests
 

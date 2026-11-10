@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Something went wrong | Spartan Club Central</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header class="site-header">
+  <div class="container"><p class="site-name">Spartan Club Central</p></div>
+</header>
+<main id="main" class="container">
+  <!-- Generic on purpose: no stack traces, SQL or class names (SPR-06). -->
+  <h1 th:text="${status == 404} ? 'Page not found' : 'Something went wrong'">Something went wrong</h1>
+  <p th:text="${status == 404} ? 'We could not find that page.' : 'Please try again in a moment.'">Please try again.</p>
+  <p><a class="button" th:href="@{/}">Back to the home page</a></p>
+</main>
+</body>
+</html>
