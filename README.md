@@ -53,6 +53,10 @@ Spartan Club Central is a web application, so there is nothing to install. You u
 4. Submit the form. If the email is already registered, use **Log In** or **Forgot Password** instead.
 5. Log in with your email and password. You are taken to your dashboard.
 
+## Running It Locally (Developers and Demos)
+
+See [docs/run-locally.md](docs/run-locally.md) for installing MySQL, loading the sample data, setting environment variables, and running the app and tests on your laptop.
+
 ## How to Run the Project
 
 **As a student**
