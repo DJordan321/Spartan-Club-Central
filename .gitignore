@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets and local files (never commit these) ###
+.env
+*.env
+application-local.properties
+logs/
+*.p12
