@@ -1,5 +1,7 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
+> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus an offline preview of the Phase 1 page that needs no Java or MySQL.
+
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
 | Piece | Tool (all free) | Address |

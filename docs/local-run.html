@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spartan Club Central: Local Run</title>
+<style>
+:root {
+  --green: #00573F; --green-dark: #003D2C; --green-tint: #E6F0EC; --gold: #F2B705;
+  --text: #1F2933; --muted: #4A5560; --bg: #F7F8F6; --card: #FFFFFF; --border: #D5DAD7;
+  --code-bg: #1E2A26; --code-text: #E8F1EC; --ok: #0B6B3A; --warn-bg: #FFF6D6; --warn-border: #E3B800;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --green: #4CC59A; --green-dark: #8BE0BF; --green-tint: #17332A; --gold: #F2B705;
+    --text: #E6ECE9; --muted: #A9B5B0; --bg: #101614; --card: #18201D; --border: #2D3A35;
+    --code-bg: #0B100E; --code-text: #E8F1EC; --ok: #5BD69F; --warn-bg: #2E2810; --warn-border: #8C7300;
+  }
+}
+:root[data-theme="dark"] {
+  --green: #4CC59A; --green-dark: #8BE0BF; --green-tint: #17332A; --gold: #F2B705;
+  --text: #E6ECE9; --muted: #A9B5B0; --bg: #101614; --card: #18201D; --border: #2D3A35;
+  --code-bg: #0B100E; --code-text: #E8F1EC; --ok: #5BD69F; --warn-bg: #2E2810; --warn-border: #8C7300;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.55; color: var(--text); background: var(--bg); }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.skip-link { position: absolute; left: -9999px; top: 0; background: var(--gold); color: #000; padding: 8px 12px; z-index: 10; }
+.skip-link:focus { left: 8px; top: 8px; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+header.site { background: #00573F; color: #fff; padding: 14px 0; border-bottom: 4px solid var(--gold); }
+header.site .container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.site-name { margin: 0; font-size: 1.25rem; font-weight: 700; }
+.badge { margin: 0; background: var(--gold); color: #000; font-size: .85rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+nav.tabs-main { display: flex; gap: 6px; margin: 20px 0 0; flex-wrap: wrap; }
+nav.tabs-main button { font: inherit; font-weight: 600; cursor: pointer; padding: 10px 16px; border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border); border-bottom: none; background: var(--card); color: var(--muted); }
+nav.tabs-main button[aria-selected="true"] { background: #00573F; color: #fff; border-color: #00573F; }
+main { padding-bottom: 40px; }
+h1 { font-size: 1.6rem; line-height: 1.25; margin: 20px 0 8px; color: var(--green-dark); }
+h2 { font-size: 1.2rem; margin: 0 0 12px; color: var(--green-dark); }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+.lead { color: var(--muted); margin-top: 0; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin: 18px 0; }
+.note { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 10px 14px; }
+.ok { color: var(--ok); font-weight: 600; }
+.muted { color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0 0; }
+.stats div { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+.stats dt { font-size: .85rem; color: var(--muted); }
+.stats dd { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--green-dark); }
+.search-form { display: flex; flex-direction: column; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+label { font-weight: 600; }
+input, select { font: inherit; padding: 10px 12px; border: 1px solid #8A949C; border-radius: 8px; background: var(--card); color: var(--text); width: 100%; }
+.button { font: inherit; font-weight: 600; cursor: pointer; background: #00573F; color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; }
+.button:hover { background: #003D2C; }
+.quick-label { margin: 16px 0 6px; font-weight: 600; }
+.chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { font: inherit; font-size: .9rem; cursor: pointer; padding: 6px 10px; border: 1px solid var(--green);
+  border-radius: 999px; color: var(--green-dark); background: transparent; }
+.chips button:hover { background: var(--green-tint); }
+.count { font-size: .9rem; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: .95rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px; border-bottom: 1px solid var(--border); }
+thead th { background: var(--green-tint); color: var(--green-dark); }
+tbody th { font-weight: 600; }
+td ul { list-style: none; padding: 0; margin: 0; }
+a { color: var(--green); }
+ol.steps { padding-left: 0; list-style: none; counter-reset: step; margin: 0; }
+ol.steps > li { counter-increment: step; position: relative; padding: 0 0 18px 44px; }
+ol.steps > li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%;
+  background: #00573F; color: #fff; font-weight: 700; display: grid; place-items: center; }
+.os-tabs { display: flex; gap: 6px; margin: 4px 0 14px; flex-wrap: wrap; }
+.os-tabs button { font: inherit; cursor: pointer; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--green); background: transparent; color: var(--green-dark); }
+.os-tabs button[aria-pressed="true"] { background: #00573F; color: #fff; }
+.code { position: relative; margin: 8px 0; }
+.code pre { margin: 0; background: var(--code-bg); color: var(--code-text); padding: 12px 70px 12px 14px; border-radius: 8px;
+  overflow-x: auto; font: .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.code button { position: absolute; top: 8px; right: 8px; font: inherit; font-size: .8rem; cursor: pointer; padding: 3px 10px;
+  border-radius: 6px; border: 1px solid #4A5A54; background: #2A3833; color: #fff; }
+code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4px; font-size: .9em; word-break: break-word; }
+.trouble td, .trouble th { min-width: 0; }
+.trouble table { min-width: 560px; }
+footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; padding: 16px 0; }
+[hidden] { display: none !important; }
+@media (min-width: 700px) {
+  h1 { font-size: 2rem; }
+  .search-form { flex-direction: row; align-items: flex-end; }
+  .search-form .field:first-child { flex: 2; }
+  .search-form .field { flex: 1; }
+  .stats { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site">
+  <div class="container">
+    <p class="site-name">Spartan Club Central</p>
+    <p class="badge">Phase 1 &middot; Local run</p>
+  </div>
+</header>
+
+<div class="container">
+  <nav class="tabs-main" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-preview" aria-controls="panel-preview" aria-selected="true">Phase 1 preview</button>
+    <button role="tab" id="tab-run" aria-controls="panel-run" aria-selected="false" tabindex="-1">Run the real app</button>
+  </nav>
+</div>
+
+<main id="main" class="container">
+
+<!-- ===================== PREVIEW ===================== -->
+<section id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+  <h1>Phase 1: Database and search</h1>
+  <p class="lead">An offline copy of the Phase 1 checkpoint page. It uses the same 32 sample clubs and the same
+    search rules as the Java app, so you can show it anywhere without Java or MySQL.</p>
+  <p class="note"><strong>Offline preview.</strong> The club data was copied from <code class="inline">database/sample-data.sql</code>
+    and the search runs in this page's JavaScript. The real app (second tab) reads the same data from MySQL through
+    Spring Boot.</p>
+
+  <section class="card" aria-labelledby="db-heading">
+    <h2 id="db-heading">1. Sample data</h2>
+    <p class="ok"><span aria-hidden="true">&#10003;</span> Loaded <span id="total-count"></span> clubs from the sample data.</p>
+    <dl class="stats">
+      <div><dt>Active clubs</dt><dd id="stat-active">0</dd></div>
+      <div><dt>All clubs (incl. inactive)</dt><dd id="stat-total">0</dd></div>
+      <div><dt>Categories</dt><dd id="stat-cats">4</dd></div>
+      <div><dt>Academic</dt><dd id="stat-1">0</dd></div>
+      <div><dt>Cultural</dt><dd id="stat-2">0</dd></div>
+      <div><dt>Sports / Service</dt><dd id="stat-34">0</dd></div>
+    </dl>
+  </section>
+
+  <section class="card" aria-labelledby="search-heading">
+    <h2 id="search-heading">2. Try the search (FR-01, FR-02)</h2>
+    <form class="search-form" id="search-form" role="search">
+      <div class="field">
+        <label for="q">Keyword</label>
+        <input id="q" name="q" type="search" maxlength="100" placeholder="e.g. robotics" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <button type="submit" class="button">Search</button>
+    </form>
+    <p class="quick-label">Quick test cases:</p>
+    <ul class="chips">
+      <li><button type="button" data-q="chess">TC-01: "chess" (name match)</button></li>
+      <li><button type="button" data-q="robotics">TC-02: "robotics" (description only)</button></li>
+      <li><button type="button" data-q="zzzzqq">TC-03: no match</button></li>
+      <li><button type="button" data-cat="3">TC-04: Sports only</button></li>
+      <li><button type="button" data-q="club" data-cat="1">TC-05: "club" + Academic</button></li>
+      <li><button type="button" data-q="film">Inactive club is hidden</button></li>
+      <li><button type="button" data-q="">Show all</button></li>
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="results-heading">
+    <h2 id="results-heading">3. Results <span class="count" id="result-count" aria-live="polite"></span></h2>
+    <p id="empty" class="muted" hidden>No clubs found.</p>
+    <div class="table-wrap" id="table-wrap" tabindex="0" aria-label="Search results, scrolls sideways on small screens">
+      <table>
+        <thead><tr>
+          <th scope="col">Club</th><th scope="col">Category</th><th scope="col">Description</th>
+          <th scope="col">Meeting time</th><th scope="col">Contact (TC-06)</th><th scope="col">Social links (FR-06)</th>
+        </tr></thead>
+        <tbody id="results"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<!-- ===================== RUN GUIDE ===================== -->
+<section id="panel-run" role="tabpanel" aria-labelledby="tab-run" hidden>
+  <h1>Run the real app on your laptop</h1>
+  <p class="lead">About 20 minutes the first time, then one command each time after. You'll end up at
+    <strong>http://localhost:8080</strong> with the live Phase 1 page reading from MySQL.</p>
+
+  <div class="os-tabs" role="group" aria-label="Choose your computer">
+    <button type="button" data-os="win" aria-pressed="true">Windows</button>
+    <button type="button" data-os="mac" aria-pressed="false">Mac</button>
+  </div>
+
+  <section class="card">
+    <h2>First-time setup</h2>
+    <ol class="steps">
+      <li>
+        <h3>Install the tools</h3>
+        <ul>
+          <li><strong>Java 17 or newer</strong>: Eclipse Temurin from adoptium.net. Check it with <code class="inline">java -version</code>.</li>
+          <li><strong>MySQL 8 Community Server</strong> from dev.mysql.com/downloads. Write down the <strong>root password</strong> you choose.
+            <span data-show="win">Also install <strong>MySQL Workbench</strong> (it comes with the Windows installer).</span>
+            <span data-show="mac" hidden>Or use Homebrew: <code class="inline">brew install mysql</code> then <code class="inline">brew services start mysql</code>.</span></li>
+          <li><strong>Git</strong> (git-scm.com) and an editor: IntelliJ IDEA Community or VS Code.</li>
+        </ul>
+      </li>
+      <li>
+        <h3>Download the project (Phase 1 branch)</h3>
+        <div data-show="win"><p class="muted">In PowerShell:</p></div>
+        <div data-show="mac" hidden><p class="muted">In Terminal:</p></div>
+        <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
+        <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
+        <div class="code"><pre>git checkout phase-1-foundation</pre><button type="button">Copy</button></div>
+      </li>
+      <li>
+        <h3>Create the database and load the 32 sample clubs</h3>
+        <div data-show="win">
+          <p>Easiest on Windows: open <strong>MySQL Workbench</strong>, connect as root, then for each file choose
+            <em>File &rarr; Open SQL Script</em> and click the lightning bolt:</p>
+          <ol>
+            <li><code class="inline">database\schema.sql</code></li>
+            <li><code class="inline">database\sample-data.sql</code></li>
+          </ol>
+        </div>
+        <div data-show="mac" hidden>
+          <div class="code"><pre>mysql -u root -p &lt; database/schema.sql</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>mysql -u root -p club_central &lt; database/sample-data.sql</pre><button type="button">Copy</button></div>
+        </div>
+      </li>
+      <li>
+        <h3>Create the app's own database user</h3>
+        <p>It can read and write data but can't drop tables. Pick a password and replace
+          <code class="inline">pick-a-local-password</code> below <em>and</em> in step 5. Run this as root
+          (a Workbench query tab, or <code class="inline">mysql -u root -p</code>):</p>
+        <div class="code"><pre>CREATE USER 'club_app'@'localhost' IDENTIFIED BY 'pick-a-local-password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost';</pre><button type="button">Copy</button></div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Every time you run it</h2>
+    <ol class="steps" start="5" style="counter-reset: step 4">
+      <li>
+        <h3>Start the app with your database password</h3>
+        <p class="muted">Run from the <code class="inline">Spartan-Club-Central</code> folder. The password lives only in this
+          window, never in a file on GitHub.</p>
+        <div data-show="win">
+          <div class="code"><pre>$env:DB_PASSWORD="pick-a-local-password"</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>.\mvnw.cmd spring-boot:run</pre><button type="button">Copy</button></div>
+        </div>
+        <div data-show="mac" hidden>
+          <div class="code"><pre>DB_PASSWORD="pick-a-local-password" ./mvnw spring-boot:run</pre><button type="button">Copy</button></div>
+        </div>
+        <p class="muted">IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr;
+          Environment variables</em> &rarr; <code class="inline">DB_PASSWORD=...</code>, then press Run.</p>
+      </li>
+      <li>
+        <h3>Open the site</h3>
+        <p>Wait for <code class="inline">Started SpartanClubApplication</code>, then open
+          <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>.
+          You should see the Phase 1 checkpoint page with <strong>31 active clubs</strong>. Press <strong>Ctrl+C</strong> in the
+          window to stop the app.</p>
+      </li>
+      <li>
+        <h3>Optional: run the tests</h3>
+        <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
+        <div data-show="mac" hidden><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
+        <p class="muted">Expect 30 passing tests (1 MySQL test skipped unless you turn it on; see docs/run-locally.md).</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Before a demo: reset the data</h2>
+    <div data-show="win"><p>In Workbench, run <code class="inline">database\reset-demo.sql</code>, then <code class="inline">database\sample-data.sql</code>.</p></div>
+    <div data-show="mac" hidden>
+      <div class="code"><pre>mysql -u root -p club_central &lt; database/reset-demo.sql</pre><button type="button">Copy</button></div>
+      <div class="code"><pre>mysql -u root -p club_central &lt; database/sample-data.sql</pre><button type="button">Copy</button></div>
+    </div>
+  </section>
+
+  <section class="card trouble">
+    <h2>If something goes wrong</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">You see</th><th scope="col">Fix</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline">Access denied for user 'club_app' (using password: NO)</code></td>
+              <td>DB_PASSWORD isn't set in the window that started the app. Redo step 5 in the same window.</td></tr>
+          <tr><td><code class="inline">Access denied ... (using password: YES)</code></td>
+              <td>Wrong password, or step 4 wasn't run. Redo step 4.</td></tr>
+          <tr><td><code class="inline">Communications link failure</code></td>
+              <td>MySQL isn't running. Windows: start "MySQL80/84" in the Services app. Mac: <code class="inline">brew services start mysql</code>.</td></tr>
+          <tr><td><code class="inline">Unknown database 'club_central'</code></td><td>Step 3 wasn't run.</td></tr>
+          <tr><td><code class="inline">Schema-validation: missing column</code></td>
+              <td>Old database. Run <code class="inline">DROP DATABASE club_central;</code> as root, then redo steps 3 and 4.</td></tr>
+          <tr><td><code class="inline">Port 8080 was already in use</code></td><td>The app is already running in another window. Stop it with Ctrl+C.</td></tr>
+          <tr><td><code class="inline">'java' is not recognized</code></td><td>Install Java 17+ and open a new terminal window.</td></tr>
+          <tr><td><code class="inline">./mvnw: Permission denied</code> (Mac)</td><td><code class="inline">chmod +x mvnw</code></td></tr>
+          <tr><td>Page shows 0 active clubs</td><td>Load <code class="inline">database/sample-data.sql</code> (step 3).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer><div class="container">Spartan Club Central &middot; NSU &middot; Phase 1 local run guide and offline preview</div></footer>
+
+<script>
+const CLUBS = [
+{
+"name": "Chess Club",
+"description": "Casual and competitive chess for every level. We run weekly practice games, puzzle nights, and travel to two regional tournaments each semester.",
+"categoryId": 1,
+"meetingTime": "Tuesdays 6:00 PM, Library Room 210",
+"contactEmail": "chess@example.com",
+"contactInfo": "Stop by any Tuesday, boards provided.",
+"instagramUrl": "https://example.com/instagram/chessclub",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Engineering Builders Society",
+"description": "Hands-on engineering projects for all majors. Teams design, build and program robots for intercollegiate robotics competitions and community STEM days.",
+"categoryId": 1,
+"meetingTime": "Thursdays 5:30 PM, Engineering Lab B",
+"contactEmail": "builders@example.com",
+"contactInfo": "Email us or visit the lab.",
+"instagramUrl": "https://example.com/instagram/builders",
+"websiteUrl": "https://example.com/builders",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Pre-Med Club",
+"description": "Support for students preparing for medical school: MCAT study groups, shadowing tips, and talks from health professionals.",
+"categoryId": 1,
+"meetingTime": "Every other Monday 7:00 PM, Science Hall 101",
+"contactEmail": "premed@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/premed",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Computer Science Club",
+"description": "Coding nights, hackathon teams, interview practice and tech talks. Beginners welcome, no experience needed.",
+"categoryId": 1,
+"meetingTime": "Wednesdays 6:30 PM, Tech Center 305",
+"contactEmail": "csclub@example.com",
+"contactInfo": "Join our Discord from the website.",
+"instagramUrl": "https://example.com/instagram/csclub",
+"websiteUrl": "https://example.com/csclub",
+"otherSocialUrl": "https://example.com/discord/csclub",
+"active": true
+},
+{
+"name": "Debate and Forensics Team",
+"description": "Competitive debate, public speaking and mock trial. Improve your argument skills and compete at regional tournaments.",
+"categoryId": 1,
+"meetingTime": "Mondays and Thursdays 4:00 PM, Humanities 120",
+"contactEmail": "debate@example.com",
+"contactInfo": null,
+"instagramUrl": null,
+"websiteUrl": "https://example.com/debate",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Math Circle",
+"description": "Problem-solving sessions, puzzle competitions and peer tutoring for anyone who enjoys mathematics.",
+"categoryId": 1,
+"meetingTime": "Fridays 3:00 PM, Science Hall 214",
+"contactEmail": "math@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/mathcircle",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Business Leaders Club",
+"description": "Networking events, resume workshops, case competitions and visits from local entrepreneurs.",
+"categoryId": 1,
+"meetingTime": "Tuesdays 7:00 PM, Business Building 150",
+"contactEmail": "business@example.com",
+"contactInfo": "Business casual for networking nights.",
+"instagramUrl": "https://example.com/instagram/business",
+"websiteUrl": "https://example.com/business",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Psychology Club",
+"description": "Discussions on current research, graduate school preparation and volunteer opportunities in mental health awareness.",
+"categoryId": 1,
+"meetingTime": "Wednesdays 5:00 PM, Social Sciences 230",
+"contactEmail": "psych@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/psych",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "African Student Union",
+"description": "Celebrating African cultures through food, music, fashion shows and conversation. Everyone is welcome.",
+"categoryId": 2,
+"meetingTime": "Fridays 6:00 PM, Student Center Ballroom",
+"contactEmail": "asu@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/asu",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Caribbean Students Club",
+"description": "Bringing Caribbean culture to campus with heritage week, carnival celebrations and cooking nights.",
+"categoryId": 2,
+"meetingTime": "Thursdays 7:00 PM, Student Center 204",
+"contactEmail": "caribbean@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/caribbean",
+"websiteUrl": null,
+"otherSocialUrl": "https://example.com/tiktok/caribbean",
+"active": true
+},
+{
+"name": "Latin American Student Association",
+"description": "Cultural events, dance nights and community service highlighting Latin American heritage.",
+"categoryId": 2,
+"meetingTime": "Tuesdays 6:00 PM, Student Center 210",
+"contactEmail": "lasa@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/lasa",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Gospel Choir",
+"description": "Student-led gospel choir performing at campus events and churches across the region. No audition needed for rehearsals.",
+"categoryId": 2,
+"meetingTime": "Mondays and Wednesdays 7:30 PM, Fine Arts Hall",
+"contactEmail": "gospel@example.com",
+"contactInfo": "Rehearsals are open, just show up.",
+"instagramUrl": "https://example.com/instagram/gospel",
+"websiteUrl": "https://example.com/gospel",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Anime and Gaming Club",
+"description": "Anime screenings, tabletop games and casual video game tournaments.",
+"categoryId": 2,
+"meetingTime": "Fridays 7:00 PM, Student Center Game Room",
+"contactEmail": "anime@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/anime",
+"websiteUrl": null,
+"otherSocialUrl": "https://example.com/discord/anime",
+"active": true
+},
+{
+"name": "Poetry and Spoken Word Club",
+"description": "Open mics, writing workshops and slam poetry competitions. Share your voice or just come listen.",
+"categoryId": 2,
+"meetingTime": "Thursdays 8:00 PM, Campus Cafe",
+"contactEmail": "poetry@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/poetry",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "International Students Club",
+"description": "A home away from home for international students: cultural nights, trips and help adjusting to campus life.",
+"categoryId": 2,
+"meetingTime": "Wednesdays 5:00 PM, International Office",
+"contactEmail": "international@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/international",
+"websiteUrl": "https://example.com/international",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Dance Collective",
+"description": "Hip hop, contemporary and step. Weekly practice plus two showcases each semester.",
+"categoryId": 2,
+"meetingTime": "Tuesdays and Thursdays 8:00 PM, Gym Studio",
+"contactEmail": "dance@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/dance",
+"websiteUrl": null,
+"otherSocialUrl": "https://example.com/tiktok/dance",
+"active": true
+},
+{
+"name": "Retro Film Society",
+"description": "Classic movie screenings and discussion. Currently inactive.",
+"categoryId": 2,
+"meetingTime": "Not meeting this semester",
+"contactEmail": "film@example.com",
+"contactInfo": null,
+"instagramUrl": null,
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": false
+},
+{
+"name": "Soccer Club",
+"description": "Co-ed recreational soccer with pickup games and intramural league teams.",
+"categoryId": 3,
+"meetingTime": "Saturdays 10:00 AM, South Field",
+"contactEmail": "soccer@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/soccer",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Basketball Club",
+"description": "Pickup games, skills clinics and intramural teams for all skill levels.",
+"categoryId": 3,
+"meetingTime": "Mondays and Wednesdays 8:00 PM, Main Gym",
+"contactEmail": "basketball@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/basketball",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Running Club",
+"description": "Group runs for every pace, from casual 5K to half marathon training.",
+"categoryId": 3,
+"meetingTime": "Tuesdays and Thursdays 6:30 AM, Track Entrance",
+"contactEmail": "running@example.com",
+"contactInfo": "All paces welcome.",
+"instagramUrl": "https://example.com/instagram/running",
+"websiteUrl": null,
+"otherSocialUrl": "https://example.com/strava/running",
+"active": true
+},
+{
+"name": "Volleyball Club",
+"description": "Indoor and sand volleyball practices plus weekend tournaments.",
+"categoryId": 3,
+"meetingTime": "Sundays 2:00 PM, Rec Center Court 2",
+"contactEmail": "volleyball@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/volleyball",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Martial Arts Club",
+"description": "Self-defense, karate and Brazilian jiu-jitsu taught by certified student instructors.",
+"categoryId": 3,
+"meetingTime": "Mondays and Thursdays 6:00 PM, Rec Center Mat Room",
+"contactEmail": "martialarts@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/martialarts",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Esports Club",
+"description": "Competitive and casual gaming teams competing in collegiate esports leagues.",
+"categoryId": 3,
+"meetingTime": "Wednesdays 8:00 PM, Tech Center Lab 110",
+"contactEmail": "esports@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/esports",
+"websiteUrl": null,
+"otherSocialUrl": "https://example.com/twitch/esports",
+"active": true
+},
+{
+"name": "Swim Club",
+"description": "Lap swimming, stroke clinics and friendly meets. Must be able to swim one pool length.",
+"categoryId": 3,
+"meetingTime": "Tuesdays 7:00 PM, Aquatic Center",
+"contactEmail": "swim@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/swim",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Tennis Club",
+"description": "Rallies, drills and doubles ladders. Rackets available to borrow.",
+"categoryId": 3,
+"meetingTime": "Saturdays 9:00 AM, Campus Courts",
+"contactEmail": "tennis@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/tennis",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Habitat Builders",
+"description": "Volunteer construction days building affordable housing with local partners.",
+"categoryId": 4,
+"meetingTime": "Saturdays 8:00 AM, meet at Student Center",
+"contactEmail": "habitat@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/habitat",
+"websiteUrl": "https://example.com/habitat",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Campus Food Pantry Volunteers",
+"description": "Stock shelves, run food drives and help fellow students access free groceries.",
+"categoryId": 4,
+"meetingTime": "Flexible shifts, Student Center 101",
+"contactEmail": "pantry@example.com",
+"contactInfo": "Sign up for shifts by email.",
+"instagramUrl": "https://example.com/instagram/pantry",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Tutoring Corps",
+"description": "Volunteer tutors helping local middle and high school students with math, reading and science.",
+"categoryId": 4,
+"meetingTime": "Weekdays 3:30 PM, local schools",
+"contactEmail": "tutoring@example.com",
+"contactInfo": null,
+"instagramUrl": null,
+"websiteUrl": "https://example.com/tutoring",
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Green Campus Club",
+"description": "Recycling drives, campus garden work days and sustainability awareness events.",
+"categoryId": 4,
+"meetingTime": "Thursdays 4:30 PM, Campus Garden",
+"contactEmail": "green@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/green",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Blood Drive Committee",
+"description": "Organizes campus blood drives with regional blood banks every semester.",
+"categoryId": 4,
+"meetingTime": "First Monday of each month 6:00 PM, Health Center",
+"contactEmail": "blood@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/blood",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Mentoring Club",
+"description": "Upper-class students mentor first-year and transfer students through their first semester.",
+"categoryId": 4,
+"meetingTime": "Wednesdays 6:00 PM, Student Center 220",
+"contactEmail": "mentoring@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/mentoring",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+},
+{
+"name": "Animal Shelter Volunteers",
+"description": "Weekend volunteering at the local animal shelter: walking dogs, socializing cats and adoption events.",
+"categoryId": 4,
+"meetingTime": "Sundays 11:00 AM, carpool from Lot C",
+"contactEmail": "animals@example.com",
+"contactInfo": null,
+"instagramUrl": "https://example.com/instagram/animals",
+"websiteUrl": null,
+"otherSocialUrl": null,
+"active": true
+}
+];
+const CATEGORIES = [ {id: 1, name: "Academic"}, {id: 2, name: "Cultural"}, {id: 3, name: "Sports"}, {id: 4, name: "Service"} ];
+const catName = id => (CATEGORIES.find(c => c.id === id) || {}).name || "";
+
+// Same rules as ClubRepository.search + ClubService.normalizeKeyword in the Java app.
+function search(rawKeyword, categoryId) {
+  let kw = (rawKeyword || "").trim();
+  kw = kw === "" ? null : kw.slice(0, 100).toLowerCase();
+  return CLUBS
+    .filter(c => c.active)
+    .filter(c => kw === null || c.name.toLowerCase().includes(kw) || c.description.toLowerCase().includes(kw))
+    .filter(c => categoryId == null || c.categoryId === categoryId)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function el(tag, text, attrs) {
+  const e = document.createElement(tag);
+  if (text != null) e.textContent = text;            // textContent: never interprets HTML (like th:text)
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  return e;
+}
+function abbreviate(s, n) { return s.length > n ? s.slice(0, n - 3) + "..." : s; }
+
+function render(results) {
+  const body = document.getElementById("results");
+  body.replaceChildren();
+  for (const c of results) {
+    const tr = document.createElement("tr");
+    tr.append(el("th", c.name, {scope: "row"}), el("td", catName(c.categoryId)),
+              el("td", abbreviate(c.description, 120)), el("td", c.meetingTime || ""));
+    const contact = el("td");
+    contact.append(el("span", c.contactEmail));
+    if (c.contactInfo) { contact.append(el("br"), el("small", c.contactInfo)); }
+    const links = el("td"), ul = el("ul");
+    [["Instagram", c.instagramUrl], ["Website", c.websiteUrl], ["Other", c.otherSocialUrl]].forEach(([label, url]) => {
+      if (url) { const li = el("li"); li.append(el("a", label, {href: url, target: "_blank", rel: "noopener noreferrer"})); ul.append(li); }
+    });
+    links.append(ul);
+    tr.append(contact, links);
+    body.append(tr);
+  }
+  document.getElementById("result-count").textContent = results.length + (results.length === 1 ? " club" : " clubs");
+  document.getElementById("empty").hidden = results.length > 0;
+  document.getElementById("table-wrap").hidden = results.length === 0;
+}
+
+function runSearch() {
+  const q = document.getElementById("q").value;
+  const cat = document.getElementById("category").value;
+  render(search(q, cat === "" ? null : Number(cat)));
+}
+
+// Stats + category options
+const active = CLUBS.filter(c => c.active);
+document.getElementById("total-count").textContent = CLUBS.length;
+document.getElementById("stat-total").textContent = CLUBS.length;
+document.getElementById("stat-active").textContent = active.length;
+document.getElementById("stat-1").textContent = active.filter(c => c.categoryId === 1).length;
+document.getElementById("stat-2").textContent = active.filter(c => c.categoryId === 2).length;
+document.getElementById("stat-34").textContent =
+  active.filter(c => c.categoryId === 3).length + " / " + active.filter(c => c.categoryId === 4).length;
+const sel = document.getElementById("category");
+CATEGORIES.slice().sort((a, b) => a.name.localeCompare(b.name))
+  .forEach(c => sel.append(el("option", c.name, {value: c.id})));
+
+document.getElementById("search-form").addEventListener("submit", e => { e.preventDefault(); runSearch(); });
+document.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
+  document.getElementById("q").value = b.dataset.q || "";
+  document.getElementById("category").value = b.dataset.cat || "";
+  runSearch();
+}));
+runSearch();
+
+// Main tabs (keyboard: left/right arrows)
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+function selectTab(tab) {
+  tabs.forEach(t => {
+    const on = t === tab;
+    t.setAttribute("aria-selected", on); t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+  });
+  try { localStorage.setItem("scc-tab", tab.id); } catch (e) {}
+}
+tabs.forEach((t, i) => {
+  t.addEventListener("click", () => selectTab(t));
+  t.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      selectTab(next); next.focus();
+    }
+  });
+});
+
+// Windows / Mac instructions
+function selectOs(os) {
+  document.querySelectorAll(".os-tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
+  document.querySelectorAll("[data-show]").forEach(n => n.hidden = n.dataset.show !== os);
+  try { localStorage.setItem("scc-os", os); } catch (e) {}
+}
+document.querySelectorAll(".os-tabs button").forEach(b => b.addEventListener("click", () => selectOs(b.dataset.os)));
+
+try {
+  const savedTab = localStorage.getItem("scc-tab"); if (savedTab && document.getElementById(savedTab)) selectTab(document.getElementById(savedTab));
+  const savedOs = localStorage.getItem("scc-os");
+  selectOs(savedOs || (/Mac|iPhone|iPad/.test(navigator.platform) ? "mac" : "win"));
+} catch (e) { selectOs("win"); }
+
+// Copy buttons
+document.querySelectorAll(".code button").forEach(b => b.addEventListener("click", async () => {
+  const text = b.previousElementSibling.textContent;
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select();
+    try { document.execCommand("copy"); } catch (e2) {} t.remove();
+  }
+  b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500);
+}));
+</script>
+</body>
+</html>
