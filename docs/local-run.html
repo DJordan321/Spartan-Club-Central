@@ -1089,10 +1089,10 @@ function loginPage(params) {
     const saved = state.saved; state.saved = null; saveState();
     location.hash = "#" + (saved && (saved === home || saved.startsWith(home + "/")) ? saved : home);
   });
-  const fillAdmin = h("button", { type: "button", class: "button button-outline" }, "Fill in the demo admin");
-  fillAdmin.addEventListener("click", () => { email.value = DEMO_ADMIN.email; password.value = DEMO_ADMIN.password; });
-  const fillLeader = h("button", { type: "button", class: "button button-outline" }, "Fill in the demo leader");
+  const fillLeader = h("button", { type: "button", class: "button button-outline" }, "Log in as Chess Club leader");
   fillLeader.addEventListener("click", () => { email.value = DEMO_LEADER.email; password.value = DEMO_LEADER.password; });
+  const fillAdmin = h("button", { type: "button", class: "button button-outline" }, "Log in as administrator");
+  fillAdmin.addEventListener("click", () => { email.value = DEMO_ADMIN.email; password.value = DEMO_ADMIN.password; });
   return h("div", { class: "container page auth-page" },
     h("div", { class: "card auth-card" },
       h("h1", {}, "Club leader login"),
@@ -1103,7 +1103,11 @@ function loginPage(params) {
       params.has("reset") ? h("p", { class: "notice notice-ok", role: "status" }, "Your password was changed. Log in with your new password.") : null,
       form,
       h("p", { class: "auth-switch" }, h("a", { href: "#/forgot-password" }, "Forgot your password?")),
-      h("p", { class: "auth-switch auth-switch-tight" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))));
+      h("p", { class: "auth-switch auth-switch-tight" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))),
+    h("div", { class: "demo-creds" },
+      h("p", {}, h("strong", {}, "Chess Club leader: "), h("code", {}, DEMO_LEADER.email), " / ", h("code", {}, DEMO_LEADER.password)),
+      h("p", {}, h("strong", {}, "Administrator: "), h("code", {}, DEMO_ADMIN.email), " / ", h("code", {}, DEMO_ADMIN.password)),
+      h("div", { class: "fill-buttons" }, fillLeader, fillAdmin)));
 }
 
 function registerPage(form, errors) {
