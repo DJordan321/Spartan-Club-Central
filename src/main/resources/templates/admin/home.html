@@ -4,14 +4,110 @@
 <body>
 <div th:replace="~{fragments/layout :: header}"></div>
 
-<!-- Administrator area (ROLE_ADMIN only). Phase 6 adds the club and leader tools. -->
+<!--/*
+  Administrator area (ROLE_ADMIN only). Account recovery and deactivations:
+  hide/show any club, block a leader account, email a reset link.
+  Shows request COUNTS only, never students' details (NFR-02).
+*/-->
 <main id="main" class="container page">
   <h1>Administrator</h1>
   <p class="muted">Logged in as <span th:text="${currentUser.displayName}">Administrator</span>.</p>
-  <section class="card dash-card">
-    <h2>Coming next</h2>
-    <p>Lists of all clubs and leader accounts, deactivating a club, and sending a leader a password reset link arrive
-      in a later update.</p>
+
+  <p class="notice notice-ok" role="status" th:if="${param.clubHidden != null}">The club is now hidden from students.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.clubShown != null}">The club is visible to students again.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.resetSent != null}">A password reset link was emailed to the leader.</p>
+  <p class="notice notice-error" role="alert" th:if="${param.resetFailed != null}">The reset email couldn't be sent. Check that the mail server (Mailpit) is running, then try again.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.leaderDisabled != null}">The leader account is blocked. It can't log in or reset its password.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.leaderEnabled != null}">The leader account can log in again.</p>
+
+  <nav class="admin-jump" aria-label="Sections on this page">
+    <a href="#clubs">Clubs (<span th:text="${#lists.size(clubs)}">32</span>)</a>
+    <a href="#leaders">Leader accounts (<span th:text="${#lists.size(leaders)}">2</span>)</a>
+    <a href="#audit">Security log</a>
+  </nav>
+
+  <section class="card dash-card" id="clubs" aria-labelledby="clubs-heading">
+    <h2 id="clubs-heading">Clubs</h2>
+    <div class="table-scroll" tabindex="0" aria-labelledby="clubs-heading">
+      <table class="data-table">
+        <thead><tr><th scope="col">Club</th><th scope="col">Category</th><th scope="col">Leader</th>
+          <th scope="col">Requests</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+        <tbody>
+        <tr th:each="row : ${clubs}">
+          <th scope="row">
+            <a th:if="${row.club.active}" th:href="@{/clubs/{id}(id=${row.club.clubId})}" th:text="${row.club.clubName}">Chess Club</a>
+            <span th:unless="${row.club.active}" th:text="${row.club.clubName}">Retro Film Society</span>
+          </th>
+          <td th:text="${row.club.category.categoryName}">Academic</td>
+          <td th:text="${row.leader != null} ? ${row.leader.name} : 'None yet'">Demo Leader</td>
+          <td th:text="${row.requestCount}">3</td>
+          <td><span class="status" th:classappend="${row.club.active} ? 'status-DELIVERED' : 'status-FAILED'"
+                    th:text="${row.club.active} ? 'Visible' : 'Hidden'">Visible</span></td>
+          <td>
+            <form method="post" th:if="${row.club.active}" th:action="@{/admin/clubs/{id}/deactivate(id=${row.club.clubId})}">
+              <button type="submit" class="button button-outline button-small">Hide<span class="visually-hidden" th:text="' ' + ${row.club.clubName}"></span></button>
+            </form>
+            <form method="post" th:unless="${row.club.active}" th:action="@{/admin/clubs/{id}/activate(id=${row.club.clubId})}">
+              <button type="submit" class="button button-small">Show<span class="visually-hidden" th:text="' ' + ${row.club.clubName}"></span></button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card dash-card" id="leaders" aria-labelledby="leaders-heading">
+    <h2 id="leaders-heading">Leader accounts</h2>
+    <p class="muted">Send a reset link when a leader is locked out; you never see or set their password.
+      Block an account that doesn't belong to a real club leader.</p>
+    <p th:if="${#lists.isEmpty(leaders)}">No leader accounts yet.</p>
+    <div class="table-scroll" tabindex="0" aria-labelledby="leaders-heading" th:unless="${#lists.isEmpty(leaders)}">
+      <table class="data-table">
+        <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Club</th>
+          <th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="row : ${leaders}" th:with="l=${row.leader}">
+          <th scope="row" th:text="${l.name}">Demo Leader</th>
+          <td th:text="${l.email}">demo.leader@clubcentral.local</td>
+          <td th:text="${row.clubName != null} ? ${row.clubName} : 'None yet'">Chess Club</td>
+          <td><span class="status" th:classappend="${l.enabled} ? 'status-DELIVERED' : 'status-FAILED'"
+                    th:text="${l.enabled} ? 'Active' : 'Blocked'">Active</span></td>
+          <td class="action-cell">
+            <form method="post" th:if="${l.enabled}" th:action="@{/admin/leaders/{id}/send-reset(id=${l.leaderId})}">
+              <button type="submit" class="button button-outline button-small">Send reset link<span class="visually-hidden" th:text="' to ' + ${l.name}"></span></button>
+            </form>
+            <form method="post" th:if="${l.enabled}" th:action="@{/admin/leaders/{id}/disable(id=${l.leaderId})}">
+              <button type="submit" class="button button-outline button-small button-danger-outline">Block<span class="visually-hidden" th:text="' ' + ${l.name}"></span></button>
+            </form>
+            <form method="post" th:unless="${l.enabled}" th:action="@{/admin/leaders/{id}/enable(id=${l.leaderId})}">
+              <button type="submit" class="button button-small">Unblock<span class="visually-hidden" th:text="' ' + ${l.name}"></span></button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card dash-card" id="audit" aria-labelledby="audit-heading">
+    <h2 id="audit-heading">Security log</h2>
+    <p class="muted">The 50 most recent events (SPR-08). Account numbers only: no passwords, emails or student details.</p>
+    <div class="table-scroll" tabindex="0" aria-labelledby="audit-heading">
+      <table class="data-table">
+        <thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">Action</th>
+          <th scope="col">On</th><th scope="col">Result</th></tr></thead>
+        <tbody>
+        <tr th:each="a : ${auditLog}">
+          <td th:text="${#temporals.format(a.eventTime, 'MMM d, h:mm:ss a')}">Nov 12, 3:00 PM</td>
+          <td th:text="${a.actorType} + (${a.actorId != null} ? ' #' + ${a.actorId} : '')">LEADER #1</td>
+          <td th:text="${a.action}">LOGIN_SUCCESS</td>
+          <td th:text="${a.targetType != null} ? ${a.targetType} + ' #' + ${a.targetId} : ''">CLUB #1</td>
+          <td th:text="${a.success} ? 'OK' : 'Denied/failed'">OK</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </main>
 

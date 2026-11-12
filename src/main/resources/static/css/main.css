@@ -276,3 +276,18 @@ textarea {
 .request-meta { margin: 6px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
 .request-message { white-space: pre-line; overflow-wrap: anywhere; margin: 0; }
 .small { font-size: .9rem; margin: 10px 0 0; }
+
+/* ---------- Password reset + administrator (Phase 6) ---------- */
+.auth-switch-tight { margin-top: 8px; }
+.admin-jump { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 0 0; font-weight: 600; }
+/* position: relative keeps the hidden screen-reader text inside the scroll box (it would otherwise widen the page) */
+.table-scroll { overflow-x: auto; position: relative; }
+.data-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .95rem; }
+.data-table th, .data-table td { text-align: left; vertical-align: middle; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table thead th { background: var(--green-tint); color: var(--green-dark); }
+.data-table tbody th { font-weight: 600; }
+.data-table form { margin: 0; }
+.action-cell { display: flex; flex-wrap: wrap; gap: 6px; }
+.button-small { padding: 5px 12px; min-height: 36px; font-size: .9rem; }
+.button-danger-outline { color: #A4161A; border-color: #A4161A; }
+.button-danger-outline:hover { background: #FDF0F0; color: #A4161A; }

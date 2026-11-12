@@ -63,4 +63,31 @@ public class NotificationService {
                 + "Reply to this email to answer the student directly.\n\n"
                 + "Spartan Club Central\n";
     }
+
+    /**
+     * Emails a one-time password reset link (FR-11). The link is the only
+     * place the raw token ever exists; the database keeps just its hash.
+     *
+     * @return true if the mail server accepted the email
+     */
+    public boolean sendResetLink(String toEmail, String leaderName, String link) {
+        try {
+            SimpleMailMessage mail = new SimpleMailMessage();
+            mail.setFrom(fromAddress);
+            mail.setTo(toEmail);
+            mail.setSubject("Reset your Spartan Club Central password");
+            mail.setText("Hello " + leaderName + ",\n\n"
+                    + "Someone asked to reset the password for your club leader account.\n"
+                    + "To choose a new password, open this link within 30 minutes:\n\n"
+                    + link + "\n\n"
+                    + "The link works once. If you didn't ask for this, you can ignore this email;\n"
+                    + "your password stays the same.\n\n"
+                    + "Spartan Club Central\n");
+            mailSender.send(mail);
+            return true;
+        } catch (MailException e) {
+            log.warn("Password reset email could not be sent: {}", e.getClass().getSimpleName());
+            return false;
+        }
+    }
 }

@@ -17,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
  * Who may open which page (SPR-01, SPR-07). Replaces the Phase 1 "everything
  * is public" setup.
  *
- *   Students (no account)  every public GET page, the join request form, registration
+ *   Students (no account)  every public GET page, the join request form, registration,
+ *                          forgot/reset password
  *   ROLE_LEADER            /dashboard/**
  *   ROLE_ADMIN             /admin/**
  *   Anything else          blocked: every new POST/PUT/DELETE route must be listed here
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/dashboard", "/dashboard/**").hasRole("LEADER")
                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                 // Public forms (POST) that need no account.
-                .requestMatchers(HttpMethod.POST, "/clubs/*/requests", "/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/clubs/*/requests", "/register", "/forgot-password", "/reset-password").permitAll()
                 // Every other page view is public: homepage, directory, profiles, login, CSS.
                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
                 .anyRequest().denyAll())

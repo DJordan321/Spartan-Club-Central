@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuditLogger {
 
-    // Actions recorded so far. Phase 6 adds password-reset events.
+    // Every action the app records.
     public static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
     public static final String LOGIN_FAILED = "LOGIN_FAILED";
     public static final String LOGOUT = "LOGOUT";
@@ -31,6 +31,11 @@ public class AuditLogger {
     public static final String CLUB_ACTIVATED = "CLUB_ACTIVATED";
     public static final String CLUB_DELETED = "CLUB_DELETED";
     public static final String OWNERSHIP_DENIED = "OWNERSHIP_DENIED";
+    public static final String PASSWORD_RESET_REQUESTED = "PASSWORD_RESET_REQUESTED";
+    public static final String PASSWORD_RESET_COMPLETED = "PASSWORD_RESET_COMPLETED";
+    public static final String RESET_LINK_SENT = "RESET_LINK_SENT";
+    public static final String LEADER_DISABLED = "LEADER_DISABLED";
+    public static final String LEADER_ENABLED = "LEADER_ENABLED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 

@@ -19,6 +19,7 @@
     <p class="notice notice-error" role="alert" th:if="${param.error != null}">Invalid email or password.</p>
     <p class="notice notice-ok" role="status" th:if="${param.registered != null}">Your account was created. Log in to continue.</p>
     <p class="notice notice-ok" role="status" th:if="${param.logout != null}">You've been logged out.</p>
+    <p class="notice notice-ok" role="status" th:if="${param.reset != null}">Your password was changed. Log in with your new password.</p>
 
     <form class="stack-form" method="post" th:action="@{/login}">
       <div class="field">
@@ -31,8 +32,9 @@
       </div>
       <button type="submit" class="button">Log in</button>
     </form>
+    <p class="auth-switch"><a th:href="@{/forgot-password}">Forgot your password?</a></p>
 
-    <p class="auth-switch">Lead a club and don't have an account? <a th:href="@{/register}">Create a leader account</a></p>
+    <p class="auth-switch auth-switch-tight">Lead a club and don't have an account? <a th:href="@{/register}">Create a leader account</a></p>
   </div>
 </main>
 

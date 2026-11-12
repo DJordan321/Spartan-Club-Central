@@ -10,7 +10,7 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 5 status:** the student pages, the join request form, leader accounts and the leader dashboard are live:
+> **Phase 6 status:** every feature is in: student pages, join requests, leader accounts, the leader dashboard, password reset and the administrator tools:
 > - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
 > - `/clubs` directory: keyword + category search (FR-01, FR-02)
 > - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
@@ -20,7 +20,9 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 >
 > - Leader dashboard: create your club, edit it, hide/show it, delete it (after a confirmation page), and read the join requests sent to it, only ever for your own club (FR-08, FR-09, FR-12, NFR-02, SPR-03, SPR-04)
 >
-> Password reset and the administrator tools arrive in Phase 6.
+> - Forgot/reset password by emailed one-time link (FR-11) and the administrator page: all clubs and leaders, hide/show any club, block a leader account, send a reset link, recent security log (FR-12)
+>
+> Phase 7 adds the final security hardening, a performance check and the demo script.
 >
 > ![Club directory](screenshots/phase2-directory.png)
 
@@ -208,7 +210,22 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | **Delete this club permanently...** → **Yes, delete permanently** | The warning lists how many requests will go; afterwards the club is gone and you can create a new one | FR-12, TC-14 |
 | Workbench: `SELECT action, actor_id, target_id FROM audit_log;` | CLUB_EDITED, CLUB_DEACTIVATED, CLUB_ACTIVATED, OWNERSHIP_DENIED, CLUB_CREATED, CLUB_DELETED | SPR-08 |
 
-Automated tests: `./mvnw test` should report 117 passing and 1 skipped.
+**Phase 6: password reset and administrator** (Mailpit running)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| **Leader login → Forgot your password?**, enter the demo leader's email | "If that email belongs to a club leader account, we've sent a link..." | FR-11 |
+| Do the same with `nobody@example.com` | The exact same message, and no email in Mailpit | SPR-06 (no account discovery) |
+| Open the email in Mailpit (http://localhost:8025) and click the link | "Choose a new password" | FR-11, TC-15 |
+| Try `short`, then a proper new password | Error, then "Your password was changed."; the old password no longer works | FR-11, TC-15 |
+| Open the same link again | "This link doesn't work" (links work once, for 30 minutes) | TC-16 |
+| Log in with your `ADMIN_EMAIL` | Clubs (with leader and request counts), Leader accounts, Security log; no student names or emails | FR-04, NFR-02 |
+| **Hide** Chess Club, then open http://localhost:8080/clubs/1 | "Page not found"; **Show** brings it back | FR-12 |
+| **Block** the demo leader, then try to log in as them | "Invalid email or password."; **Unblock** restores access | Conflict C7 |
+| **Send reset link** | "A password reset link was emailed to the leader."; the email is in Mailpit | FR-11 |
+| Scroll to **Security log** | PASSWORD_RESET_REQUESTED/COMPLETED, RESET_LINK_SENT, LEADER_DISABLED, CLUB_DEACTIVATED... | SPR-08, TC-24 |
+
+Automated tests: `./mvnw test` should report 133 passing and 1 skipped.
 
 ## Mailpit (fake email inbox, needed from Phase 3)
 

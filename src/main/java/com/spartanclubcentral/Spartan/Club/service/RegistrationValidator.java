@@ -23,8 +23,8 @@ public class RegistrationValidator {
         String name = RequestValidator.trim(form.getName());
         String email = RequestValidator.trim(form.getEmail());
         String position = RequestValidator.trim(form.getPosition());
-        String password = form.getPassword() == null ? "" : form.getPassword();
-        String confirm = form.getConfirmPassword() == null ? "" : form.getConfirmPassword();
+        String password = form.getPassword();
+        String confirm = form.getConfirmPassword();
 
         if (name.isEmpty()) {
             errors.put("name", "Enter your name.");
@@ -42,15 +42,25 @@ public class RegistrationValidator {
             errors.put("position", "Position must be " + FieldLimits.POSITION + " characters or fewer.");
         }
 
+        errors.putAll(validatePassword(password, confirm));
+        return errors;
+    }
+
+    /**
+     * The password rule, shared by registration and password reset (FR-04, FR-11).
+     * Returns errors for "password" and/or "confirmPassword".
+     */
+    public Map<String, String> validatePassword(String password, String confirm) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        password = password == null ? "" : password;
+        confirm = confirm == null ? "" : confirm;
         if (password.isEmpty()) {
             errors.put("password", "Choose a password.");
         } else if (password.length() < FieldLimits.PASSWORD_MIN) {
             errors.put("password", "Password must be at least " + FieldLimits.PASSWORD_MIN + " characters.");
         } else if (password.getBytes(StandardCharsets.UTF_8).length > FieldLimits.PASSWORD_MAX) {
             errors.put("password", "Password must be " + FieldLimits.PASSWORD_MAX + " characters or fewer.");
-        }
-
-        if (!errors.containsKey("password") && !password.equals(confirm)) {
+        } else if (!password.equals(confirm)) {
             errors.put("confirmPassword", "The two passwords don't match.");
         }
         return errors;
