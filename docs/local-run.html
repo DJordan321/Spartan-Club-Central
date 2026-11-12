@@ -352,6 +352,7 @@ textarea {
 .picture-row { display: flex; align-items: center; gap: 12px; }
 .picture-row p { margin: 0; }
 input[type=file] { padding: 8px; }
+.request-name { margin: 0; font-size: 1.15rem; }
 
 
 /* ===== Extra styles for this offline file only ===== */
@@ -1418,19 +1419,17 @@ function confirmDeletePage(u, club) {
 function leaderInboxPage(u, club) {
   document.title = "Join requests | Spartan Club Central";
   const list = requestsFor(club.id).slice().reverse();
-  const label = s => s === "FAILED" ? "Email not sent" : s === "DELIVERED" ? "Emailed" : "Saved";
   return h("div", { class: "container page" },
     h("p", { class: "back-link" }, h("a", { href: "#/dashboard" }, "← Dashboard")),
     h("h1", {}, "Join requests for ", h("span", {}, club.name)),
-    h("p", { class: "muted" }, "Only you can see these. Reply by email; each request's email address goes straight to the student."),
+    h("p", { class: "muted" }, "Everyone who asked to join, newest first. Only you can see this list. To reply, email the student from your own email; their address is under their name."),
     list.length === 0
       ? h("div", { class: "card empty-state" }, h("h2", {}, "No requests yet"),
-          h("p", {}, "When a student uses the form on your club's page, it shows up here and is emailed to your club's contact address."))
+          h("p", {}, "When a student uses the form on your club's page, their name, email and message show up here."))
       : h("ol", { class: "request-list", reversed: true }, list.map(r => h("li", { class: "card request" },
-          h("div", { class: "request-head" }, h("h2", {}, r.name), h("span", { class: "status status-" + r.status }, label(r.status))),
+          h("h2", { class: "request-name" }, r.name),
           h("p", { class: "request-meta" }, h("a", { href: "mailto:" + r.email }, r.email), " · ", r.date),
-          h("p", { class: "request-message" }, r.message),
-          r.status === "FAILED" ? h("p", { class: "muted small" }, "The email to your club couldn't be sent when this arrived, so this page is the only copy.") : null))));
+          h("p", { class: "request-message" }, r.message)))));
 }
 
 // ---- Phase 6: password reset (same rules as AuthService) ----

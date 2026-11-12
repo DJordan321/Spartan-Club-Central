@@ -214,7 +214,7 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | Do this | You should see | Proves |
 |---|---|---|
 | Log in as `demo.leader@clubcentral.local` / `spartan-demo-2026` | Dashboard with Chess Club, "Visible to students", **Join requests 3** | FR-04 |
-| Click **Join requests** | Three requests (one marked "Email not sent"), only Chess Club's | NFR-02, SPR-04 |
+| Click **Join requests** | A backlog of three requests (name, email, date, message), only Chess Club's | NFR-02, SPR-04 |
 | **Edit club**, website `javascript:alert(1)` | "Enter a full web address starting with https://"; your other changes are kept | SPR-05 |
 | Fix it, change the meeting time, **Save changes** | "Your changes were saved."; the public Chess Club page shows the new time | FR-09, TC-12 |
 | **Hide club from students**, then open http://localhost:8080/clubs/1 | "Page not found"; Chess Club is gone from search. **Show club** brings it back | FR-12, TC-13 |

@@ -201,8 +201,14 @@ class DashboardControllerTest {
     // ---------- NFR-02 / SPR-04 request inbox ----------
 
     @Test
-    @DisplayName("TC-20: a leader's inbox shows only their own club's requests")
+    @DisplayName("TC-20: a leader's request backlog shows only their own club's requests, with no email status")
     void inboxShowsOnlyOwnRequests() throws Exception {
+        JoinRequest failed = request(chess, "Failed Mail", "failed@example.com", "Sent while mail was down");
+        failed.setStatus(com.spartanclubcentral.Spartan.Club.model.RequestStatus.FAILED);
+        requests.saveAndFlush(failed);
+        mvc.perform(get("/dashboard/clubs/" + chess.getClubId() + "/requests").with(user(me(leaderA))))
+                .andExpect(content().string(allOf(containsString("Failed Mail"), not(containsString("Email not sent")),
+                        not(containsString("Emailed")), not(containsString("status-")))));
         mvc.perform(get("/dashboard/clubs/" + chess.getClubId() + "/requests").with(user(me(leaderA))))
                 .andExpect(status().isOk())
                 .andExpect(content().string(allOf(containsString("Chess Student"), containsString("chess.student@example.com"),

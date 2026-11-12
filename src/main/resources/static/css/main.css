@@ -344,3 +344,4 @@ textarea {
 .picture-row { display: flex; align-items: center; gap: 12px; }
 .picture-row p { margin: 0; }
 input[type=file] { padding: 8px; }
+.request-name { margin: 0; font-size: 1.15rem; }
