@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Page not found')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<!-- Generic on purpose: no stack traces, SQL or class names (SPR-06). -->
+<main id="main" class="container page narrow">
+  <h1>Page not found</h1>
+  <p>We couldn't find that page. The club may no longer be listed, or the address may be mistyped.</p>
+  <p><a class="button" th:href="@{/clubs}">Browse all clubs</a></p>
+</main>
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

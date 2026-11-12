@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Shared pieces used by every page (NFR-06, NFR-07):
+    head(title)  page <head> with title, viewport and stylesheet
+    header       skip link + site header and navigation
+    footer       site footer
+  Usage in a page:
+    <head th:replace="~{fragments/layout :: head('Browse clubs')}"></head>
+    <div th:replace="~{fragments/layout :: header}"></div>
+-->
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' | Spartan Club Central'">Spartan Club Central</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<th:block th:fragment="header">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="site-name" th:href="@{/}">Spartan Club Central</a>
+      <nav aria-label="Main">
+        <ul class="nav-links">
+          <li><a th:href="@{/}">Home</a></li>
+          <li><a th:href="@{/clubs}">Browse clubs</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</th:block>
+
+<th:block th:fragment="footer">
+  <footer class="site-footer">
+    <div class="container">
+      <p>Spartan Club Central &middot; Find your people at NSU.</p>
+    </div>
+  </footer>
+</th:block>
+
+</body>
+</html>

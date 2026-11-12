@@ -1,5 +1,7 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
+> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles) that needs no Java or MySQL.
+
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
 | Piece | Tool (all free) | Address |
@@ -8,7 +10,14 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 1 status:** the database, entities and search query are done and tested. The web pages arrive in Phase 2, so http://localhost:8080 shows an error page for now. That is expected.
+> **Phase 2 status:** the student pages are live:
+> - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
+> - `/clubs` directory: keyword + category search (FR-01, FR-02)
+> - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
+>
+> The join request form arrives in Phase 3 and leader login in Phase 4.
+>
+> ![Club directory](screenshots/phase2-directory.png)
 
 ---
 
@@ -77,7 +86,7 @@ $env:DB_PASSWORD="pick-a-local-password"
 ./mvnw spring-boot:run
 ```
 
-On Windows: `mvnw.cmd spring-boot:run`. Wait for `Started SpartanClubApplication`, then open http://localhost:8080. From Phase 3 on, also start Mailpit first (run `mailpit` in another terminal).
+On Windows: `mvnw.cmd spring-boot:run`. Wait for `Started SpartanClubApplication`, then open http://localhost:8080 (the homepage). Stop the app with **Ctrl+C**. From Phase 3 on, also start Mailpit first (run `mailpit` in another terminal).
 
 ## 5. Run the tests
 
@@ -119,6 +128,21 @@ mysql -u root -p club_central < database/sample-data.sql
 | `Port 8080 was already in use` | Another copy of the app is running. Stop it, or run with `--server.port=8081`. |
 | `./mvnw: Permission denied` (Mac/Linux) | `chmod +x mvnw` |
 | Emails don't appear (Phase 3+) | Start Mailpit and open http://localhost:8025. |
+
+## What to check in the browser (Phase 2)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Open http://localhost:8080 | 4 category cards: Academic 8, Cultural 8, Service 7, Sports 8 | NFR-03 |
+| Click **Sports** | 8 Sports clubs, one click from the homepage | FR-02, NFR-03 |
+| Search **robotics** | Only Engineering Builders Society (the word is only in its description) | FR-01, TC-02 |
+| Keyword **club** + category **Academic** | 5 Academic clubs, keyword and category still filled in | TC-05 |
+| Search **zzzzqq** | "No clubs found" message | TC-03 |
+| Open any club | Meeting time, contact email, contact info and social links filled in | FR-05, FR-06, TC-06 |
+| Go to http://localhost:8080/clubs/17 | "Page not found" (club 17 is inactive) | FR-12, SPR-06 |
+| Shrink the window to phone width | Everything fits, no sideways scrolling | NFR-08 |
+
+Automated tests: `./mvnw test` should report 39 passing and 1 skipped.
 
 ## Demo checklist
 

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spartan Club Central: Phase 2 Preview and Local Run</title>
+<style>
+/* ===== The app's real stylesheet (src/main/resources/static/css/main.css) ===== */
+/* =====================================================================
+   Spartan Club Central styles.
+   Mobile-first; no external fonts or CDNs so the demo works offline.
+   Colors meet WCAG 2.1 AA contrast (NFR-06):
+     green #00573F on white      9.6:1
+     body text #1F2933 on #F7F8F6 14:1
+     muted #4A5560 on white       7.6:1
+     black on gold #F2B705       11:1
+   Works from 320px to 1920px wide with no sideways scrolling (NFR-08).
+   ===================================================================== */
+:root {
+  --green: #00573F;
+  --green-dark: #003D2C;
+  --green-tint: #E6F0EC;
+  --gold: #F2B705;
+  --text: #1F2933;
+  --muted: #4A5560;
+  --bg: #F7F8F6;
+  --card: #FFFFFF;
+  --border: #D5DAD7;
+  --input-border: #8A949C;
+  --radius: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main { flex: 1; }
+
+.container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.page { padding-top: 24px; padding-bottom: 48px; }
+.narrow { max-width: 680px; }
+
+a { color: var(--green); }
+a:hover { color: var(--green-dark); }
+
+/* ---------- Accessibility helpers ---------- */
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 10;
+  background: var(--gold); color: #000; padding: 8px 12px; font-weight: 600;
+}
+.skip-link:focus { left: 8px; top: 8px; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Header and footer ---------- */
+.site-header { background: var(--green); color: #fff; border-bottom: 4px solid var(--gold); }
+.header-inner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 4px 16px; padding-top: 12px; padding-bottom: 12px;
+}
+.site-name { color: #fff; font-size: 1.2rem; font-weight: 700; text-decoration: none; }
+.site-name:hover { color: #fff; text-decoration: underline; }
+.nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a {
+  display: inline-block; color: #fff; text-decoration: none; font-weight: 600;
+  padding: 8px 10px; border-radius: 6px;
+}
+.nav-links a:hover { background: var(--green-dark); color: #fff; }
+
+.site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; padding: 16px 0; background: var(--card); }
+.site-footer p { margin: 0; }
+
+/* ---------- Typography ---------- */
+h1 { font-size: 1.7rem; line-height: 1.2; margin: 0 0 12px; color: var(--green-dark); }
+h2 { font-size: 1.2rem; line-height: 1.3; margin: 0 0 10px; color: var(--green-dark); }
+p { margin: 0 0 12px; }
+
+/* ---------- Buttons and form controls ---------- */
+.button {
+  display: inline-block; font: inherit; font-weight: 600; cursor: pointer; text-align: center;
+  background: var(--green); color: #fff; border: 0; border-radius: 8px;
+  padding: 11px 20px; text-decoration: none; min-height: 44px;
+}
+.button:hover { background: var(--green-dark); color: #fff; }
+.button-gold { background: var(--gold); color: #000; }
+.button-gold:hover { background: #FFCB2E; color: #000; }
+
+label { font-weight: 600; }
+input, select {
+  font: inherit; color: var(--text); background: #fff; width: 100%; min-height: 44px;
+  padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 8px;
+}
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+
+/* ---------- Homepage ---------- */
+.hero { background: var(--green-dark); color: #fff; padding: 40px 0 44px; }
+.hero h1 { color: #fff; font-size: 2rem; }
+.hero-lead { font-size: 1.1rem; max-width: 40ch; color: #E3EEE9; }
+.hero-search { display: flex; flex-direction: column; gap: 10px; max-width: 640px; margin-top: 18px; }
+.hero-search input { border-color: transparent; }
+
+#browse-heading { margin-top: 32px; font-size: 1.35rem; }
+.category-grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: 1fr; gap: 12px;
+}
+.category-card {
+  display: flex; flex-direction: column; gap: 2px; height: 100%;
+  background: var(--card); border: 1px solid var(--border); border-left: 6px solid var(--green);
+  border-radius: var(--radius); padding: 18px; text-decoration: none; color: var(--text);
+}
+.category-card:hover { border-color: var(--green); background: var(--green-tint); color: var(--text); }
+.category-name { font-size: 1.2rem; font-weight: 700; color: var(--green-dark); }
+.category-count { color: var(--muted); }
+.all-link { margin: 18px 0 48px; font-weight: 600; }
+
+/* ---------- Directory ---------- */
+.search-form { display: flex; flex-direction: column; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.result-summary { margin: 18px 0 14px; }
+.clear-link { margin-left: 10px; white-space: nowrap; }
+
+.club-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 14px; }
+.club-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;
+}
+.club-card h2 { margin: 0; font-size: 1.15rem; }
+.club-card h2 a { text-decoration: none; }
+.club-card h2 a:hover { text-decoration: underline; }
+.club-card p { margin: 0; }
+.meta { color: var(--muted); font-size: .95rem; }
+.meta-label { font-weight: 600; }
+
+.tag {
+  align-self: flex-start; display: inline-block; background: var(--green-tint); color: var(--green-dark);
+  font-size: .8rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase;
+  padding: 2px 10px; border-radius: 999px; text-decoration: none;
+}
+a.tag:hover { background: #D3E6DD; color: var(--green-dark); }
+
+.empty-state h2 { margin-bottom: 6px; }
+
+/* ---------- Club profile ---------- */
+.back-link { margin-bottom: 16px; font-weight: 600; }
+.back-link a { text-decoration: none; }
+.back-link a:hover { text-decoration: underline; }
+.profile-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.profile-header h1 { margin: 0; }
+.profile-body { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.description { white-space: pre-line; margin: 0; }
+.details dl { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.details dt { font-size: .85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.details dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.social-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.social-links a {
+  display: inline-block; padding: 6px 12px; border: 1px solid var(--green); border-radius: 999px;
+  text-decoration: none; font-weight: 600;
+}
+.social-links a:hover { background: var(--green-tint); }
+.join-card { margin-top: 16px; border-left: 6px solid var(--gold); }
+.join-card p { margin: 0; }
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 600px) {
+  .hero-search { flex-direction: row; }
+  .hero-search input { flex: 1; }
+  .category-grid { grid-template-columns: repeat(2, 1fr); }
+  .club-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 800px) {
+  h1 { font-size: 2.1rem; }
+  .hero { padding: 64px 0 68px; }
+  .hero h1 { font-size: 2.6rem; }
+  .search-form { flex-direction: row; align-items: flex-end; }
+  .search-form .field { flex: 1; }
+  .search-form .field-wide { flex: 2; }
+  .category-grid { grid-template-columns: repeat(4, 1fr); }
+  .profile-body { grid-template-columns: 2fr 1fr; align-items: start; }
+}
+
+@media (min-width: 1000px) {
+  .club-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+/* ===== Extra styles for this offline file only ===== */
+.preview-bar { background: #FFF6D6; border-bottom: 1px solid #E3B800; color: #1F2933; font-size: .9rem; }
+.preview-bar .container { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; padding-top: 8px; padding-bottom: 8px; }
+.preview-bar p { margin: 0; }
+.preview-bar nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.preview-bar a { font-weight: 700; color: #003D2C; padding: 4px 10px; border-radius: 999px; border: 1px solid #003D2C; text-decoration: none; background: #fff; }
+.preview-bar a[aria-current="page"] { background: #003D2C; color: #fff; }
+.test-panel { margin-top: 28px; border-left: 6px solid var(--gold); }
+.test-panel ul { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.test-panel a { display: inline-block; padding: 6px 10px; border: 1px solid var(--green); border-radius: 999px; text-decoration: none; font-size: .9rem; }
+.test-panel a:hover { background: var(--green-tint); }
+.guide li, .guide p { overflow-wrap: anywhere; }
+.guide h3 { font-size: 1rem; margin: 0 0 6px; }
+.guide .card { margin: 16px 0; }
+ol.steps { padding-left: 0; list-style: none; margin: 0; }
+ol.steps > li { position: relative; padding: 0 0 18px 44px; }
+ol.steps > li > .num { position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--green); color: #fff; font-weight: 700; display: grid; place-items: center; }
+.os-tabs { display: flex; gap: 6px; margin: 4px 0 6px; flex-wrap: wrap; }
+.os-tabs button { font: inherit; cursor: pointer; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--green); background: #fff; color: var(--green-dark); min-height: 40px; }
+.os-tabs button[aria-pressed="true"] { background: var(--green); color: #fff; }
+.code { position: relative; margin: 8px 0; }
+.code pre { margin: 0; background: #1E2A26; color: #E8F1EC; padding: 12px 74px 12px 14px; border-radius: 8px;
+  overflow-x: auto; font: .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.code button { position: absolute; top: 8px; right: 8px; font: inherit; font-size: .8rem; cursor: pointer; padding: 3px 10px;
+  border-radius: 6px; border: 1px solid #4A5A54; background: #2A3833; color: #fff; }
+code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4px; font-size: .9em; overflow-wrap: anywhere; }
+.trouble-wrap { overflow-x: auto; }
+.trouble { border-collapse: collapse; width: 100%; min-width: 540px; font-size: .95rem; }
+.trouble th, .trouble td { text-align: left; vertical-align: top; padding: 10px; border-bottom: 1px solid var(--border); }
+.trouble thead th { background: var(--green-tint); color: var(--green-dark); }
+.checklist li { margin-bottom: 6px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="preview-bar" role="region" aria-label="About this file">
+  <div class="container">
+    <p><strong>Offline preview of Phase 2.</strong> Same pages and search rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>.</p>
+    <nav aria-label="Preview sections">
+      <a href="#/" id="nav-preview">Website preview</a>
+      <a href="#/guide" id="nav-guide">Run the real app</a>
+    </nav>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="site-name" href="#/">Spartan Club Central</a>
+    <nav aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="#/">Home</a></li>
+        <li><a href="#/clubs">Browse clubs</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="container"><p>Spartan Club Central &middot; Find your people at NSU.</p></div>
+</footer>
+
+<!-- ===================== Run guide (shown at #/guide) ===================== -->
+<template id="guide-template">
+  <div class="container page guide">
+    <h1>Run the real app on your laptop</h1>
+    <p>About 20 minutes the first time, then one command each time after. You'll end up at
+      <strong>http://localhost:8080</strong> with these same pages reading live data from MySQL.</p>
+    <div class="os-tabs" role="group" aria-label="Choose your computer">
+      <button type="button" data-os="win" aria-pressed="true">Windows</button>
+      <button type="button" data-os="mac" aria-pressed="false">Mac</button>
+    </div>
+
+    <section class="card">
+      <h2>First-time setup</h2>
+      <ol class="steps">
+        <li><span class="num" aria-hidden="true">1</span>
+          <h3>Install the tools</h3>
+          <ul>
+            <li><strong>Java 17 or newer</strong>: Eclipse Temurin from adoptium.net. Check with <code class="inline">java -version</code>.</li>
+            <li><strong>MySQL 8 Community Server</strong> from dev.mysql.com/downloads. Write down the <strong>root password</strong>.
+              <span data-show="win">Also install <strong>MySQL Workbench</strong> (included in the Windows installer).</span>
+              <span data-show="mac">Or with Homebrew: <code class="inline">brew install mysql</code> then <code class="inline">brew services start mysql</code>.</span></li>
+            <li><strong>Git</strong> (git-scm.com) and an editor: IntelliJ IDEA Community or VS Code.</li>
+          </ul>
+        </li>
+        <li><span class="num" aria-hidden="true">2</span>
+          <h3>Download the project (Phase 2 branch)</h3>
+          <p data-show="win">In PowerShell:</p><p data-show="mac">In Terminal:</p>
+          <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-2-public-pages</pre><button type="button">Copy</button></div>
+          <p>Already cloned it for Phase 1? Run these two instead:</p>
+          <div class="code"><pre>git fetch origin</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-2-public-pages</pre><button type="button">Copy</button></div>
+        </li>
+        <li><span class="num" aria-hidden="true">3</span>
+          <h3>Create the database and load the 32 sample clubs</h3>
+          <p>Skip this if you already did it for Phase 1: Phase 2 uses the same database.</p>
+          <div data-show="win">
+            <p>Open <strong>MySQL Workbench</strong>, connect as root, then for each file choose
+              <em>File &rarr; Open SQL Script</em> and click the lightning bolt:
+              <code class="inline">database\schema.sql</code>, then <code class="inline">database\sample-data.sql</code>.</p>
+          </div>
+          <div data-show="mac">
+            <div class="code"><pre>mysql -u root -p &lt; database/schema.sql</pre><button type="button">Copy</button></div>
+            <div class="code"><pre>mysql -u root -p club_central &lt; database/sample-data.sql</pre><button type="button">Copy</button></div>
+          </div>
+        </li>
+        <li><span class="num" aria-hidden="true">4</span>
+          <h3>Create the app's database user (also only once)</h3>
+          <p>Replace <code class="inline">pick-a-local-password</code> here <em>and</em> in step 5. Run as root
+            (a Workbench query tab, or <code class="inline">mysql -u root -p</code>):</p>
+          <div class="code"><pre>CREATE USER 'club_app'@'localhost' IDENTIFIED BY 'pick-a-local-password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost';</pre><button type="button">Copy</button></div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Every time you run it</h2>
+      <ol class="steps">
+        <li><span class="num" aria-hidden="true">5</span>
+          <h3>Start the app with your database password</h3>
+          <p>From the <code class="inline">Spartan-Club-Central</code> folder. The password stays in this window, never in a file on GitHub.</p>
+          <div data-show="win">
+            <div class="code"><pre>$env:DB_PASSWORD="pick-a-local-password"</pre><button type="button">Copy</button></div>
+            <div class="code"><pre>.\mvnw.cmd spring-boot:run</pre><button type="button">Copy</button></div>
+          </div>
+          <div data-show="mac">
+            <div class="code"><pre>DB_PASSWORD="pick-a-local-password" ./mvnw spring-boot:run</pre><button type="button">Copy</button></div>
+          </div>
+          <p>IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr; Environment variables</em>
+            &rarr; <code class="inline">DB_PASSWORD=...</code>, then press Run.</p>
+        </li>
+        <li><span class="num" aria-hidden="true">6</span>
+          <h3>Open the site and test it</h3>
+          <p>Wait for <code class="inline">Started SpartanClubApplication</code>, then open
+            <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>. Press <strong>Ctrl+C</strong> to stop.</p>
+          <ul class="checklist">
+            <li>Homepage shows 4 category cards: Academic 8, Cultural 8, Service 7, Sports 8.</li>
+            <li>Click <strong>Sports</strong>: 8 Sports clubs, in one click (NFR-03).</li>
+            <li>Search <strong>robotics</strong>: only Engineering Builders Society (TC-02).</li>
+            <li>Keyword <strong>club</strong> + category <strong>Academic</strong>: 5 Academic clubs only (TC-05).</li>
+            <li>Open a club: meeting time, contact email, contact info and social links are filled in (TC-06).</li>
+            <li>Go to <code class="inline">localhost:8080/clubs/17</code> (the inactive club): friendly "Page not found".</li>
+          </ul>
+        </li>
+        <li><span class="num" aria-hidden="true">7</span>
+          <h3>Optional: run the automated tests</h3>
+          <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
+          <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
+          <p>Expect <strong>39 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Before a demo: reset the data</h2>
+      <p data-show="win">In Workbench, run <code class="inline">database\reset-demo.sql</code>, then <code class="inline">database\sample-data.sql</code>.</p>
+      <div data-show="mac">
+        <div class="code"><pre>mysql -u root -p club_central &lt; database/reset-demo.sql</pre><button type="button">Copy</button></div>
+        <div class="code"><pre>mysql -u root -p club_central &lt; database/sample-data.sql</pre><button type="button">Copy</button></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>If something goes wrong</h2>
+      <div class="trouble-wrap" tabindex="0" aria-label="Troubleshooting table, scrolls sideways on small screens">
+        <table class="trouble">
+          <thead><tr><th scope="col">You see</th><th scope="col">Fix</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">Access denied for user 'club_app' (using password: NO)</code></td><td>DB_PASSWORD isn't set in the window that started the app. Redo step 5 in the same window.</td></tr>
+            <tr><td><code class="inline">Access denied ... (using password: YES)</code></td><td>Wrong password, or step 4 wasn't run.</td></tr>
+            <tr><td><code class="inline">Communications link failure</code></td><td>MySQL isn't running. Windows: start the MySQL service in the Services app. Mac: <code class="inline">brew services start mysql</code>.</td></tr>
+            <tr><td><code class="inline">Unknown database 'club_central'</code></td><td>Step 3 wasn't run.</td></tr>
+            <tr><td><code class="inline">Schema-validation: missing column</code></td><td>Old database. Run <code class="inline">DROP DATABASE club_central;</code> as root, then redo steps 3 and 4.</td></tr>
+            <tr><td><code class="inline">Port 8080 was already in use</code></td><td>The app is already running in another window. Stop it with Ctrl+C.</td></tr>
+            <tr><td>Homepage says 0 clubs</td><td>Load <code class="inline">database/sample-data.sql</code> (step 3).</td></tr>
+            <tr><td>You still see the Phase 1 checkpoint page</td><td>You're on the old branch. Run <code class="inline">git checkout phase-2-public-pages</code> and restart the app.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+"use strict";
+const CLUBS = [{"name": "Chess Club", "description": "Casual and competitive chess for every level. We run weekly practice games, puzzle nights, and travel to two regional tournaments each semester.", "categoryId": 1, "meetingTime": "Tuesdays 6:00 PM, Library Room 210", "contactEmail": "chess@example.com", "contactInfo": "Stop by any Tuesday, boards provided.", "instagramUrl": "https://example.com/instagram/chessclub", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Engineering Builders Society", "description": "Hands-on engineering projects for all majors. Teams design, build and program robots for intercollegiate robotics competitions and community STEM days.", "categoryId": 1, "meetingTime": "Thursdays 5:30 PM, Engineering Lab B", "contactEmail": "builders@example.com", "contactInfo": "Email us or visit the lab.", "instagramUrl": "https://example.com/instagram/builders", "websiteUrl": "https://example.com/builders", "otherSocialUrl": null, "active": true}, {"name": "Pre-Med Club", "description": "Support for students preparing for medical school: MCAT study groups, shadowing tips, and talks from health professionals.", "categoryId": 1, "meetingTime": "Every other Monday 7:00 PM, Science Hall 101", "contactEmail": "premed@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/premed", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Computer Science Club", "description": "Coding nights, hackathon teams, interview practice and tech talks. Beginners welcome, no experience needed.", "categoryId": 1, "meetingTime": "Wednesdays 6:30 PM, Tech Center 305", "contactEmail": "csclub@example.com", "contactInfo": "Join our Discord from the website.", "instagramUrl": "https://example.com/instagram/csclub", "websiteUrl": "https://example.com/csclub", "otherSocialUrl": "https://example.com/discord/csclub", "active": true}, {"name": "Debate and Forensics Team", "description": "Competitive debate, public speaking and mock trial. Improve your argument skills and compete at regional tournaments.", "categoryId": 1, "meetingTime": "Mondays and Thursdays 4:00 PM, Humanities 120", "contactEmail": "debate@example.com", "contactInfo": null, "instagramUrl": null, "websiteUrl": "https://example.com/debate", "otherSocialUrl": null, "active": true}, {"name": "Math Circle", "description": "Problem-solving sessions, puzzle competitions and peer tutoring for anyone who enjoys mathematics.", "categoryId": 1, "meetingTime": "Fridays 3:00 PM, Science Hall 214", "contactEmail": "math@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/mathcircle", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Business Leaders Club", "description": "Networking events, resume workshops, case competitions and visits from local entrepreneurs.", "categoryId": 1, "meetingTime": "Tuesdays 7:00 PM, Business Building 150", "contactEmail": "business@example.com", "contactInfo": "Business casual for networking nights.", "instagramUrl": "https://example.com/instagram/business", "websiteUrl": "https://example.com/business", "otherSocialUrl": null, "active": true}, {"name": "Psychology Club", "description": "Discussions on current research, graduate school preparation and volunteer opportunities in mental health awareness.", "categoryId": 1, "meetingTime": "Wednesdays 5:00 PM, Social Sciences 230", "contactEmail": "psych@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/psych", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "African Student Union", "description": "Celebrating African cultures through food, music, fashion shows and conversation. Everyone is welcome.", "categoryId": 2, "meetingTime": "Fridays 6:00 PM, Student Center Ballroom", "contactEmail": "asu@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/asu", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Caribbean Students Club", "description": "Bringing Caribbean culture to campus with heritage week, carnival celebrations and cooking nights.", "categoryId": 2, "meetingTime": "Thursdays 7:00 PM, Student Center 204", "contactEmail": "caribbean@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/caribbean", "websiteUrl": null, "otherSocialUrl": "https://example.com/tiktok/caribbean", "active": true}, {"name": "Latin American Student Association", "description": "Cultural events, dance nights and community service highlighting Latin American heritage.", "categoryId": 2, "meetingTime": "Tuesdays 6:00 PM, Student Center 210", "contactEmail": "lasa@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/lasa", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Gospel Choir", "description": "Student-led gospel choir performing at campus events and churches across the region. No audition needed for rehearsals.", "categoryId": 2, "meetingTime": "Mondays and Wednesdays 7:30 PM, Fine Arts Hall", "contactEmail": "gospel@example.com", "contactInfo": "Rehearsals are open, just show up.", "instagramUrl": "https://example.com/instagram/gospel", "websiteUrl": "https://example.com/gospel", "otherSocialUrl": null, "active": true}, {"name": "Anime and Gaming Club", "description": "Anime screenings, tabletop games and casual video game tournaments.", "categoryId": 2, "meetingTime": "Fridays 7:00 PM, Student Center Game Room", "contactEmail": "anime@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/anime", "websiteUrl": null, "otherSocialUrl": "https://example.com/discord/anime", "active": true}, {"name": "Poetry and Spoken Word Club", "description": "Open mics, writing workshops and slam poetry competitions. Share your voice or just come listen.", "categoryId": 2, "meetingTime": "Thursdays 8:00 PM, Campus Cafe", "contactEmail": "poetry@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/poetry", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "International Students Club", "description": "A home away from home for international students: cultural nights, trips and help adjusting to campus life.", "categoryId": 2, "meetingTime": "Wednesdays 5:00 PM, International Office", "contactEmail": "international@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/international", "websiteUrl": "https://example.com/international", "otherSocialUrl": null, "active": true}, {"name": "Dance Collective", "description": "Hip hop, contemporary and step. Weekly practice plus two showcases each semester.", "categoryId": 2, "meetingTime": "Tuesdays and Thursdays 8:00 PM, Gym Studio", "contactEmail": "dance@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/dance", "websiteUrl": null, "otherSocialUrl": "https://example.com/tiktok/dance", "active": true}, {"name": "Retro Film Society", "description": "Classic movie screenings and discussion. Currently inactive.", "categoryId": 2, "meetingTime": "Not meeting this semester", "contactEmail": "film@example.com", "contactInfo": null, "instagramUrl": null, "websiteUrl": null, "otherSocialUrl": null, "active": false}, {"name": "Soccer Club", "description": "Co-ed recreational soccer with pickup games and intramural league teams.", "categoryId": 3, "meetingTime": "Saturdays 10:00 AM, South Field", "contactEmail": "soccer@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/soccer", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Basketball Club", "description": "Pickup games, skills clinics and intramural teams for all skill levels.", "categoryId": 3, "meetingTime": "Mondays and Wednesdays 8:00 PM, Main Gym", "contactEmail": "basketball@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/basketball", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Running Club", "description": "Group runs for every pace, from casual 5K to half marathon training.", "categoryId": 3, "meetingTime": "Tuesdays and Thursdays 6:30 AM, Track Entrance", "contactEmail": "running@example.com", "contactInfo": "All paces welcome.", "instagramUrl": "https://example.com/instagram/running", "websiteUrl": null, "otherSocialUrl": "https://example.com/strava/running", "active": true}, {"name": "Volleyball Club", "description": "Indoor and sand volleyball practices plus weekend tournaments.", "categoryId": 3, "meetingTime": "Sundays 2:00 PM, Rec Center Court 2", "contactEmail": "volleyball@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/volleyball", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Martial Arts Club", "description": "Self-defense, karate and Brazilian jiu-jitsu taught by certified student instructors.", "categoryId": 3, "meetingTime": "Mondays and Thursdays 6:00 PM, Rec Center Mat Room", "contactEmail": "martialarts@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/martialarts", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Esports Club", "description": "Competitive and casual gaming teams competing in collegiate esports leagues.", "categoryId": 3, "meetingTime": "Wednesdays 8:00 PM, Tech Center Lab 110", "contactEmail": "esports@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/esports", "websiteUrl": null, "otherSocialUrl": "https://example.com/twitch/esports", "active": true}, {"name": "Swim Club", "description": "Lap swimming, stroke clinics and friendly meets. Must be able to swim one pool length.", "categoryId": 3, "meetingTime": "Tuesdays 7:00 PM, Aquatic Center", "contactEmail": "swim@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/swim", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Tennis Club", "description": "Rallies, drills and doubles ladders. Rackets available to borrow.", "categoryId": 3, "meetingTime": "Saturdays 9:00 AM, Campus Courts", "contactEmail": "tennis@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/tennis", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Habitat Builders", "description": "Volunteer construction days building affordable housing with local partners.", "categoryId": 4, "meetingTime": "Saturdays 8:00 AM, meet at Student Center", "contactEmail": "habitat@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/habitat", "websiteUrl": "https://example.com/habitat", "otherSocialUrl": null, "active": true}, {"name": "Campus Food Pantry Volunteers", "description": "Stock shelves, run food drives and help fellow students access free groceries.", "categoryId": 4, "meetingTime": "Flexible shifts, Student Center 101", "contactEmail": "pantry@example.com", "contactInfo": "Sign up for shifts by email.", "instagramUrl": "https://example.com/instagram/pantry", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Tutoring Corps", "description": "Volunteer tutors helping local middle and high school students with math, reading and science.", "categoryId": 4, "meetingTime": "Weekdays 3:30 PM, local schools", "contactEmail": "tutoring@example.com", "contactInfo": null, "instagramUrl": null, "websiteUrl": "https://example.com/tutoring", "otherSocialUrl": null, "active": true}, {"name": "Green Campus Club", "description": "Recycling drives, campus garden work days and sustainability awareness events.", "categoryId": 4, "meetingTime": "Thursdays 4:30 PM, Campus Garden", "contactEmail": "green@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/green", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Blood Drive Committee", "description": "Organizes campus blood drives with regional blood banks every semester.", "categoryId": 4, "meetingTime": "First Monday of each month 6:00 PM, Health Center", "contactEmail": "blood@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/blood", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Mentoring Club", "description": "Upper-class students mentor first-year and transfer students through their first semester.", "categoryId": 4, "meetingTime": "Wednesdays 6:00 PM, Student Center 220", "contactEmail": "mentoring@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/mentoring", "websiteUrl": null, "otherSocialUrl": null, "active": true}, {"name": "Animal Shelter Volunteers", "description": "Weekend volunteering at the local animal shelter: walking dogs, socializing cats and adoption events.", "categoryId": 4, "meetingTime": "Sundays 11:00 AM, carpool from Lot C", "contactEmail": "animals@example.com", "contactInfo": null, "instagramUrl": "https://example.com/instagram/animals", "websiteUrl": null, "otherSocialUrl": null, "active": true}].map((c, i) => Object.assign({ id: i + 1 }, c));  // ids match AUTO_INCREMENT order in MySQL
+const CATEGORIES = [ {id: 1, name: "Academic"}, {id: 2, name: "Cultural"}, {id: 3, name: "Sports"}, {id: 4, name: "Service"} ]
+  .sort((a, b) => a.name.localeCompare(b.name));
+const catName = id => (CATEGORIES.find(c => c.id === id) || {}).name || "";
+const TODAY = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+// ---- Same rules as ClubService + ClubRepository.search in the Java app ----
+function normalizeKeyword(raw) { const kw = (raw || "").trim(); return kw === "" ? null : kw.slice(0, 100); }
+function search(rawKeyword, categoryId) {
+  const kw = normalizeKeyword(rawKeyword); const k = kw && kw.toLowerCase();
+  return CLUBS.filter(c => c.active)
+    .filter(c => k === null || c.name.toLowerCase().includes(k) || c.description.toLowerCase().includes(k))
+    .filter(c => categoryId == null || c.categoryId === categoryId)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+function getActiveClub(id) { return CLUBS.find(c => c.id === id && c.active) || null; }
+
+// ---- Tiny DOM helper: text always goes in via textContent (like Thymeleaf th:text) ----
+function h(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) { if (v != null && v !== false) e.setAttribute(k, v === true ? "" : v); }
+  for (const c of children.flat()) { if (c == null || c === false) continue; e.append(c instanceof Node ? c : document.createTextNode(String(c))); }
+  return e;
+}
+const plural = n => n + (n === 1 ? " club" : " clubs");
+const abbreviate = (s, n) => s.length > n ? s.slice(0, n - 3) + "..." : s;
+const clubsUrl = (q, cat) => {
+  const p = new URLSearchParams(); if (q) p.set("q", q); if (cat != null) p.set("category", cat);
+  const s = p.toString(); return "#/clubs" + (s ? "?" + s : "");
+};
+
+// ---- Pages (mirror the Thymeleaf templates) ----
+function homePage() {
+  document.title = "Find a club | Spartan Club Central";
+  const counts = {}; search(null, null).forEach(c => counts[c.categoryId] = (counts[c.categoryId] || 0) + 1);
+  const form = h("form", { class: "hero-search", role: "search" },
+    h("label", { for: "q", class: "visually-hidden" }, "Search clubs"),
+    h("input", { id: "q", name: "q", type: "search", maxlength: "100", placeholder: "Search by name or interest, e.g. robotics" }),
+    h("button", { type: "submit", class: "button button-gold" }, "Search"));
+  form.addEventListener("submit", e => { e.preventDefault(); location.hash = clubsUrl(form.q.value.trim(), null); });
+  return [
+    h("section", { class: "hero" }, h("div", { class: "container" },
+      h("h1", {}, "Find your club at NSU"),
+      h("p", { class: "hero-lead" }, "Search every student club in one place, then reach out to join. No account needed."),
+      form)),
+    h("section", { class: "container", "aria-labelledby": "browse-heading" },
+      h("h2", { id: "browse-heading" }, "Browse by category"),
+      h("ul", { class: "category-grid" }, CATEGORIES.map(cat => h("li", {},
+        h("a", { class: "category-card", href: clubsUrl(null, cat.id) },
+          h("span", { class: "category-name" }, cat.name),
+          h("span", { class: "category-count" }, plural(counts[cat.id] || 0)))))),
+      h("p", { class: "all-link" }, h("a", { href: "#/clubs" }, "See all clubs →")),
+      testPanel())
+  ];
+}
+
+function directoryPage(params) {
+  document.title = "Browse clubs | Spartan Club Central";
+  const q = (params.get("q") || "").trim();
+  const rawCat = params.get("category");
+  if (rawCat !== null && rawCat !== "" && !/^\d+$/.test(rawCat)) return notFoundPage();   // like ?category=abc in the app
+  const cat = rawCat ? Number(rawCat) : null;
+  const clubs = search(q, cat);
+  const catLabel = cat != null ? catName(cat) : "";
+
+  const select = h("select", { id: "category", name: "category" }, h("option", { value: "" }, "All categories"),
+    CATEGORIES.map(c => h("option", { value: c.id, selected: c.id === cat }, c.name)));
+  const input = h("input", { id: "q", name: "q", type: "search", maxlength: "100", placeholder: "Name or interest, e.g. robotics" });
+  input.value = q;
+  const form = h("form", { class: "search-form card", role: "search" },
+    h("div", { class: "field field-wide" }, h("label", { for: "q" }, "Keyword"), input),
+    h("div", { class: "field" }, h("label", { for: "category" }, "Category"), select),
+    h("button", { type: "submit", class: "button" }, "Search"));
+  form.addEventListener("submit", e => { e.preventDefault(); location.hash = clubsUrl(input.value.trim(), select.value === "" ? null : Number(select.value)); });
+
+  const summary = h("p", { class: "result-summary", role: "status" }, h("strong", {}, plural(clubs.length)),
+    q ? [" matching “", q, "”"] : null,
+    catLabel ? [" in ", catLabel] : null,
+    (q || cat != null) ? h("a", { class: "clear-link", href: "#/clubs" }, "Clear search") : null);
+
+  const results = clubs.length === 0
+    ? h("div", { class: "card empty-state" }, h("h2", {}, "No clubs found"),
+        h("p", {}, "Try a different word, choose “All categories”, or ", h("a", { href: "#/clubs" }, "see every club"), "."))
+    : h("ul", { class: "club-grid" }, clubs.map(c => h("li", { class: "club-card" },
+        h("span", { class: "tag" }, catName(c.categoryId)),
+        h("h2", {}, h("a", { href: "#/clubs/" + c.id }, c.name)),
+        h("p", {}, abbreviate(c.description, 150)),
+        c.meetingTime ? h("p", { class: "meta" }, h("span", { class: "meta-label" }, "Meets:"), " ", c.meetingTime) : null)));
+
+  return h("div", { class: "container page" }, h("h1", {}, "Browse clubs"), form, summary, results, testPanel());
+}
+
+function profilePage(id) {
+  const c = getActiveClub(id);
+  if (!c) return notFoundPage();
+  document.title = c.name + " | Spartan Club Central";
+  const ext = (label, url) => url ? h("li", {}, h("a", { href: url, target: "_blank", rel: "noopener noreferrer" },
+    label, h("span", { class: "visually-hidden" }, " (opens in a new tab)"))) : null;
+  const detail = (label, content) => content ? h("div", {}, h("dt", {}, label), h("dd", {}, content)) : null;
+  const hasLinks = c.instagramUrl || c.websiteUrl || c.otherSocialUrl;
+  return h("div", { class: "container page" },
+    h("p", { class: "back-link" }, h("a", { href: "#/clubs" }, "← All clubs")),
+    h("article", { class: "profile" },
+      h("header", { class: "profile-header" },
+        h("a", { class: "tag", href: clubsUrl(null, c.categoryId) }, catName(c.categoryId)),
+        h("h1", {}, c.name)),
+      h("div", { class: "profile-body" },
+        h("section", { class: "card", "aria-labelledby": "about-heading" },
+          h("h2", { id: "about-heading" }, "About"), h("p", { class: "description" }, c.description)),
+        h("aside", { class: "card details", "aria-labelledby": "details-heading" },
+          h("h2", { id: "details-heading" }, "Details"),
+          h("dl", {},
+            detail("Meeting time", c.meetingTime),
+            detail("Contact email", h("a", { href: "mailto:" + c.contactEmail }, c.contactEmail)),
+            detail("More contact info", c.contactInfo),
+            detail("Find us online", hasLinks ? h("ul", { class: "social-links" },
+              ext("Instagram", c.instagramUrl), ext("Website", c.websiteUrl), ext("Other link", c.otherSocialUrl)) : null),
+            detail("Last updated", TODAY)))),
+      h("section", { class: "card join-card", "aria-labelledby": "join-heading" },
+        h("h2", { id: "join-heading" }, "Interested in joining?"),
+        h("p", {}, "A join request form is coming in the next update. For now, email the club at ",
+          h("a", { href: "mailto:" + c.contactEmail }, c.contactEmail), "."))));
+}
+
+function notFoundPage() {
+  document.title = "Page not found | Spartan Club Central";
+  return h("div", { class: "container page narrow" }, h("h1", {}, "Page not found"),
+    h("p", {}, "We couldn't find that page. The club may no longer be listed, or the address may be mistyped."),
+    h("p", {}, h("a", { class: "button", href: "#/clubs" }, "Browse all clubs")));
+}
+
+function guidePage() {
+  document.title = "Run the real app | Spartan Club Central";
+  const node = document.getElementById("guide-template").content.cloneNode(true);
+  node.querySelectorAll(".os-tabs button").forEach(b => b.addEventListener("click", () => selectOs(b.dataset.os)));
+  node.querySelectorAll(".code button").forEach(b => b.addEventListener("click", () => copy(b)));
+  return node;
+}
+
+// Shortcut buttons for the test cases (only in this preview file, not in the real app).
+function testPanel() {
+  const t = (label, href) => h("li", {}, h("a", { href }, label));
+  return h("section", { class: "card test-panel", "aria-labelledby": "tests-heading" },
+    h("h2", { id: "tests-heading" }, "Test cases (preview file only)"),
+    h("ul", {},
+      t("TC-01: “chess”", clubsUrl("chess")),
+      t("TC-02: “robotics” (description only)", clubsUrl("robotics")),
+      t("TC-03: no match", clubsUrl("zzzzqq")),
+      t("TC-04: Sports only", clubsUrl(null, 3)),
+      t("TC-05: “club” + Academic", clubsUrl("club", 1)),
+      t("TC-06: club profile", "#/clubs/2"),
+      t("Inactive club (#17) is hidden", "#/clubs/17"),
+      t("Unknown page", "#/nope")));
+}
+
+// ---- Router ----
+function render() {
+  const hash = location.hash.replace(/^#/, "") || "/";
+  const [path, query] = hash.split("?");
+  const params = new URLSearchParams(query || "");
+  let page, isGuide = false;
+  if (path === "/" ) page = homePage();
+  else if (path === "/clubs") page = directoryPage(params);
+  else if (/^\/clubs\/\d+$/.test(path)) page = profilePage(Number(path.split("/")[2]));
+  else if (path === "/guide") { page = guidePage(); isGuide = true; }
+  else page = notFoundPage();
+  const main = document.getElementById("main");
+  main.replaceChildren(...[].concat(page));
+  const navPreview = document.getElementById("nav-preview"), navGuide = document.getElementById("nav-guide");
+  navPreview.removeAttribute("aria-current"); navGuide.removeAttribute("aria-current");
+  (isGuide ? navGuide : navPreview).setAttribute("aria-current", "page");
+  if (isGuide) selectOs(savedOs());
+  window.scrollTo(0, 0);
+}
+
+function savedOs() {
+  try { const s = localStorage.getItem("scc-os"); if (s) return s; } catch (e) {}
+  return /Mac|iPhone|iPad/.test(navigator.platform) ? "mac" : "win";
+}
+function selectOs(os) {
+  document.querySelectorAll(".os-tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
+  document.querySelectorAll("[data-show]").forEach(n => n.hidden = n.dataset.show !== os);
+  try { localStorage.setItem("scc-os", os); } catch (e) {}
+}
+async function copy(b) {
+  const text = b.previousElementSibling.textContent;
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
+  b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500);
+}
+
+window.addEventListener("hashchange", render);
+render();
+</script>
+</body>
+</html>

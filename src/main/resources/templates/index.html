@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Find a club')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main">
+  <section class="hero">
+    <div class="container">
+      <h1>Find your club at NSU</h1>
+      <p class="hero-lead">Search every student club in one place, then reach out to join. No account needed.</p>
+      <form class="hero-search" method="get" th:action="@{/clubs}" role="search">
+        <label for="q" class="visually-hidden">Search clubs</label>
+        <input id="q" name="q" type="search" maxlength="100"
+               placeholder="Search by name or interest, e.g. robotics">
+        <button type="submit" class="button button-gold">Search</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="container" aria-labelledby="browse-heading">
+    <h2 id="browse-heading">Browse by category</h2>
+    <!-- One click from the homepage to filtered results (NFR-03). -->
+    <ul class="category-grid">
+      <li th:each="cat : ${categories}">
+        <a class="category-card" th:href="@{/clubs(category=${cat.categoryId})}">
+          <span class="category-name" th:text="${cat.categoryName}">Academic</span>
+          <span class="category-count"
+                th:with="n=${counts.get(cat.categoryId) ?: 0}"
+                th:text="${n} + (${n} == 1 ? ' club' : ' clubs')">8 clubs</span>
+        </a>
+      </li>
+    </ul>
+    <p class="all-link"><a th:href="@{/clubs}">See all clubs &rarr;</a></p>
+  </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
