@@ -105,7 +105,7 @@ You can edit and view requests only for your own club.
 | Document | What's in it |
 |---|---|
 | [docs/run-locally.md](docs/run-locally.md) | Install, run, test, reset, troubleshoot, and the demo script |
-| [docs/local-run.html](docs/local-run.html) | Open in any browser: clickable offline preview of the whole site plus the setup guide |
+| [docs/local-run.html](docs/local-run.html) | Open in any browser: the whole site working offline with the sample clubs, ready for a class demo (no Java, MySQL or Mailpit needed) |
 | [docs/architecture.md](docs/architecture.md) | How the code is organized and why |
 | [docs/traceability.md](docs/traceability.md) | Every requirement → code → tests |
 | [docs/requirements.md](docs/requirements.md), [docs/security-privacy-checklist.md](docs/security-privacy-checklist.md) | Requirements and security checklist |

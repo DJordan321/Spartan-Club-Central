@@ -1,6 +1,6 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
-> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form, pretend Mailpit inbox, leader registration and login, and the leader dashboard) that needs no Java, MySQL or Mailpit.
+> No time to set up? Open [`docs/local-run.html`](local-run.html) in any browser. It is the whole site working offline (homepage, directory, every club page with its officers and events, join form, leader login and dashboard, admin page) with the same sample clubs, and needs no Java, MySQL or Mailpit. Log in there with `demo.leader@clubcentral.local` / `spartan-demo-2026` (leader) or `admin@clubcentral.local` / `demo-admin-pass` (admin); these work only in that file.
 
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
