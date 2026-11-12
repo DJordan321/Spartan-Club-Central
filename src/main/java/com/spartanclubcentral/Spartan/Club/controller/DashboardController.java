@@ -5,6 +5,7 @@ import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.security.AccountPrincipal;
 import com.spartanclubcentral.Spartan.Club.service.AuthService;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.EventService;
 import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import com.spartanclubcentral.Spartan.Club.service.RequestService;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
@@ -46,13 +47,15 @@ public class DashboardController {
     private final ClubService clubService;
     private final RequestService requestService;
     private final OfficerService officerService;
+    private final EventService eventService;
 
     public DashboardController(AuthService authService, ClubService clubService, RequestService requestService,
-                               OfficerService officerService) {
+                               OfficerService officerService, EventService eventService) {
         this.authService = authService;
         this.clubService = clubService;
         this.requestService = requestService;
         this.officerService = officerService;
+        this.eventService = eventService;
     }
 
     @GetMapping("/dashboard")
@@ -62,6 +65,7 @@ public class DashboardController {
         model.addAttribute("club", club.orElse(null));
         model.addAttribute("requestCount", club.map(c -> clubService.countRequests(me.getId(), c.getClubId())).orElse(0L));
         model.addAttribute("officers", club.map(c -> officerService.listForLeader(me.getId(), c.getClubId())).orElse(List.of()));
+        model.addAttribute("events", club.map(c -> eventService.upcomingForLeader(me.getId(), c.getClubId())).orElse(List.of()));
         return "dashboard/home";
     }
 

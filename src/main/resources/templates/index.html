@@ -31,7 +31,19 @@
         </a>
       </li>
     </ul>
-    <p class="all-link"><a th:href="@{/clubs}">See all clubs &rarr;</a></p>
+    <p class="all-link all-link-tight"><a th:href="@{/clubs}">See all clubs &rarr;</a></p>
+
+    <!--/* FR-14: the next few events from active clubs in the coming 7 days. */-->
+    <section class="coming-up" aria-labelledby="coming-heading" th:unless="${#lists.isEmpty(comingUp)}">
+      <h2 id="coming-heading">Coming up this week</h2>
+      <ul class="coming-list">
+        <li th:each="e : ${comingUp}" class="coming-item">
+          <p class="coming-when"><th:block th:replace="~{fragments/event :: when(${e})}"></th:block></p>
+          <p class="coming-title" th:text="${e.title}">Robot build night</p>
+          <p class="coming-club"><a th:href="@{/clubs/{id}(id=${e.club.clubId})}" th:text="${e.club.clubName}">Engineering Builders Society</a></p>
+        </li>
+      </ul>
+    </section>
   </section>
 </main>
 

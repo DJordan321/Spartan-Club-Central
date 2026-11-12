@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
+import com.spartanclubcentral.Spartan.Club.repository.EventRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
 import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
@@ -26,7 +27,7 @@ class ClubServiceTest {
     private final RequestRepository requestRepository = mock(RequestRepository.class);
     private final AuditLogger audit = mock(AuditLogger.class);
     private final ClubService service = new ClubService(clubRepository, categoryRepository, leaderRepository,
-            requestRepository, mock(OfficerRepository.class), new ClubValidator(), audit);
+            requestRepository, mock(OfficerRepository.class), mock(EventRepository.class), new ClubValidator(), audit);
 
     @Test
     void blankKeywordMeansNoKeyword() {

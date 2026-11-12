@@ -4,6 +4,7 @@ import com.spartanclubcentral.Spartan.Club.dto.JoinRequestForm;
 import com.spartanclubcentral.Spartan.Club.model.Category;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.EventService;
 import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +30,19 @@ public class ClubController {
 
     private final ClubService clubService;
     private final OfficerService officerService;
+    private final EventService eventService;
 
-    public ClubController(ClubService clubService, OfficerService officerService) {
+    public ClubController(ClubService clubService, OfficerService officerService, EventService eventService) {
         this.clubService = clubService;
         this.officerService = officerService;
+        this.eventService = eventService;
     }
 
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("categories", clubService.listCategories());
         model.addAttribute("counts", clubService.activeClubCountsByCategory());
+        model.addAttribute("comingUp", eventService.comingUpThisWeek(6));          // FR-14
         return "index";
     }
 
@@ -60,6 +64,7 @@ public class ClubController {
     public String profile(@PathVariable("id") Long id, Model model) {
         model.addAttribute("club", clubService.getActiveClub(id));
         model.addAttribute("officers", officerService.listForPublicClub(id));   // FR-13
+        model.addAttribute("events", eventService.upcomingForPublicClub(id));    // FR-14
         model.addAttribute("joinForm", new JoinRequestForm());   // empty join form (FR-03)
         model.addAttribute("errors", Map.of());
         return "club";

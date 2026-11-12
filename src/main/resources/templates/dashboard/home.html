@@ -43,6 +43,18 @@
       </div>
     </section>
 
+    <section class="card dash-card" aria-labelledby="events-dash-heading">
+      <h2 id="events-dash-heading">Events</h2>
+      <p th:if="${#lists.isEmpty(events)}">No upcoming events. Posting events helps students see what joining is like.</p>
+      <p th:unless="${#lists.isEmpty(events)}">Next: <strong th:text="${events[0].title}">Blitz tournament</strong>,
+        <th:block th:replace="~{fragments/event :: when(${events[0]})}"></th:block>
+        <span th:if="${#lists.size(events) > 1}" th:text="'(+' + ${#lists.size(events) - 1} + ' more)'">(+1 more)</span></p>
+      <p class="action-row">
+        <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/events/new(id=${club.clubId})}">Post an event</a>
+        <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/events(id=${club.clubId})}">Manage events</a>
+      </p>
+    </section>
+
     <section class="card dash-card" aria-labelledby="officers-heading">
       <h2 id="officers-heading">Officers</h2>
       <p th:if="${#lists.isEmpty(officers)}">No officers are listed. Students see who runs the club on your club's page.</p>

@@ -37,6 +37,9 @@ public class AuditLogger {
     public static final String LEADER_DISABLED = "LEADER_DISABLED";
     public static final String LEADER_ENABLED = "LEADER_ENABLED";
     public static final String OFFICERS_UPDATED = "OFFICERS_UPDATED";
+    public static final String EVENT_CREATED = "EVENT_CREATED";
+    public static final String EVENT_EDITED = "EVENT_EDITED";
+    public static final String EVENT_DELETED = "EVENT_DELETED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 

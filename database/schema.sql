@@ -76,6 +76,21 @@ CREATE TABLE club_officer (
   INDEX idx_officer_club_order (club_id, display_order)
 );
 
+-- Club events shown on the club page (FR-14). Leaders manage them from the dashboard.
+CREATE TABLE club_event (
+  event_id     BIGINT         AUTO_INCREMENT PRIMARY KEY,
+  club_id      BIGINT         NOT NULL,
+  title        VARCHAR(100)   NOT NULL,
+  description  VARCHAR(1000)  NULL,
+  starts_at    DATETIME       NOT NULL,              -- campus local time (DATETIME: never shifted by time zone)
+  ends_at      DATETIME       NULL,
+  location     VARCHAR(150)   NULL,
+  created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_event_club FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE,
+  INDEX idx_event_club_start (club_id, starts_at),
+  INDEX idx_event_start (starts_at)
+);
+
 -- Join/contact requests from students (FR-03). Named join_request, not
 -- "request", so it is never confused with an HTTP request.
 CREATE TABLE join_request (

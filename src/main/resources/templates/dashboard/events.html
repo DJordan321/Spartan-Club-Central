@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Events')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--/* FR-14: the leader's events. Upcoming ones appear on the club page (next 5); past ones only here. */-->
+<main id="main" class="container page form-page">
+  <p class="back-link"><a th:href="@{/dashboard}">&larr; Dashboard</a></p>
+  <h1>Events for <span th:text="${club.clubName}">Chess Club</span></h1>
+
+  <p class="notice notice-ok" role="status" th:if="${param.created != null}">Event posted. It's on your club's page now.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.saved != null}">Event updated.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.deleted != null}">Event deleted.</p>
+
+  <p><a class="button" th:href="@{/dashboard/clubs/{id}/events/new(id=${club.clubId})}">Post an event</a></p>
+
+  <section class="card dash-card" aria-labelledby="upcoming-heading">
+    <h2 id="upcoming-heading">Upcoming (<span th:text="${#lists.size(upcoming)}">2</span>)</h2>
+    <p class="muted">Students see the next 5 on your club's page.</p>
+    <p th:if="${#lists.isEmpty(upcoming)}">Nothing scheduled.</p>
+    <ul class="event-list" th:unless="${#lists.isEmpty(upcoming)}">
+      <li th:each="e : ${upcoming}" class="event event-manage">
+        <div>
+          <h3 class="event-title" th:text="${e.title}">Blitz tournament</h3>
+          <p class="event-when"><th:block th:replace="~{fragments/event :: when(${e})}"></th:block>
+            <span th:if="${e.location}"> &middot; <span th:text="${e.location}">Library</span></span></p>
+        </div>
+        <div class="action-row officer-actions">
+          <a class="button button-outline button-small" th:href="@{/dashboard/clubs/{id}/events/{eid}/edit(id=${club.clubId},eid=${e.eventId})}">Edit<span class="visually-hidden" th:text="' ' + ${e.title}"></span></a>
+          <a class="button button-outline button-small button-danger-outline" th:href="@{/dashboard/clubs/{id}/events/{eid}/delete(id=${club.clubId},eid=${e.eventId})}">Delete<span class="visually-hidden" th:text="' ' + ${e.title}"></span></a>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="card dash-card" aria-labelledby="past-heading" th:unless="${#lists.isEmpty(past)}">
+    <h2 id="past-heading">Past (<span th:text="${#lists.size(past)}">1</span>)</h2>
+    <p class="muted">Not shown to students.</p>
+    <ul class="event-list">
+      <li th:each="e : ${past}" class="event event-manage">
+        <div>
+          <h3 class="event-title" th:text="${e.title}">Old event</h3>
+          <p class="event-when"><th:block th:replace="~{fragments/event :: when(${e})}"></th:block></p>
+        </div>
+        <div class="action-row officer-actions">
+          <a class="button button-outline button-small button-danger-outline" th:href="@{/dashboard/clubs/{id}/events/{eid}/delete(id=${club.clubId},eid=${e.eventId})}">Delete<span class="visually-hidden" th:text="' ' + ${e.title}"></span></a>
+        </div>
+      </li>
+    </ul>
+  </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

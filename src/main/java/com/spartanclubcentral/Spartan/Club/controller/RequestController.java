@@ -2,6 +2,7 @@ package com.spartanclubcentral.Spartan.Club.controller;
 
 import com.spartanclubcentral.Spartan.Club.dto.JoinRequestForm;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.EventService;
 import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import com.spartanclubcentral.Spartan.Club.service.RequestService;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
@@ -28,11 +29,14 @@ public class RequestController {
     private final RequestService requestService;
     private final ClubService clubService;
     private final OfficerService officerService;
+    private final EventService eventService;
 
-    public RequestController(RequestService requestService, ClubService clubService, OfficerService officerService) {
+    public RequestController(RequestService requestService, ClubService clubService, OfficerService officerService,
+                             EventService eventService) {
         this.requestService = requestService;
         this.clubService = clubService;
         this.officerService = officerService;
+        this.eventService = eventService;
     }
 
     @PostMapping("/clubs/{id}/requests")
@@ -46,6 +50,7 @@ public class RequestController {
             // Show the club page again with the typed values and one message per field.
             model.addAttribute("club", clubService.getActiveClub(id));
             model.addAttribute("officers", officerService.listForPublicClub(id));
+            model.addAttribute("events", eventService.upcomingForPublicClub(id));
             model.addAttribute("errors", e.getFieldErrors());
             return "club";
         }

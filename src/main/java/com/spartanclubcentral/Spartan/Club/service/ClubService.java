@@ -6,6 +6,7 @@ import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
 import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
+import com.spartanclubcentral.Spartan.Club.repository.EventRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
 import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
@@ -41,17 +42,20 @@ public class ClubService {
     private final LeaderRepository leaderRepository;
     private final RequestRepository requestRepository;
     private final OfficerRepository officerRepository;
+    private final EventRepository eventRepository;
     private final ClubValidator validator;
     private final AuditLogger audit;
 
     public ClubService(ClubRepository clubRepository, CategoryRepository categoryRepository,
                        LeaderRepository leaderRepository, RequestRepository requestRepository,
-                       OfficerRepository officerRepository, ClubValidator validator, AuditLogger audit) {
+                       OfficerRepository officerRepository, EventRepository eventRepository,
+                       ClubValidator validator, AuditLogger audit) {
         this.clubRepository = clubRepository;
         this.categoryRepository = categoryRepository;
         this.leaderRepository = leaderRepository;
         this.requestRepository = requestRepository;
         this.officerRepository = officerRepository;
+        this.eventRepository = eventRepository;
         this.validator = validator;
         this.audit = audit;
     }
@@ -186,6 +190,7 @@ public class ClubService {
         leaderRepository.saveAndFlush(leader);
         requestRepository.deleteByClubId(clubId);
         officerRepository.deleteByClubId(clubId);
+        eventRepository.deleteByClubId(clubId);
         clubRepository.delete(club);
         audit.log("LEADER", leaderId, AuditLogger.CLUB_DELETED, "CLUB", clubId, true);
     }

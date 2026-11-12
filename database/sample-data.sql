@@ -76,3 +76,23 @@ SELECT c.club_id, o.name, o.role, o.ord FROM club c JOIN (
   SELECT 'Habitat Builders', 'Marcus Bell', 'Volunteer Coordinator', 2 UNION ALL
   SELECT 'Tutoring Corps', 'Olivia Scott', 'Coordinator', 1
 ) o ON o.club = c.club_name;
+
+-- Events (FR-14): dated relative to the day you load this file, so they're
+-- always upcoming during a demo. Chess Club's events come from demo mode.
+INSERT INTO club_event (club_id, title, description, starts_at, ends_at, location)
+SELECT c.club_id, e.title, e.description,
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL e.days DAY), e.start_time),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL e.days DAY), e.end_time),
+       e.location
+FROM club c JOIN (
+  SELECT 'Engineering Builders Society' AS club, 'Robot build night' AS title, 'Bring a laptop; we provide the parts.' AS description, 2 AS days, '18:00:00' AS start_time, '20:30:00' AS end_time, 'Engineering Lab B' AS location UNION ALL
+  SELECT 'Computer Science Club', 'Intro to Git workshop', 'Hands-on session for beginners.', 3, '18:30:00', '20:00:00', 'Tech Center 305' UNION ALL
+  SELECT 'Computer Science Club', 'Mini hackathon', 'Teams of 2 to 4. Pizza provided.', 10, '10:00:00', '16:00:00', 'Tech Center Lab 110' UNION ALL
+  SELECT 'African Student Union', 'Culture night', 'Food, music and a fashion showcase.', 6, '19:00:00', '22:00:00', 'Student Center Ballroom' UNION ALL
+  SELECT 'Gospel Choir', 'Open rehearsal', 'Come sing with us, no audition.', 1, '19:30:00', '21:00:00', 'Fine Arts Hall' UNION ALL
+  SELECT 'Soccer Club', 'Pickup game', 'All skill levels.', 4, '10:00:00', '12:00:00', 'South Field' UNION ALL
+  SELECT 'Running Club', 'Sunrise 5K', 'Easy group pace.', 5, '06:30:00', '07:30:00', 'Track Entrance' UNION ALL
+  SELECT 'Habitat Builders', 'Build day', 'Closed-toe shoes required.', 8, '08:00:00', '14:00:00', 'Meet at Student Center' UNION ALL
+  SELECT 'Green Campus Club', 'Campus garden workday', 'Gloves provided.', 3, '16:30:00', '18:00:00', 'Campus Garden' UNION ALL
+  SELECT 'Anime and Gaming Club', 'Smash tournament', 'Sign up at the door.', 7, '19:00:00', '23:00:00', 'Student Center Game Room'
+) e ON e.club = c.club_name;

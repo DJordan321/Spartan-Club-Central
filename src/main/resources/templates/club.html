@@ -66,6 +66,20 @@
       </aside>
     </div>
 
+    <!--/* Upcoming events (FR-14): up to 5, past events never shown. */-->
+    <section class="card events-card" aria-labelledby="events-heading">
+      <h2 id="events-heading">Upcoming events</h2>
+      <p class="muted" th:if="${#lists.isEmpty(events)}">No upcoming events right now. Check back soon, or send the club a message below.</p>
+      <ul class="event-list" th:unless="${#lists.isEmpty(events)}">
+        <li th:each="e : ${events}" class="event">
+          <h3 class="event-title" th:text="${e.title}">Blitz tournament</h3>
+          <p class="event-when"><th:block th:replace="~{fragments/event :: when(${e})}"></th:block>
+            <span th:if="${e.location}"> &middot; <span th:text="${e.location}">Library Room 210</span></span></p>
+          <p class="event-description" th:if="${e.description}" th:text="${e.description}">Description</p>
+        </li>
+      </ul>
+    </section>
+
     <!--
       Join/contact request form (FR-03). No login needed.
       th:action makes Thymeleaf add the hidden CSRF token automatically.

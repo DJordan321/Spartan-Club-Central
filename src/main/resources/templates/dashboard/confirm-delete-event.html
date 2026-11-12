@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Delete event')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<main id="main" class="container page narrow">
+  <h1>Delete <span th:text="${event.title}">Blitz tournament</span>?</h1>
+  <div class="card danger-card">
+    <p><th:block th:replace="~{fragments/event :: when(${event})}"></th:block>. It will be removed from
+      <span th:text="${club.clubName}">Chess Club</span>'s page. This can't be undone.</p>
+    <div class="action-row">
+      <form method="post" th:action="@{/dashboard/clubs/{id}/events/{eid}/delete(id=${club.clubId},eid=${event.eventId})}">
+        <button type="submit" class="button button-danger">Yes, delete</button>
+      </form>
+      <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/events(id=${club.clubId})}">Cancel</a>
+    </div>
+  </div>
+</main>
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

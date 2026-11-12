@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${eventId == null} ? 'Post an event' : 'Edit event')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--/* FR-14 create/edit. Native date and time inputs, no JavaScript. Checked by EventValidator (SPR-05). */-->
+<main id="main" class="container page form-page">
+  <p class="back-link"><a th:href="@{/dashboard/clubs/{id}/events(id=${club.clubId})}">&larr; Events</a></p>
+  <h1 th:text="${eventId == null} ? 'Post an event' : 'Edit event'">Post an event</h1>
+  <p class="muted">For <span th:text="${club.clubName}">Chess Club</span>. Upcoming events appear on your club's page.</p>
+
+  <div class="error-summary" role="alert" th:if="${!#maps.isEmpty(errors)}" tabindex="-1" id="error-summary">
+    <h2>Please fix the following:</h2>
+    <ul><li th:each="e : ${errors}"><a th:href="'#' + ${e.key}" th:text="${e.value}">Enter a title.</a></li></ul>
+  </div>
+
+  <form class="card stack-form" method="post" novalidate th:object="${form}"
+        th:action="${eventId == null} ? @{/dashboard/clubs/{id}/events(id=${club.clubId})} : @{/dashboard/clubs/{id}/events/{eid}(id=${club.clubId},eid=${eventId})}">
+    <div class="field" th:classappend="${errors.containsKey('title')} ? 'has-error'">
+      <label for="title">Title</label>
+      <p class="field-error" id="title-error" th:if="${errors.containsKey('title')}" th:text="${errors.get('title')}">Error</p>
+      <input id="title" name="title" type="text" maxlength="100" required th:value="*{title}" placeholder="e.g. Blitz tournament"
+             th:attr="aria-invalid=${errors.containsKey('title')},aria-describedby=${errors.containsKey('title')} ? 'title-error' : null">
+    </div>
+    <div class="field-row">
+      <div class="field" th:classappend="${errors.containsKey('date')} ? 'has-error'">
+        <label for="date">Date</label>
+        <p class="field-error" id="date-error" th:if="${errors.containsKey('date')}" th:text="${errors.get('date')}">Error</p>
+        <input id="date" name="date" type="date" required th:value="*{date}"
+               th:attr="aria-invalid=${errors.containsKey('date')},aria-describedby=${errors.containsKey('date')} ? 'date-error' : null">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('startTime')} ? 'has-error'">
+        <label for="startTime">Starts</label>
+        <p class="field-error" id="startTime-error" th:if="${errors.containsKey('startTime')}" th:text="${errors.get('startTime')}">Error</p>
+        <input id="startTime" name="startTime" type="time" required th:value="*{startTime}"
+               th:attr="aria-invalid=${errors.containsKey('startTime')},aria-describedby=${errors.containsKey('startTime')} ? 'startTime-error' : null">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('endTime')} ? 'has-error'">
+        <label for="endTime">Ends <span class="optional">(optional)</span></label>
+        <p class="field-error" id="endTime-error" th:if="${errors.containsKey('endTime')}" th:text="${errors.get('endTime')}">Error</p>
+        <input id="endTime" name="endTime" type="time" th:value="*{endTime}"
+               th:attr="aria-invalid=${errors.containsKey('endTime')},aria-describedby=${errors.containsKey('endTime')} ? 'endTime-error' : null">
+      </div>
+    </div>
+    <div class="field" th:classappend="${errors.containsKey('location')} ? 'has-error'">
+      <label for="location">Location <span class="optional">(optional)</span></label>
+      <p class="field-error" id="location-error" th:if="${errors.containsKey('location')}" th:text="${errors.get('location')}">Error</p>
+      <input id="location" name="location" type="text" maxlength="150" th:value="*{location}" placeholder="e.g. Library Room 210"
+             th:attr="aria-invalid=${errors.containsKey('location')},aria-describedby=${errors.containsKey('location')} ? 'location-error' : null">
+    </div>
+    <div class="field" th:classappend="${errors.containsKey('description')} ? 'has-error'">
+      <label for="description">Details <span class="optional">(optional)</span></label>
+      <p class="field-hint" id="description-hint">What should students know or bring? Up to 1,000 characters.</p>
+      <p class="field-error" id="description-error" th:if="${errors.containsKey('description')}" th:text="${errors.get('description')}">Error</p>
+      <textarea id="description" name="description" rows="4" maxlength="1000" th:text="*{description}"
+                th:attr="aria-invalid=${errors.containsKey('description')},aria-describedby=${errors.containsKey('description')} ? 'description-hint description-error' : 'description-hint'"></textarea>
+    </div>
+    <div class="action-row">
+      <button type="submit" class="button" th:text="${eventId == null} ? 'Post event' : 'Save changes'">Post event</button>
+      <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/events(id=${club.clubId})}">Cancel</a>
+    </div>
+  </form>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

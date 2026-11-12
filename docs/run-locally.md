@@ -89,7 +89,7 @@ $env:DB_PASSWORD="pick-a-local-password"
 
 ## 3b. Upgrading a database from before Phase 8
 
-If you created `club_central` before Phase 8, add the new tables and columns once (your clubs, accounts and requests are kept). As root:
+If you created `club_central` before Phase 8 (or during it), run the upgrade script. It's safe to run again after each Phase 8 update; anything already there is skipped (your clubs, accounts and requests are kept). As root:
 
 ```bash
 mysql -u root -p club_central < database/migrations/002-leaders-events-pictures.sql
@@ -244,7 +244,17 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | Add it properly, then **Move up** | The public page shows the new officer in the new order | FR-13 |
 | Open http://localhost:8080/dashboard/clubs/18/officers | "That request wasn't allowed" (Soccer Club isn't yours) | SPR-03 |
 
-Automated tests: `./mvnw test` should report 144 passing and 1 skipped.
+**Phase 8B: club events** (demo mode; load `sample-data.sql` the same day, since its events are dated from that day)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Open the homepage | **Coming up this week**: the next events from all clubs | FR-14 |
+| Open Chess Club | **Upcoming events**: Blitz tournament, Beginner lesson night, with dates like "Sun, Nov 15 · 6:00 PM to 8:00 PM" | FR-14 |
+| As the demo leader: **Post an event** that ends before it starts | "The end time must be after the start time." | SPR-05 |
+| Fix it and post | It appears on Chess Club's page in date order | FR-14 |
+| Open http://localhost:8080/dashboard/clubs/18/events | "That request wasn't allowed" | SPR-03 |
+
+Automated tests: `./mvnw test` should report 158 passing and 1 skipped.
 
 ## Performance check (NFR-04)
 

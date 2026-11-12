@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* Shared event date/time line, e.g. "Thu, Nov 20 · 6:00 PM to 8:00 PM" inside a real <time> element (NFR-06). */-->
+<th:block th:fragment="when(e)"><time th:datetime="${e.startsAt}"
+    th:text="${#temporals.format(e.startsAt, 'EEE, MMM d')} + ' · ' + ${#temporals.format(e.startsAt, 'h:mm a')}
+             + (${e.endsAt != null} ? ' to ' + ${#temporals.format(e.endsAt, 'h:mm a')} : '')">Thu, Nov 20 · 6:00 PM</time></th:block>
+</body>
+</html>

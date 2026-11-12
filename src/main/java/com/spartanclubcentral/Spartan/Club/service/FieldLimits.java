@@ -32,6 +32,12 @@ public final class FieldLimits {
     public static final int OFFICER_ROLE = 50;
     /** Most officers one club can list. */
     public static final int MAX_OFFICERS = 10;
+    /** Club events (FR-14). */
+    public static final int EVENT_TITLE = 100;
+    public static final int EVENT_DESCRIPTION = 1000;
+    public static final int EVENT_LOCATION = 150;
+    /** Events can be scheduled at most this many days ahead. */
+    public static final int EVENT_MAX_DAYS_AHEAD = 366;
 
     private FieldLimits() {
     }

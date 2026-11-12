@@ -9,12 +9,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.spartanclubcentral.Spartan.Club.model.Category;
 import com.spartanclubcentral.Spartan.Club.model.Club;
+import com.spartanclubcentral.Spartan.Club.model.ClubEvent;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
 import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.model.JoinRequest;
 import com.spartanclubcentral.Spartan.Club.repository.AuditLogRepository;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
+import com.spartanclubcentral.Spartan.Club.repository.EventRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
 import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
@@ -46,6 +48,7 @@ class PageRenderWithoutTransactionTest {
     @Autowired private RequestRepository requests;
     @Autowired private AuditLogRepository auditLogs;
     @Autowired private OfficerRepository officers;
+    @Autowired private EventRepository events;
     @Autowired private TransactionTemplate tx;
 
     private Club club;
@@ -74,6 +77,11 @@ class PageRenderWithoutTransactionTest {
         r.setMessage("Hello");
         requests.save(r);
         officers.save(new ClubOfficer(club, "Render Officer", "President", 1));
+        ClubEvent e = new ClubEvent();
+        e.setClub(club);
+        e.setTitle("Render Event");
+        e.setStartsAt(java.time.LocalDateTime.now().plusDays(2));
+        events.save(e);
     }
 
     @AfterEach
@@ -81,6 +89,7 @@ class PageRenderWithoutTransactionTest {
         tx.executeWithoutResult(status -> {
             requests.deleteByClubId(club.getClubId());
             officers.deleteByClubId(club.getClubId());
+            events.deleteByClubId(club.getClubId());
             leaders.deleteById(leader.getLeaderId());
             clubs.deleteById(club.getClubId());
             categories.deleteById(category.getCategoryId());
@@ -92,7 +101,10 @@ class PageRenderWithoutTransactionTest {
     void publicClubPageShowsOfficers() throws Exception {
         mvc.perform(get("/clubs/" + club.getClubId()))
                 .andExpect(status().isOk())
-                .andExpect(content().string(allOf(containsString("Render Officer"), containsString("</html>"))));
+                .andExpect(content().string(allOf(containsString("Render Officer"), containsString("Render Event"), containsString("</html>"))));
+        mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(containsString("Coming up this week"), containsString("Render Test Club"), containsString("</html>"))));
     }
 
     @Test
@@ -109,7 +121,8 @@ class PageRenderWithoutTransactionTest {
         AccountPrincipal me = new AccountPrincipal(leader.getLeaderId(), leader.getEmail(), leader.getName(), "x", Role.LEADER, true);
         for (String url : new String[] {"/dashboard", "/dashboard/clubs/" + club.getClubId() + "/edit",
                 "/dashboard/clubs/" + club.getClubId() + "/requests", "/dashboard/clubs/" + club.getClubId() + "/delete",
-                "/dashboard/clubs/" + club.getClubId() + "/officers"}) {
+                "/dashboard/clubs/" + club.getClubId() + "/officers", "/dashboard/clubs/" + club.getClubId() + "/events",
+                "/dashboard/clubs/" + club.getClubId() + "/events/new"}) {
             mvc.perform(get(url).with(user(me)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(allOf(containsString("Render Test Club"), containsString("</html>"))));

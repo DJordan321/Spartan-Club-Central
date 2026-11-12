@@ -1,6 +1,6 @@
 # Requirements Traceability (as built)
 
-Every requirement, the code that meets it, the automated tests that check it, and how to see it by hand. Automated tests live under `src/test/java/com/spartanclubcentral/Spartan/Club/` and run with `./mvnw test` (144 passing, plus 1 opt-in MySQL check). Manual steps refer to the tables in `docs/run-locally.md`.
+Every requirement, the code that meets it, the automated tests that check it, and how to see it by hand. Automated tests live under `src/test/java/com/spartanclubcentral/Spartan/Club/` and run with `./mvnw test` (158 passing, plus 1 opt-in MySQL check). Manual steps refer to the tables in `docs/run-locally.md`.
 
 ## Functional requirements
 
@@ -18,6 +18,7 @@ Every requirement, the code that meets it, the automated tests that check it, an
 | FR-10 | Store all club data | `database/schema.sql`, `model/*`, `ddl-auto=validate` | `MySqlSampleDataTest` (schema matches entities), `ClubRepositoryTest` | Met |
 | FR-11 | Reset a forgotten password | `AuthService.requestReset/resetPassword`, `AuthController`, `AdminService.sendResetLink` | `PasswordResetTest` (TC-15, TC-16), `AdminControllerTest` | Met |
 | FR-13 | Club officers on the club page | `ClubOfficer`, `OfficerService` (ownership + officer-belongs-to-club check), `OfficerController`, `club.html`, `dashboard/officers.html` | `OfficerControllerTest` (incl. ownership via another club's officer id), `OfficerValidatorTest`, `PageRenderWithoutTransactionTest` | Met |
+| FR-14 | Club events on the club page | `ClubEvent`, `EventService` (ownership + event-belongs-to-club check), `EventValidator`, `EventController`, `club.html`, `index.html`, `dashboard/events.html` | `EventControllerTest` (incl. ownership via another club's event id), `EventValidatorTest`, `PageRenderWithoutTransactionTest` | Met |
 | FR-12 | Deactivate or delete a listing | `ClubService.setActive/deleteClub`, `AdminService.setClubActive`, `confirm-delete.html` | `DashboardControllerTest` (TC-13, TC-14), `AdminControllerTest`, `ClubRepositoryTest` | Met |
 
 ## Non-functional requirements

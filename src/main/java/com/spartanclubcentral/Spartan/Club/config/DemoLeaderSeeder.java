@@ -1,11 +1,13 @@
 package com.spartanclubcentral.Spartan.Club.config;
 
 import com.spartanclubcentral.Spartan.Club.model.Club;
+import com.spartanclubcentral.Spartan.Club.model.ClubEvent;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
 import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.model.JoinRequest;
 import com.spartanclubcentral.Spartan.Club.model.RequestStatus;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
+import com.spartanclubcentral.Spartan.Club.repository.EventRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
 import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
@@ -52,18 +54,20 @@ public class DemoLeaderSeeder implements ApplicationRunner {
     private final ClubRepository clubs;
     private final RequestRepository requests;
     private final OfficerRepository officers;
+    private final EventRepository events;
     private final AuthService authService;
     private final PasswordHasher passwordHasher;
     private final AuditLogger audit;
 
     public DemoLeaderSeeder(LeaderRepository leaders, ClubRepository clubs, RequestRepository requests,
-                            OfficerRepository officers,
+                            OfficerRepository officers, EventRepository events,
                             AuthService authService,
                             PasswordHasher passwordHasher, AuditLogger audit) {
         this.leaders = leaders;
         this.clubs = clubs;
         this.requests = requests;
         this.officers = officers;
+        this.events = events;
         this.authService = authService;
         this.passwordHasher = passwordHasher;
         this.audit = audit;
@@ -96,6 +100,7 @@ public class DemoLeaderSeeder implements ApplicationRunner {
             officers.save(new ClubOfficer(c, "Priya Patel", "Treasurer", 2));
             officers.save(new ClubOfficer(c, "Marcus Green", "Tournament Director", 3));
         });
+        club.filter(c -> events.countByClub_ClubId(c.getClubId()) == 0).ifPresent(this::addSampleEvents);
 
         leader = leaders.save(leader);
         audit.log("LEADER", leader.getLeaderId(), AuditLogger.DEMO_SEEDED, "LEADER", leader.getLeaderId(), true);
@@ -122,5 +127,26 @@ public class DemoLeaderSeeder implements ApplicationRunner {
             r.setDateSubmitted(LocalDateTime.now().minusDays((Integer) s[4]).minusHours(3));
             requests.save(r);
         }
+    }
+
+    /** Two upcoming events (FR-14), dated from today so they're never in the past. */
+    private void addSampleEvents(Club club) {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        events.save(event(club, "Blitz tournament", "5-minute games, all levels. Prizes for the top three.",
+                today.plusDays(3).atTime(18, 0), today.plusDays(3).atTime(20, 0), "Library Room 210"));
+        events.save(event(club, "Beginner lesson night", "Learn openings and basic tactics. Boards provided.",
+                today.plusDays(8).atTime(18, 30), today.plusDays(8).atTime(19, 30), "Library Room 210"));
+    }
+
+    private static ClubEvent event(Club club, String title, String description,
+                                   LocalDateTime start, LocalDateTime end, String location) {
+        ClubEvent e = new ClubEvent();
+        e.setClub(club);
+        e.setTitle(title);
+        e.setDescription(description);
+        e.setStartsAt(start);
+        e.setEndsAt(end);
+        e.setLocation(location);
+        return e;
     }
 }

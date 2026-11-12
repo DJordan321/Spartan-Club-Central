@@ -301,3 +301,31 @@ textarea {
 .officer-manage li:last-child { border-bottom: 0; }
 .officer-text { display: flex; flex-direction: column; }
 .officer-actions { margin-top: 0; gap: 6px; }
+
+/* ---------- Events (Phase 8B) ---------- */
+.events-card { margin-top: 16px; }
+.event-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.event { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.event:last-child { border-bottom: 0; }
+.event-title { margin: 0; font-size: 1.05rem; color: var(--green-dark); }
+.event-when { margin: 2px 0 0; color: var(--muted); font-weight: 600; }
+.event-description { margin: 6px 0 0; white-space: pre-line; overflow-wrap: anywhere; }
+.event-manage { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
+.field-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.coming-up { margin: 8px 0 48px; }
+.coming-up h2 { font-size: 1.35rem; }
+.coming-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 12px; }
+.coming-item { background: var(--card); border: 1px solid var(--border); border-top: 4px solid var(--gold);
+  border-radius: var(--radius); padding: 12px 16px; }
+.coming-item p { margin: 0; }
+.coming-when { color: var(--muted); font-size: .9rem; font-weight: 600; }
+.coming-title { font-weight: 700; color: var(--green-dark); margin-top: 2px; }
+.coming-club { font-size: .95rem; margin-top: 4px; }
+@media (min-width: 600px) {
+  .field-row { grid-template-columns: repeat(3, 1fr); }
+  .coming-list { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) {
+  .coming-list { grid-template-columns: repeat(3, 1fr); }
+}
+.all-link-tight { margin-bottom: 28px; }
