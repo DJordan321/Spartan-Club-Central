@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Browse clubs')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main" class="container page">
+  <h1>Browse clubs</h1>
+
+  <form class="search-form card" method="get" th:action="@{/clubs}" role="search">
+    <div class="field field-wide">
+      <label for="q">Keyword</label>
+      <input id="q" name="q" type="search" maxlength="100" th:value="${q}"
+             placeholder="Name or interest, e.g. robotics">
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All categories</option>
+        <option th:each="cat : ${categories}" th:value="${cat.categoryId}"
+                th:text="${cat.categoryName}"
+                th:selected="${cat.categoryId == selectedCategory}">Academic</option>
+      </select>
+    </div>
+    <button type="submit" class="button">Search</button>
+  </form>
+
+  <!-- Result summary, announced to screen readers after each search. -->
+  <p class="result-summary" role="status">
+    <strong th:text="${#lists.size(clubs)} + (${#lists.size(clubs)} == 1 ? ' club' : ' clubs')">8 clubs</strong>
+    <span th:if="${!#strings.isEmpty(q)}"> matching &ldquo;<span th:text="${q}">robotics</span>&rdquo;</span>
+    <span th:if="${selectedCategoryName}"> in <span th:text="${selectedCategoryName}">Sports</span></span>
+    <a th:if="${!#strings.isEmpty(q) or selectedCategory != null}" class="clear-link" th:href="@{/clubs}">Clear search</a>
+  </p>
+
+  <div th:if="${#lists.isEmpty(clubs)}" class="card empty-state">
+    <h2>No clubs found</h2>
+    <p>Try a different word, choose &ldquo;All categories&rdquo;, or <a th:href="@{/clubs}">see every club</a>.</p>
+  </div>
+
+  <ul class="club-grid" th:unless="${#lists.isEmpty(clubs)}">
+    <li th:each="club : ${clubs}" class="club-card">
+      <span class="tag" th:text="${club.category.categoryName}">Academic</span>
+      <h2><a th:href="@{/clubs/{id}(id=${club.clubId})}" th:text="${club.clubName}">Chess Club</a></h2>
+      <p th:text="${#strings.abbreviate(club.description, 150)}">Description</p>
+      <p class="meta" th:if="${club.meetingTime}">
+        <span class="meta-label">Meets:</span> <span th:text="${club.meetingTime}">Tuesdays</span>
+      </p>
+    </li>
+  </ul>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

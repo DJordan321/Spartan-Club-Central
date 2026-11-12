@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${club.clubName})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--
+  Public club profile (FR-05, FR-06). Shows club data only: the model never
+  contains join requests, so student names/emails can't appear here (NFR-02).
+-->
+<main id="main" class="container page">
+  <p class="back-link"><a th:href="@{/clubs}">&larr; All clubs</a></p>
+
+  <article class="profile">
+    <header class="profile-header">
+      <a class="tag" th:href="@{/clubs(category=${club.category.categoryId})}"
+         th:text="${club.category.categoryName}">Academic</a>
+      <h1 th:text="${club.clubName}">Chess Club</h1>
+    </header>
+
+    <div class="profile-body">
+      <section class="card" aria-labelledby="about-heading">
+        <h2 id="about-heading">About</h2>
+        <p class="description" th:text="${club.description}">Description</p>
+      </section>
+
+      <aside class="card details" aria-labelledby="details-heading">
+        <h2 id="details-heading">Details</h2>
+        <dl>
+          <div th:if="${club.meetingTime}">
+            <dt>Meeting time</dt>
+            <dd th:text="${club.meetingTime}">Tuesdays 6 PM</dd>
+          </div>
+          <div>
+            <dt>Contact email</dt>
+            <dd><a th:href="'mailto:' + ${club.contactEmail}" th:text="${club.contactEmail}">chess@example.com</a></dd>
+          </div>
+          <div th:if="${club.contactInfo}">
+            <dt>More contact info</dt>
+            <dd th:text="${club.contactInfo}">Stop by any Tuesday.</dd>
+          </div>
+          <div th:if="${club.instagramUrl != null or club.websiteUrl != null or club.otherSocialUrl != null}">
+            <dt>Find us online</dt>
+            <dd>
+              <ul class="social-links">
+                <li th:if="${club.instagramUrl}"><a th:href="${club.instagramUrl}" target="_blank" rel="noopener noreferrer">Instagram<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+                <li th:if="${club.websiteUrl}"><a th:href="${club.websiteUrl}" target="_blank" rel="noopener noreferrer">Website<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+                <li th:if="${club.otherSocialUrl}"><a th:href="${club.otherSocialUrl}" target="_blank" rel="noopener noreferrer">Other link<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+              </ul>
+            </dd>
+          </div>
+          <div th:if="${club.lastUpdated}">
+            <dt>Last updated</dt>
+            <dd th:text="${#temporals.format(club.lastUpdated, 'MMMM d, yyyy')}">November 10, 2026</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+
+    <!-- Phase 3 replaces this section with the join/contact request form (FR-03). -->
+    <section class="card join-card" aria-labelledby="join-heading">
+      <h2 id="join-heading">Interested in joining?</h2>
+      <p>A join request form is coming in the next update. For now, email the club at
+        <a th:href="'mailto:' + ${club.contactEmail}" th:text="${club.contactEmail}">chess@example.com</a>.</p>
+    </section>
+  </article>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
