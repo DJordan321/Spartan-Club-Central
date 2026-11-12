@@ -3,10 +3,11 @@
 <head th:replace="~{fragments/layout :: head('Request not allowed')}"></head>
 <body>
 <div th:replace="~{fragments/layout :: header}"></div>
-<!-- Shown when a form arrives without a valid security (CSRF) token, e.g. a page left open too long (SPR-06). -->
+<!-- Shown for a missing/expired security (CSRF) token, or for a page you don't have permission for,
+     e.g. another leader's club (SPR-03, SPR-06). Deliberately says nothing about what exists. -->
 <main id="main" class="container page narrow">
   <h1>That request wasn't allowed</h1>
-  <p>Your page may have been open too long. Go back, refresh the page, and try again.</p>
+  <p>You don't have permission to do that, or the page was open too long. Go back, refresh the page, and try again.</p>
   <p><a class="button" th:href="@{/clubs}">Browse clubs</a></p>
 </main>
 <div th:replace="~{fragments/layout :: footer}"></div>

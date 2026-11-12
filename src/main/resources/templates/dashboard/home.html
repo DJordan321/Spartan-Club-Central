@@ -4,19 +4,62 @@
 <body>
 <div th:replace="~{fragments/layout :: header}"></div>
 
-<!-- Leader dashboard (ROLE_LEADER only). Phase 5 adds club management and the request inbox. -->
+<!--/* Leader dashboard (ROLE_LEADER only). Every club button here passes ClubService's ownership check. */-->
 <main id="main" class="container page">
   <h1>Welcome, <span th:text="${leader.name}">Jordan</span></h1>
   <p class="muted">You're logged in as a club leader<span th:if="${leader.position}">
     (<span th:text="${leader.position}">President</span>)</span>.</p>
 
-  <section class="card dash-card" aria-labelledby="club-heading">
+  <p class="notice notice-ok" role="status" th:if="${param.created != null}">Your club was created and is now listed for students.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.saved != null}">Your changes were saved.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.deactivated != null}">Your club is now hidden from students. You can show it again any time.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.activated != null}">Your club is visible to students again.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.deleted != null}">Your club and its join requests were deleted.</p>
+
+  <!--/* No club yet: invite the leader to create one (FR-08). */-->
+  <section class="card dash-card" aria-labelledby="club-heading" th:if="${club == null}">
     <h2 id="club-heading">Your club</h2>
-    <p th:if="${leader.clubId == null}">You haven't created your club's listing yet. Creating and editing your club,
-      and reading the join requests students send you, arrive in the next update.</p>
-    <p th:if="${leader.clubId != null}">Your club listing is set up. Editing it and reading join requests arrive in the
-      next update.</p>
+    <p>You haven't created your club's listing yet. Once you do, students can find it in the directory and send you
+      join requests.</p>
+    <p><a class="button" th:href="@{/dashboard/clubs/new}">Create your club</a></p>
   </section>
+
+  <th:block th:if="${club != null}">
+    <section class="card dash-card club-summary" aria-labelledby="club-heading">
+      <div class="club-summary-head">
+        <h2 id="club-heading" th:text="${club.clubName}">Chess Club</h2>
+        <span class="status" th:classappend="${club.active} ? 'status-DELIVERED' : 'status-FAILED'"
+              th:text="${club.active} ? 'Visible to students' : 'Hidden from students'">Visible to students</span>
+      </div>
+      <p class="muted"><span th:text="${club.category.categoryName}">Academic</span>
+        <span th:if="${club.meetingTime}"> &middot; <span th:text="${club.meetingTime}">Tuesdays</span></span></p>
+      <p th:text="${#strings.abbreviate(club.description, 220)}">Description</p>
+
+      <div class="action-row">
+        <a class="button" th:href="@{/dashboard/clubs/{id}/requests(id=${club.clubId})}">
+          Join requests <span class="count-pill" th:text="${requestCount}">3</span></a>
+        <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/edit(id=${club.clubId})}">Edit club</a>
+        <a class="button button-outline" th:if="${club.active}" th:href="@{/clubs/{id}(id=${club.clubId})}">View public page</a>
+      </div>
+    </section>
+
+    <section class="card dash-card" aria-labelledby="visibility-heading">
+      <h2 id="visibility-heading">Visibility</h2>
+      <th:block th:if="${club.active}">
+        <p>Hiding your club removes it from search and its page, for example during a break. Nothing is deleted.</p>
+        <form method="post" th:action="@{/dashboard/clubs/{id}/deactivate(id=${club.clubId})}">
+          <button type="submit" class="button button-outline">Hide club from students</button>
+        </form>
+      </th:block>
+      <th:block th:unless="${club.active}">
+        <p>Your club is hidden: students can't find it or send requests.</p>
+        <form method="post" th:action="@{/dashboard/clubs/{id}/activate(id=${club.clubId})}">
+          <button type="submit" class="button">Show club to students</button>
+        </form>
+      </th:block>
+      <p class="danger-link"><a th:href="@{/dashboard/clubs/{id}/delete(id=${club.clubId})}">Delete this club permanently&hellip;</a></p>
+    </section>
+  </th:block>
 
   <section class="card dash-card" aria-labelledby="account-heading">
     <h2 id="account-heading">Your account</h2>

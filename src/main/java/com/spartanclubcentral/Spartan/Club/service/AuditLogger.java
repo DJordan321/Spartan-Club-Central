@@ -18,13 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuditLogger {
 
-    // Actions used so far. Phase 5 and 6 add club and password-reset events.
+    // Actions recorded so far. Phase 6 adds password-reset events.
     public static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
     public static final String LOGIN_FAILED = "LOGIN_FAILED";
     public static final String LOGOUT = "LOGOUT";
     public static final String REGISTERED = "REGISTERED";
     public static final String ADMIN_SEEDED = "ADMIN_SEEDED";
     public static final String DEMO_SEEDED = "DEMO_SEEDED";
+    public static final String CLUB_CREATED = "CLUB_CREATED";
+    public static final String CLUB_EDITED = "CLUB_EDITED";
+    public static final String CLUB_DEACTIVATED = "CLUB_DEACTIVATED";
+    public static final String CLUB_ACTIVATED = "CLUB_ACTIVATED";
+    public static final String CLUB_DELETED = "CLUB_DELETED";
+    public static final String OWNERSHIP_DENIED = "OWNERSHIP_DENIED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 

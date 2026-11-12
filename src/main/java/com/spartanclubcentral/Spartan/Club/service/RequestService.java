@@ -7,6 +7,7 @@ import com.spartanclubcentral.Spartan.Club.model.RequestStatus;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +25,8 @@ import org.springframework.stereotype.Service;
  * Trade-off: the student waits for the email (about a second, at most the
  * 3-second timeout), which is simpler than a background queue at this scale.
  *
- * Never reads the logged-in user: students submit without an account.
- * Phase 5 adds getRequestsForClub() with the leader ownership check (SPR-04).
+ * submit() never reads the logged-in user: students submit without an account.
+ * getRequestsForClub() is the leader inbox: ownership is checked first (SPR-04).
  */
 @Service
 public class RequestService {
@@ -69,5 +70,16 @@ public class RequestService {
         boolean sent = notificationService.notifyClub(club, request);
         request.setStatus(sent ? RequestStatus.DELIVERED : RequestStatus.FAILED);
         return requestRepository.save(request);
+    }
+
+    /**
+     * The leader's request inbox (NFR-02, SPR-04): newest first, and ONLY for
+     * a club this leader owns. The ownership check runs before any student
+     * data is read, so changing the club number in the address bar shows
+     * nothing but the 403 page.
+     */
+    public List<JoinRequest> getRequestsForClub(Long leaderId, Long clubId) {
+        clubService.requireOwnedClub(leaderId, clubId);
+        return requestRepository.findByClub_ClubIdOrderByDateSubmittedDesc(clubId);
     }
 }

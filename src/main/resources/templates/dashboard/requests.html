@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Join requests')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--/*
+  Request inbox (NFR-02, SPR-04). Only reachable for the leader's own club:
+  RequestService checks ownership before reading any student data.
+  Messages are shown with th:text, so anything a student typed is plain text.
+*/-->
+<main id="main" class="container page">
+  <p class="back-link"><a th:href="@{/dashboard}">&larr; Dashboard</a></p>
+  <h1>Join requests for <span th:text="${club.clubName}">Chess Club</span></h1>
+  <p class="muted">Only you can see these. Reply by email; each request's email address goes straight to the student.</p>
+
+  <div class="card empty-state" th:if="${#lists.isEmpty(requests)}">
+    <h2>No requests yet</h2>
+    <p>When a student uses the form on your club's page, it shows up here and is emailed to your club's contact address.</p>
+  </div>
+
+  <ol class="request-list" th:unless="${#lists.isEmpty(requests)}" reversed>
+    <li class="card request" th:each="r : ${requests}">
+      <div class="request-head">
+        <h2 th:text="${r.studentName}">Jordan Lee</h2>
+        <span class="status" th:classappend="'status-' + ${r.status}"
+              th:text="${r.status.name() == 'FAILED'} ? 'Email not sent' : (${r.status.name() == 'DELIVERED'} ? 'Emailed' : 'Saved')">Emailed</span>
+      </div>
+      <p class="request-meta">
+        <a th:href="'mailto:' + ${r.studentEmail}" th:text="${r.studentEmail}">jordan@example.com</a>
+        &middot; <time th:datetime="${r.dateSubmitted}" th:text="${#temporals.format(r.dateSubmitted, 'MMM d, yyyy h:mm a')}">Nov 12, 2026</time>
+      </p>
+      <p class="request-message" th:text="${r.message}">Message</p>
+      <p class="muted small" th:if="${r.status.name() == 'FAILED'}">The email to your club couldn't be sent when this arrived, so this page is the only copy.</p>
+    </li>
+  </ol>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

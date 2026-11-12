@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
+import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +21,11 @@ class ClubServiceTest {
 
     private final ClubRepository clubRepository = mock(ClubRepository.class);
     private final CategoryRepository categoryRepository = mock(CategoryRepository.class);
-    private final ClubService service = new ClubService(clubRepository, categoryRepository);
+    private final LeaderRepository leaderRepository = mock(LeaderRepository.class);
+    private final RequestRepository requestRepository = mock(RequestRepository.class);
+    private final AuditLogger audit = mock(AuditLogger.class);
+    private final ClubService service = new ClubService(clubRepository, categoryRepository, leaderRepository,
+            requestRepository, new ClubValidator(), audit);
 
     @Test
     void blankKeywordMeansNoKeyword() {
@@ -56,5 +62,21 @@ class ClubServiceTest {
         when(clubRepository.findByClubIdAndActiveTrue(8L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.getActiveClub(8L)).isInstanceOf(NotFoundException.class);
         assertThatThrownBy(() -> service.getActiveClub(null)).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void ownershipCheckPassesOnlyForTheOwningLeader() {
+        Club club = new Club();
+        com.spartanclubcentral.Spartan.Club.model.ClubLeader owner = new com.spartanclubcentral.Spartan.Club.model.ClubLeader();
+        org.springframework.test.util.ReflectionTestUtils.setField(club, "clubId", 5L);
+        owner.setClub(club);
+        when(clubRepository.findById(5L)).thenReturn(Optional.of(club));
+        when(leaderRepository.findById(1L)).thenReturn(Optional.of(owner));
+        when(leaderRepository.findById(2L)).thenReturn(Optional.of(new com.spartanclubcentral.Spartan.Club.model.ClubLeader()));
+
+        assertThat(service.requireOwnedClub(1L, 5L)).isSameAs(club);
+        assertThatThrownBy(() -> service.requireOwnedClub(2L, 5L))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+        verify(audit).log("LEADER", 2L, AuditLogger.OWNERSHIP_DENIED, "CLUB", 5L, false);
     }
 }

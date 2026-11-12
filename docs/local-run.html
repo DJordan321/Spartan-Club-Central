@@ -256,6 +256,35 @@ textarea {
 .account-list dt { font-size: .85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
 .account-list dd { margin: 2px 0 0; overflow-wrap: anywhere; }
 
+/* ---------- Leader dashboard (Phase 5) ---------- */
+.button-outline { background: #fff; color: var(--green-dark); border: 1px solid var(--green); }
+.button-outline:hover { background: var(--green-tint); color: var(--green-dark); }
+.button-danger { background: #A4161A; color: #fff; }
+.button-danger:hover { background: #7D1013; color: #fff; }
+.action-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+.action-row form { margin: 0; }
+.club-summary-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 6px; }
+.club-summary-head h2 { margin: 0; font-size: 1.35rem; }
+.status { display: inline-block; font-size: .8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.status-DELIVERED { background: var(--green-tint); color: var(--green-dark); }
+.status-FAILED { background: #FDF0F0; color: #A4161A; }
+.status-SUBMITTED { background: #FFF6D6; color: #5C4A00; }
+.count-pill { display: inline-block; min-width: 1.6em; margin-left: 6px; padding: 0 7px; border-radius: 999px;
+  background: #fff; color: var(--green-dark); font-size: .85rem; text-align: center; }
+.danger-link { margin: 16px 0 0; }
+.danger-link a { color: #A4161A; font-weight: 600; }
+.danger-card { border-left: 6px solid #A4161A; }
+.form-page { max-width: 760px; }
+.club-form fieldset { border: 0; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.club-form legend { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; padding: 0; }
+.club-form .action-row .button { align-self: auto; }
+.request-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.request-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.request-head h2 { margin: 0; font-size: 1.15rem; }
+.request-meta { margin: 6px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
+.request-message { white-space: pre-line; overflow-wrap: anywhere; margin: 0; }
+.small { font-size: .9rem; margin: 10px 0 0; }
+
 
 /* ===== Extra styles for this offline file only ===== */
 .preview-bar { background: #FFF6D6; border-bottom: 1px solid #E3B800; color: #1F2933; font-size: .9rem; }
@@ -323,7 +352,7 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="preview-bar" role="region" aria-label="About this file">
   <div class="container">
-    <p><strong>Offline preview through Phase 4.</strong> Same pages and rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>. Don't type real passwords here.</p>
+    <p><strong>Offline preview through Phase 5.</strong> Same pages and rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>. Don't type real passwords here.</p>
     <nav aria-label="Preview sections">
       <a href="#/" id="nav-preview">Website preview</a>
       <a href="#/mailpit" id="nav-mail">Inbox &amp; database <span id="mail-count"></span></a>
@@ -380,10 +409,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
           <p data-show="win">In PowerShell:</p><p data-show="mac">In Terminal:</p>
           <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
           <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-4-authentication</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-5-leader-dashboard</pre><button type="button">Copy</button></div>
           <p>Already cloned it for Phase 1? Run these two instead:</p>
           <div class="code"><pre>git fetch origin</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-4-authentication</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-5-leader-dashboard</pre><button type="button">Copy</button></div>
         </li>
         <li><span class="num" aria-hidden="true">3</span>
           <h3>Create the database and load the 32 sample clubs</h3>
@@ -462,6 +491,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <li>Log in with a wrong password: "Invalid email or password." Log in correctly: your dashboard, and the header shows <strong>Dashboard</strong> and <strong>Log out</strong>.</li>
             <li>While logged in as a leader, open <code class="inline">localhost:8080/admin</code>: "That request wasn't allowed".</li>
             <li>In Workbench: <code class="inline">SELECT email, password_hash FROM club_leader;</code> shows only <code class="inline">$2a$12$...</code> hashes (TC-18), and <code class="inline">SELECT * FROM audit_log;</code> shows REGISTERED, LOGIN_SUCCESS, LOGIN_FAILED with no emails (TC-24).</li>
+            <li><strong>Phase 5</strong> (start in demo mode): log in as <code class="inline">demo.leader@clubcentral.local</code> / <code class="inline">spartan-demo-2026</code>. The dashboard shows Chess Club with <strong>3</strong> join requests; open them (only Chess Club's appear).</li>
+            <li><strong>Edit club</strong>: enter <code class="inline">javascript:alert(1)</code> as the website: "Enter a full web address starting with https://". Fix it and change the meeting time; the public Chess Club page shows the new time (TC-12).</li>
+            <li><strong>Hide club from students</strong>: <code class="inline">localhost:8080/clubs/1</code> now says "Page not found"; <strong>Show club</strong> brings it back (TC-13).</li>
+            <li>Register a second leader. While logged in as them, open <code class="inline">localhost:8080/dashboard/clubs/1/requests</code>: "That request wasn't allowed" (TC-19, TC-20). Then create a club for them, and delete it from its confirmation page (TC-11, TC-14).</li>
             <li>Log out, then log in with your ADMIN_EMAIL: you land on the Administrator page.</li>
           </ul>
         </li>
@@ -469,7 +502,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
           <h3>Optional: run the automated tests</h3>
           <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
           <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
-          <p>Expect <strong>92 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+          <p>Expect <strong>117 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
         </li>
       </ol>
     </section>
@@ -500,7 +533,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <tr><td>"That request wasn't allowed" after sending the form</td><td>The page was open too long or from an old tab. Refresh the club page and send again.</td></tr>
             <tr><td>Admin login says "Invalid email or password"</td><td>ADMIN_EMAIL / ADMIN_PASSWORD weren't set the first time the app started, or the password was under 8 characters (check the app's window for a message). The admin is only created when none exists yet.</td></tr>
             <tr><td>"That request wasn't allowed" on the dashboard</td><td>You're logged in as the administrator. Log out and log in as a leader.</td></tr>
-            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-4-authentication</code> and restart the app.</td></tr>
+            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-5-leader-dashboard</code> and restart the app.</td></tr>
           </tbody>
         </table>
       </div>
@@ -520,17 +553,19 @@ const TODAY = new Date().toLocaleDateString("en-US", { month: "long", day: "nume
 function normalizeKeyword(raw) { const kw = (raw || "").trim(); return kw === "" ? null : kw.slice(0, 100); }
 function search(rawKeyword, categoryId) {
   const kw = normalizeKeyword(rawKeyword); const k = kw && kw.toLowerCase();
-  return CLUBS.filter(c => c.active)
+  return allClubs().filter(c => c.active)
     .filter(c => k === null || c.name.toLowerCase().includes(k) || c.description.toLowerCase().includes(k))
     .filter(c => categoryId == null || c.categoryId === categoryId)
     .sort((a, b) => a.name.localeCompare(b.name));
 }
-function getActiveClub(id) { return CLUBS.find(c => c.id === id && c.active) || null; }
+function getActiveClub(id) { return allClubs().find(c => c.id === id && c.active) || null; }
+function allClubs() { if (!state.clubs) state.clubs = CLUBS.map(c => Object.assign({}, c)); return state.clubs; }
+function findClub(id) { return allClubs().find(c => c.id === id) || null; }
 
 // ---- Phase 3: what MySQL + Mailpit would hold, kept for this browser tab only ----
 const STATE_KEY = "scc-preview";
 const state = (() => {
-  const fresh = { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [] };
+  const fresh = { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null };
   try { const saved = JSON.parse(sessionStorage.getItem(STATE_KEY)); if (saved && Array.isArray(saved.requests)) return Object.assign(fresh, saved); } catch (e) {}
   return fresh;
 })();
@@ -775,6 +810,14 @@ async function ensureAdmin() {
       hash: await previewHash(DEMO_LEADER.password), clubId: DEMO_LEADER.clubId, enabled: true,
       createdAt: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) });
     audit("LEADER", id, "DEMO_SEEDED", true);
+    if (!state.requests.some(r => r.clubId === DEMO_LEADER.clubId)) {
+      const day = n => new Date(Date.now() - n * 86400000 - 3 * 3600000).toLocaleString("en-US");
+      [["Jordan Lee", "jordan.lee@example.com", "Hi! I've played chess for 3 years and would love to join your Tuesday games.", "DELIVERED", 2],
+       ["Priya Patel", "priya.patel@example.com", "Do you teach beginners? I know the rules but have never played in a tournament.", "DELIVERED", 1],
+       ["Marcus Green", "marcus.green@example.com", "Is there a membership fee? Also, can transfer students join mid-semester?", "FAILED", 0]]
+        .forEach(([name, email, message, status, n]) => state.requests.push({ id: state.requests.length + 1, clubId: 1,
+          clubName: "Chess Club", name, email, message, status, date: day(n) }));
+    }
     saveState();
   }
 }
@@ -928,25 +971,221 @@ function fillButton(label, f) {
   return b;
 }
 
-function dashboardPage(u) {
+// ---- Phase 5: leader dashboard (same rules as ClubService / DashboardController) ----
+const CATS = [{ id: 1, name: "Academic" }, { id: 2, name: "Cultural" }, { id: 3, name: "Sports" }, { id: 4, name: "Service" }];
+const NOTICES = { created: "Your club was created and is now listed for students.", saved: "Your changes were saved.",
+  deactivated: "Your club is now hidden from students. You can show it again any time.",
+  activated: "Your club is visible to students again.", deleted: "Your club and its join requests were deleted." };
+
+// THE OWNERSHIP RULE (SPR-03): every club action goes through this first.
+function requireOwnedClub(u, clubId) {
+  const club = findClub(clubId);
+  if (!club) return { page: notFoundPage() };
+  if (u.leader.clubId !== clubId) {
+    audit("LEADER", u.id, "OWNERSHIP_DENIED", false); saveState();
+    return { page: forbiddenPage() };
+  }
+  return { club };
+}
+const requestsFor = clubId => state.requests.filter(r => r.clubId === clubId);
+
+// Same rules and messages as ClubValidator.java + ClubService.validate
+function validateClub(f, ownId) {
+  const e = {}; const t = v => (v || "").trim();
+  const req = (k, max, missing, label) => { const v = t(f[k]); if (!v) e[k] = missing; else if (v.length > max) e[k] = tooLong(label, max, v.length); };
+  const opt = (k, max, label) => { const v = t(f[k]); if (v.length > max) e[k] = tooLong(label, max, v.length); };
+  const url = k => { const v = t(f[k]); if (!v) return; if (v.length > 255) { e[k] = tooLong("Link", 255, v.length); return; }
+    let ok = false; try { const u = new URL(v); ok = (u.protocol === "http:" || u.protocol === "https:") && !!u.hostname; } catch (x) {}
+    if (!ok) e[k] = "Enter a full web address starting with https://"; };
+  req("clubName", 100, "Enter the club's name.", "Club name");
+  req("description", 2000, "Describe what the club does.", "Description");
+  if (!f.categoryId) e.categoryId = "Choose a category.";
+  else if (!CATS.some(c => c.id === Number(f.categoryId))) e.categoryId = "Choose a category from the list.";
+  opt("meetingTime", 100, "Meeting time");
+  const em = t(f.contactEmail);
+  if (!em) e.contactEmail = "Enter the email address join requests should go to.";
+  else if (!isEmail(em)) e.contactEmail = "Enter a valid email address, like club@example.com.";
+  opt("contactInfo", 255, "Contact info");
+  url("instagramUrl"); url("websiteUrl"); url("otherSocialUrl");
+  if (!e.clubName && allClubs().some(c => c.name.toLowerCase() === t(f.clubName).toLowerCase() && c.id !== ownId))
+    e.clubName = "Another club already uses that name.";
+  const order = ["clubName", "description", "categoryId", "meetingTime", "contactEmail", "contactInfo", "instagramUrl", "websiteUrl", "otherSocialUrl"];
+  const out = {}; order.forEach(k => { if (e[k]) out[k] = e[k]; }); return out;
+}
+function tooLong(label, max, n) { return label + " must be " + max.toLocaleString("en-US") + " characters or fewer (yours is " + n.toLocaleString("en-US") + ")."; }
+function applyForm(club, f) {
+  const t = v => (v || "").trim(), n = v => t(v) || null;
+  Object.assign(club, { name: t(f.clubName), description: t(f.description), categoryId: Number(f.categoryId),
+    meetingTime: n(f.meetingTime), contactEmail: t(f.contactEmail), contactInfo: n(f.contactInfo),
+    instagramUrl: n(f.instagramUrl), websiteUrl: n(f.websiteUrl), otherSocialUrl: n(f.otherSocialUrl) });
+}
+function actionButton(label, cls, onClick) { const b = h("button", { type: "button", class: "button " + cls }, label); b.addEventListener("click", onClick); return b; }
+
+function dashboardPage(u, params) {
   document.title = "Dashboard | Spartan Club Central";
   const l = u.leader;
+  const club = l.clubId != null ? findClub(l.clubId) : null;
+  const notice = Object.keys(NOTICES).find(k => params.has(k));
+  let clubSections;
+  if (!club) {
+    clubSections = h("section", { class: "card dash-card", "aria-labelledby": "club-heading" },
+      h("h2", { id: "club-heading" }, "Your club"),
+      h("p", {}, "You haven't created your club's listing yet. Once you do, students can find it in the directory and send you join requests."),
+      h("p", {}, h("a", { class: "button", href: "#/dashboard/clubs/new" }, "Create your club")));
+  } else {
+    const count = requestsFor(club.id).length;
+    const setActive = active => () => {
+      const r = requireOwnedClub(u, club.id); if (!r.club) return;
+      r.club.active = active; audit("LEADER", u.id, active ? "CLUB_ACTIVATED" : "CLUB_DEACTIVATED", true); saveState();
+      location.hash = "#/dashboard?" + (active ? "activated" : "deactivated");
+    };
+    clubSections = [
+      h("section", { class: "card dash-card club-summary", "aria-labelledby": "club-heading" },
+        h("div", { class: "club-summary-head" }, h("h2", { id: "club-heading" }, club.name),
+          h("span", { class: "status " + (club.active ? "status-DELIVERED" : "status-FAILED") }, club.active ? "Visible to students" : "Hidden from students")),
+        h("p", { class: "muted" }, catName(club.categoryId), club.meetingTime ? [" · ", club.meetingTime] : null),
+        h("p", {}, abbreviate(club.description, 220)),
+        h("div", { class: "action-row" },
+          h("a", { class: "button", href: "#/dashboard/clubs/" + club.id + "/requests" }, "Join requests ", h("span", { class: "count-pill" }, count)),
+          h("a", { class: "button button-outline", href: "#/dashboard/clubs/" + club.id + "/edit" }, "Edit club"),
+          club.active ? h("a", { class: "button button-outline", href: "#/clubs/" + club.id }, "View public page") : null)),
+      h("section", { class: "card dash-card", "aria-labelledby": "visibility-heading" },
+        h("h2", { id: "visibility-heading" }, "Visibility"),
+        club.active
+          ? [h("p", {}, "Hiding your club removes it from search and its page, for example during a break. Nothing is deleted."),
+             actionButton("Hide club from students", "button-outline", setActive(false))]
+          : [h("p", {}, "Your club is hidden: students can't find it or send requests."),
+             actionButton("Show club to students", "", setActive(true))],
+        h("p", { class: "danger-link" }, h("a", { href: "#/dashboard/clubs/" + club.id + "/delete" }, "Delete this club permanently…")))];
+  }
   return h("div", { class: "container page" },
     h("h1", {}, "Welcome, ", h("span", {}, l.name)),
     h("p", { class: "muted" }, "You're logged in as a club leader", l.position ? [" (", l.position, ")"] : null, "."),
-    h("section", { class: "card dash-card", "aria-labelledby": "club-heading" },
-      h("h2", { id: "club-heading" }, "Your club"),
-      h("p", {}, l.clubId == null
-        ? "You haven't created your club's listing yet. Creating and editing your club, and reading the join requests students send you, arrive in the next update."
-        : "Your club listing is set up. Editing it and reading join requests arrive in the next update.")),
+    notice ? h("p", { class: "notice notice-ok", role: "status" }, NOTICES[notice]) : null,
+    clubSections,
     h("section", { class: "card dash-card", "aria-labelledby": "account-heading" },
       h("h2", { id: "account-heading" }, "Your account"),
       h("dl", { class: "account-list" },
         h("div", {}, h("dt", {}, "Name"), h("dd", {}, l.name)),
         h("div", {}, h("dt", {}, "Email"), h("dd", {}, l.email)),
         h("div", {}, h("dt", {}, "Member since"), h("dd", {}, l.createdAt))),
-      h("p", { class: "muted" }, "For your security you'll be logged out automatically after 30 minutes without activity.")));
+      h("p", { class: "muted" }, "For your security you'll be logged out automatically after 30 minutes without activity.")),
+    h("section", { class: "card test-panel", "aria-labelledby": "dtests-heading" },
+      h("h2", { id: "dtests-heading" }, "Test the ownership rule (preview file only)"),
+      h("p", {}, "These try another leader's club (Soccer Club, #18) by changing the number in the address. Each should show “That request wasn't allowed” (TC-19, TC-20)."),
+      h("ul", {},
+        h("li", {}, h("a", { href: "#/dashboard/clubs/18/edit" }, "Edit Soccer Club")),
+        h("li", {}, h("a", { href: "#/dashboard/clubs/18/requests" }, "Read Soccer Club's requests")),
+        h("li", {}, h("a", { href: "#/dashboard/clubs/18/delete" }, "Delete Soccer Club")),
+        h("li", {}, h("a", { href: "#/mailpit" }, "See OWNERSHIP_DENIED in the audit log")))));
 }
+
+function clubFormPage(u, club, form, errors) {
+  const creating = !club;
+  document.title = (creating ? "Create your club" : "Edit club") + " | Spartan Club Central";
+  form = form || (club ? { clubName: club.name, description: club.description, categoryId: club.categoryId, meetingTime: club.meetingTime || "",
+    contactEmail: club.contactEmail, contactInfo: club.contactInfo || "", instagramUrl: club.instagramUrl || "", websiteUrl: club.websiteUrl || "",
+    otherSocialUrl: club.otherSocialUrl || "" } : { clubName: "", description: "", categoryId: "", meetingTime: "", contactEmail: "", contactInfo: "",
+    instagramUrl: "", websiteUrl: "", otherSocialUrl: "" });
+  errors = errors || {};
+  const inp = (id, type, max, extra) => input(id, type, max, "off", form[id], extra);
+  const name = inp("clubName", "text", 100, { required: true });
+  const cat = h("select", { id: "categoryId", name: "categoryId", required: true }, h("option", { value: "" }, "Choose a category"),
+    CATS.slice().sort((a, b) => a.name.localeCompare(b.name)).map(c => h("option", { value: c.id, selected: Number(form.categoryId) === c.id }, c.name)));
+  const desc = h("textarea", { id: "description", name: "description", rows: "6", maxlength: "2000", required: true }); desc.value = form.description;
+  const meet = inp("meetingTime", "text", 100, { placeholder: "e.g. Tuesdays 6:00 PM, Library Room 210" });
+  const email = inp("contactEmail", "email", 254, { required: true });
+  const info = inp("contactInfo", "text", 255, { placeholder: "e.g. Stop by any Tuesday, boards provided" });
+  const ig = inp("instagramUrl", "url", 255, { placeholder: "https://" }), web = inp("websiteUrl", "url", 255, { placeholder: "https://" }),
+        other = inp("otherSocialUrl", "url", 255, { placeholder: "https://" });
+  const el = h("form", { class: "card stack-form club-form", novalidate: true },
+    h("fieldset", {}, h("legend", {}, "About the club"),
+      formField("clubName", "Club name", name, errors),
+      formField("categoryId", "Category", cat, errors),
+      formField("description", "Description", desc, errors, "What does your club do? Who is it for? Up to 2,000 characters."),
+      formField("meetingTime", "Meeting time and place", meet, errors, null, true)),
+    h("fieldset", {}, h("legend", {}, "Contact"),
+      formField("contactEmail", "Contact email", email, errors, "Join requests from students are emailed here. It's also shown on your club's page."),
+      formField("contactInfo", "More contact info", info, errors, null, true)),
+    h("fieldset", {}, h("legend", {}, "Links ", h("span", { class: "optional" }, "(optional)")),
+      h("p", { class: "field-hint" }, "Full web addresses starting with https://"),
+      formField("instagramUrl", "Instagram", ig, errors),
+      formField("websiteUrl", "Website", web, errors),
+      formField("otherSocialUrl", "Other link (Discord, TikTok, ...)", other, errors)),
+    h("div", { class: "action-row" },
+      h("button", { type: "submit", class: "button" }, creating ? "Create club" : "Save changes"),
+      h("a", { class: "button button-outline", href: "#/dashboard" }, "Cancel")));
+  el.addEventListener("submit", e => {
+    e.preventDefault();
+    const f = { clubName: name.value, description: desc.value, categoryId: cat.value, meetingTime: meet.value, contactEmail: email.value,
+      contactInfo: info.value, instagramUrl: ig.value, websiteUrl: web.value, otherSocialUrl: other.value };
+    const fresh = currentUser(); if (!fresh || fresh.role !== "LEADER") { location.hash = "#/login"; return; }
+    if (!creating) { const r = requireOwnedClub(fresh, club.id); if (!r.club) { document.getElementById("main").replaceChildren(r.page); return; } }
+    if (creating && fresh.leader.clubId != null) { document.getElementById("main").replaceChildren(forbiddenPage()); return; }
+    const errs = validateClub(f, creating ? null : club.id);
+    if (Object.keys(errs).length) {
+      document.getElementById("main").replaceChildren(clubFormPage(fresh, club, f, errs));
+      const s = document.getElementById("error-summary"); s.scrollIntoView({ block: "start" }); s.focus(); return;
+    }
+    if (creating) {
+      const c = { id: Math.max(...allClubs().map(x => x.id)) + 1, active: true }; applyForm(c, f); allClubs().push(c);
+      fresh.leader.clubId = c.id; audit("LEADER", fresh.id, "CLUB_CREATED", true); saveState(); location.hash = "#/dashboard?created";
+    } else {
+      applyForm(club, f); audit("LEADER", fresh.id, "CLUB_EDITED", true); saveState(); location.hash = "#/dashboard?saved";
+    }
+  });
+  return h("div", { class: "container page form-page" },
+    h("p", { class: "back-link" }, h("a", { href: "#/dashboard" }, "← Dashboard")),
+    h("h1", {}, creating ? "Create your club" : "Edit " + club.name),
+    creating ? h("p", { class: "muted" }, "This is what students will see on your club's page. You can change it any time.") : null,
+    errorSummary(errors), el,
+    h("section", { class: "card test-panel" }, h("h2", {}, "Test the form (preview file only)"),
+      h("div", { class: "fill-buttons" },
+        fillButton("Valid club", { clubName: "Robotics Club", description: "We design, build and program robots. Beginners welcome!", categoryId: "1",
+          contactEmail: "robotics@example.com", meetingTime: "Wednesdays 6:00 PM, Engineering Lab A", instagramUrl: "https://example.com/instagram/robotics" }),
+        fillButton("Duplicate name + bad link", { clubName: "Soccer Club", websiteUrl: "javascript:alert(1)", contactEmail: "x@" }),
+        fillButton("Description too long", { description: "x".repeat(2001) }))));
+}
+
+function confirmDeletePage(u, club) {
+  document.title = "Delete club | Spartan Club Central";
+  const n = requestsFor(club.id).length;
+  const del = actionButton("Yes, delete permanently", "button-danger", () => {
+    const fresh = currentUser(); const r = fresh && fresh.role === "LEADER" ? requireOwnedClub(fresh, club.id) : {};
+    if (!r.club) { location.hash = "#/login"; return; }
+    state.clubs = allClubs().filter(c => c.id !== club.id);
+    state.requests = state.requests.filter(x => x.clubId !== club.id);
+    fresh.leader.clubId = null; audit("LEADER", fresh.id, "CLUB_DELETED", true); saveState();
+    location.hash = "#/dashboard?deleted";
+  });
+  return h("div", { class: "container page narrow" },
+    h("h1", {}, "Delete ", h("span", {}, club.name), "?"),
+    h("div", { class: "card danger-card" },
+      h("p", {}, h("strong", {}, "This can't be undone."), " It permanently deletes:"),
+      h("ul", {}, h("li", {}, "your club's listing and public page"), h("li", {}, n + (n === 1 ? " join request" : " join requests") + " from students")),
+      h("p", {}, "Your leader account stays, and you can create a new club later."),
+      h("p", { class: "muted" }, "Just taking a break? ", h("a", { href: "#/dashboard" }, "Hide your club instead"), "; nothing is lost."),
+      h("div", { class: "action-row" }, del, h("a", { class: "button button-outline", href: "#/dashboard" }, "Cancel"))));
+}
+
+function leaderInboxPage(u, club) {
+  document.title = "Join requests | Spartan Club Central";
+  const list = requestsFor(club.id).slice().reverse();
+  const label = s => s === "FAILED" ? "Email not sent" : s === "DELIVERED" ? "Emailed" : "Saved";
+  return h("div", { class: "container page" },
+    h("p", { class: "back-link" }, h("a", { href: "#/dashboard" }, "← Dashboard")),
+    h("h1", {}, "Join requests for ", h("span", {}, club.name)),
+    h("p", { class: "muted" }, "Only you can see these. Reply by email; each request's email address goes straight to the student."),
+    list.length === 0
+      ? h("div", { class: "card empty-state" }, h("h2", {}, "No requests yet"),
+          h("p", {}, "When a student uses the form on your club's page, it shows up here and is emailed to your club's contact address."))
+      : h("ol", { class: "request-list", reversed: true }, list.map(r => h("li", { class: "card request" },
+          h("div", { class: "request-head" }, h("h2", {}, r.name), h("span", { class: "status status-" + r.status }, label(r.status))),
+          h("p", { class: "request-meta" }, h("a", { href: "mailto:" + r.email }, r.email), " · ", r.date),
+          h("p", { class: "request-message" }, r.message),
+          r.status === "FAILED" ? h("p", { class: "muted small" }, "The email to your club couldn't be sent when this arrived, so this page is the only copy.") : null))));
+}
+
 function adminPage(u) {
   document.title = "Administrator | Spartan Club Central";
   return h("div", { class: "container page" },
@@ -987,7 +1226,7 @@ function inboxPage() {
   clear.addEventListener("click", () => { state.requests = []; state.emails = []; saveState(); render(); });
   const reset = h("button", { type: "button", class: "button button-outline" }, "Reset everything");
   reset.addEventListener("click", async () => { try { sessionStorage.removeItem(STATE_KEY); } catch (e) {} Object.assign(state,
-    { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [] }); await ensureAdmin(); render(); });
+    { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null }); await ensureAdmin(); render(); });
   const table = (cols, rows) => h("div", { class: "db-wrap", tabindex: "0", "aria-label": "Table, scrolls sideways on small screens" },
     h("table", { class: "db-table" }, h("thead", {}, h("tr", {}, cols.map(c => h("th", { scope: "col" }, c)))), h("tbody", {}, rows)));
   return h("div", { class: "container page" },
@@ -1101,7 +1340,19 @@ function render() {
   };
   if (path === "/dashboard" || path.startsWith("/dashboard/")) {
     const ok = needs("LEADER"); if (ok === null) return;
-    page = ok ? dashboardPage(ok) : forbiddenPage();
+    if (!ok) page = forbiddenPage();
+    else if (path === "/dashboard") page = dashboardPage(ok, params);
+    else if (path === "/dashboard/clubs/new") {
+      if (ok.leader.clubId != null) { location.replace("#/dashboard"); return; }      // one club per leader
+      page = clubFormPage(ok, null);
+    } else {
+      const m = path.match(/^\/dashboard\/clubs\/(\d+)\/(edit|delete|requests)$/);
+      if (!m) page = notFoundPage();
+      else {
+        const r = requireOwnedClub(ok, Number(m[1]));
+        page = r.page || (m[2] === "edit" ? clubFormPage(ok, r.club) : m[2] === "delete" ? confirmDeletePage(ok, r.club) : leaderInboxPage(ok, r.club));
+      }
+    }
   } else if (path === "/admin" || path.startsWith("/admin/")) {
     const ok = needs("ADMIN"); if (ok === null) return;
     page = ok ? adminPage(ok) : forbiddenPage();

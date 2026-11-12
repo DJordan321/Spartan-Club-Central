@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Delete club')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--/* FR-12, conflict C5: deleting also deletes the club's join requests, so ask first and suggest hiding instead. */-->
+<main id="main" class="container page narrow">
+  <h1>Delete <span th:text="${club.clubName}">Chess Club</span>?</h1>
+  <div class="card danger-card">
+    <p><strong>This can't be undone.</strong> It permanently deletes:</p>
+    <ul>
+      <li>your club's listing and public page</li>
+      <li><span th:text="${requestCount} + (${requestCount} == 1 ? ' join request' : ' join requests')">3 join requests</span>
+        from students</li>
+    </ul>
+    <p>Your leader account stays, and you can create a new club later.</p>
+    <p class="muted">Just taking a break? <a th:href="@{/dashboard}">Hide your club instead</a>; nothing is lost.</p>
+    <div class="action-row">
+      <form method="post" th:action="@{/dashboard/clubs/{id}/delete(id=${club.clubId})}">
+        <button type="submit" class="button button-danger">Yes, delete permanently</button>
+      </form>
+      <a class="button button-outline" th:href="@{/dashboard}">Cancel</a>
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,7 +15,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  *
  * Users only ever see "Page not found" or "Something went wrong": never a
  * stack trace, SQL or class name. Details go to the server log instead.
- * Phase 4 adds the 403 "access denied" case.
+ * A leader trying to use another leader's club gets the 403 page (SPR-03).
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,5 +34,12 @@ public class GlobalExceptionHandler {
     public String badParameter(MethodArgumentTypeMismatchException e) {
         log.debug("Bad value for parameter '{}'", e.getName());
         return "error/404";
+    }
+
+    /** A leader acting on a club they don't own (SPR-03). ClubService already logged OWNERSHIP_DENIED. */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String forbidden() {
+        return "error/403";
     }
 }

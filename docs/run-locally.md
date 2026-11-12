@@ -1,6 +1,6 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
-> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form, pretend Mailpit inbox, leader registration and login) that needs no Java, MySQL or Mailpit.
+> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form, pretend Mailpit inbox, leader registration and login, and the leader dashboard) that needs no Java, MySQL or Mailpit.
 
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
@@ -10,7 +10,7 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 4 status:** the student pages, the join request form, and leader accounts are live:
+> **Phase 5 status:** the student pages, the join request form, leader accounts and the leader dashboard are live:
 > - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
 > - `/clubs` directory: keyword + category search (FR-01, FR-02)
 > - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
@@ -18,7 +18,9 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 >
 > - Leader registration and login (`/register`, `/login`), a leader dashboard (`/dashboard`) and an administrator page (`/admin`), each open only to the right role (FR-04, SPR-01)
 >
-> Creating and editing your club and the request inbox arrive in Phase 5; password reset and admin tools in Phase 6.
+> - Leader dashboard: create your club, edit it, hide/show it, delete it (after a confirmation page), and read the join requests sent to it, only ever for your own club (FR-08, FR-09, FR-12, NFR-02, SPR-03, SPR-04)
+>
+> Password reset and the administrator tools arrive in Phase 6.
 >
 > ![Club directory](screenshots/phase2-directory.png)
 
@@ -107,7 +109,7 @@ SPRING_PROFILES_ACTIVE=demo DB_PASSWORD="pick-a-local-password" ADMIN_EMAIL="adm
 
 Windows PowerShell: run `$env:SPRING_PROFILES_ACTIVE="demo"` along with the other `$env:` lines, then `.\mvnw.cmd spring-boot:run`. In IntelliJ, add `SPRING_PROFILES_ACTIVE=demo` to the run configuration's environment variables.
 
-The app's window confirms it with `Demo mode: created demo leader ...`. The password is still stored only as a BCrypt hash.
+The app's window confirms it with `Demo mode: created demo leader ...`. Demo mode also adds three made-up join requests to Chess Club so the request inbox has something to show. The password is still stored only as a BCrypt hash.
 
 > **Laptop demos only.** This password is public in the code, so never use the `demo` profile on a real deployment. Without it, no demo account is created. An account created earlier stays in your database until you run `reset-demo.sql`.
 
@@ -192,7 +194,21 @@ mysql -u root -p club_central < database/sample-data.sql
 
 Your browser gets a new session cookie when you log in, and you're logged out after 30 minutes without activity (SPR-07).
 
-Automated tests: `./mvnw test` should report 92 passing and 1 skipped.
+**Phase 5: leader dashboard** (start in demo mode so the demo leader exists, see "Demo mode" above)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Log in as `demo.leader@clubcentral.local` / `spartan-demo-2026` | Dashboard with Chess Club, "Visible to students", **Join requests 3** | FR-04 |
+| Click **Join requests** | Three requests (one marked "Email not sent"), only Chess Club's | NFR-02, SPR-04 |
+| **Edit club**, website `javascript:alert(1)` | "Enter a full web address starting with https://"; your other changes are kept | SPR-05 |
+| Fix it, change the meeting time, **Save changes** | "Your changes were saved."; the public Chess Club page shows the new time | FR-09, TC-12 |
+| **Hide club from students**, then open http://localhost:8080/clubs/1 | "Page not found"; Chess Club is gone from search. **Show club** brings it back | FR-12, TC-13 |
+| Register and log in as a second leader, then open http://localhost:8080/dashboard/clubs/1/requests | "That request wasn't allowed", with no student data | SPR-03, TC-19, TC-20 |
+| As that leader, **Create your club** | "Your club was created..."; students can find it right away | FR-08, TC-11 |
+| **Delete this club permanently...** → **Yes, delete permanently** | The warning lists how many requests will go; afterwards the club is gone and you can create a new one | FR-12, TC-14 |
+| Workbench: `SELECT action, actor_id, target_id FROM audit_log;` | CLUB_EDITED, CLUB_DEACTIVATED, CLUB_ACTIVATED, OWNERSHIP_DENIED, CLUB_CREATED, CLUB_DELETED | SPR-08 |
+
+Automated tests: `./mvnw test` should report 117 passing and 1 skipped.
 
 ## Mailpit (fake email inbox, needed from Phase 3)
 
