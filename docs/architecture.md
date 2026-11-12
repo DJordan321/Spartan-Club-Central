@@ -14,36 +14,39 @@ This describes the system as it exists in the code, so a new teammate can find t
 
 ## 2. Layers
 
+Type: a **layered (n-tier) architecture using the MVC pattern**, in one Spring Boot program with one MySQL database (client–server). Each layer only calls the layer below it.
+
 ```mermaid
 flowchart TB
-    subgraph Browser["Browser (untrusted)"]
-        STU["Student"]
-        LDR["Club leader (ROLE_LEADER)"]
-        ADM["Administrator (ROLE_ADMIN)"]
+    subgraph L1["1. Users (browser, untrusted)"]
+        STU["Student<br/>search, club pages, join request"]
+        LDR["Club leader (ROLE_LEADER)<br/>own club, officers, events, picture"]
+        ADM["Administrator (ROLE_ADMIN)<br/>hide clubs, block accounts, audit log"]
     end
-    subgraph Server["Spring Boot application"]
-        SEC["Spring Security: login, roles, CSRF, sessions, security headers"]
-        subgraph V["Templates (Thymeleaf)"]
-            T["index, directory, club, request-sent, login, register,<br/>forgot/reset-password, dashboard/*, admin/home, error/*"]
-        end
-        subgraph C["Controllers"]
-            CC["ClubController"]; RC["RequestController"]; AC["AuthController"]
-            DC["DashboardController"]; ADC["AdminController"]; GEH["GlobalExceptionHandler"]
-        end
-        subgraph S["Services (all rules)"]
-            CS["ClubService<br/>search + ownership check"]; RS["RequestService"]; AS["AuthService"]
-            ADS["AdminService"]; NS["NotificationService"]; VAL["RequestValidator, ClubValidator,<br/>RegistrationValidator, EmailRules, FieldLimits"]
-            PH["PasswordHasher (BCrypt 12)"]; AL["AuditLogger"]
-        end
-        subgraph R["Repositories (Spring Data JPA, bound parameters only)"]
-            REPO["Club, Category, Request, Leader, Admin,<br/>PasswordResetToken, AuditLog"]
-        end
+    subgraph L2["2. Security"]
+        SEC["Spring Security: login, roles, CSRF, 30-min sessions, security headers"]
     end
-    DB[("MySQL: club_central")]
-    MAIL[["Mailpit (SMTP 1025, inbox 8025)"]]
-    STU & LDR & ADM --> SEC --> C --> S --> R --> DB
-    C --> V
-    NS --> MAIL
+    subgraph L3["3. Presentation (controllers + Thymeleaf pages)"]
+        CTRL["ClubController · RequestController · AuthController · DashboardController<br/>OfficerController · EventController · PictureController · AdminController"]
+        VIEW["Thymeleaf pages: index, directory, club, forms, dashboard/*, admin/home, error/*"]
+    end
+    subgraph L4["4. Business logic (services: all rules)"]
+        SVC["ClubService (search + requireOwnedClub) · RequestService · AuthService · AdminService<br/>OfficerService · EventService · ClubImageService · NotificationService"]
+        HLP["Validators + FieldLimits · PasswordHasher (BCrypt 12) · AuditLogger · ImageStorage"]
+    end
+    subgraph L5["5. Data access (Spring Data JPA, bound parameters only)"]
+        REPO["9 repositories: Club, Category, Request, Leader, Admin,<br/>Officer, Event, PasswordResetToken, AuditLog"]
+    end
+    subgraph L6["6. Storage (demo laptop)"]
+        DB[("MySQL: club_central")]
+        UP[["Uploads folder (UPLOAD_DIR)"]]
+        MAIL[["Mailpit (SMTP 1025, inbox 8025)"]]
+    end
+    STU & LDR & ADM --> SEC --> CTRL --> SVC --> REPO --> DB
+    CTRL --> VIEW
+    SVC --- HLP
+    HLP -- pictures --> UP
+    SVC -- emails --> MAIL
 ```
 
 ## 3. Where everything is
@@ -54,12 +57,12 @@ flowchart TB
 |---|---|---|
 | `config` | `SecurityConfig`, `RoleBasedSuccessHandler`, `AdminSeeder`, `DemoLeaderSeeder` | Who may open what; where to go after login; create the admin from `ADMIN_EMAIL`/`ADMIN_PASSWORD`; demo-mode leader account |
 | `security` | `AccountPrincipal`, `SecurityEventListener` | The logged-in account; login/logout events to the audit log |
-| `controller` | `ClubController`, `RequestController`, `AuthController`, `DashboardController`, `AdminController`, `CurrentUserAdvice`, `GlobalExceptionHandler` | Map web addresses to services and pages. No rules, no repositories |
-| `service` | `ClubService`, `RequestService`, `AuthService`, `AdminService`, `NotificationService`, `AuditLogger`, `PasswordHasher`, validators, `FieldLimits`, `EmailRules` | All business rules |
+| `controller` | `ClubController`, `RequestController`, `AuthController`, `DashboardController`, `OfficerController`, `EventController`, `PictureController`, `AdminController`, `CurrentUserAdvice`, `GlobalExceptionHandler` | Map web addresses to services and pages. No rules, no repositories |
+| `service` | `ClubService`, `RequestService`, `AuthService`, `AdminService`, `OfficerService`, `EventService`, `ClubImageService`, `ClubPictures`, `ImageStorage`, `NotificationService`, `AuditLogger`, `PasswordHasher`, validators, `FieldLimits`, `EmailRules` | All business rules |
 | `service.exception` | `NotFoundException`, `ValidationException` | Turned into the 404 page or into field messages |
-| `repository` | 7 Spring Data interfaces | The only code that talks to MySQL |
+| `repository` | 9 Spring Data interfaces | The only code that talks to MySQL |
 | `model` | `Club`, `Category`, `ClubLeader`, `ClubOfficer`, `ClubEvent`, `Administrator`, `JoinRequest`, `RequestStatus`, `PasswordResetToken`, `AuditLog` | Tables as Java classes, every column mapped by name |
-| `dto` | `JoinRequestForm`, `RegistrationForm`, `ClubForm`, `ResetPasswordForm` | What users typed into forms |
+| `dto` | `JoinRequestForm`, `RegistrationForm`, `ClubForm`, `OfficerForm`, `EventForm`, `ResetPasswordForm` | What users typed into forms |
 
 Uploaded pictures live in `UPLOAD_DIR` (default `./uploads`, not in Git); category pictures are original SVGs in `static/images/categories/`. Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one stylesheet), `database/` (schema, sample data, reset script), `scripts/LoadCheck.java` (performance check), `docs/` (this file, run guide, traceability, offline preview).
 
