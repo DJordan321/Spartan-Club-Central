@@ -91,6 +91,26 @@ $env:DB_PASSWORD="pick-a-local-password"
 
 On Windows: `mvnw.cmd spring-boot:run`. Wait for `Started SpartanClubApplication`, then open http://localhost:8080 (the homepage). Stop the app with **Ctrl+C**. From Phase 3 on, also start Mailpit first (run `mailpit` in another terminal).
 
+### Demo mode: a ready-made club leader account
+
+For class demonstrations, start the app with the `demo` profile and it creates this account the first time:
+
+| Email | Password | Leads |
+|---|---|---|
+| `demo.leader@clubcentral.local` | `spartan-demo-2026` | Chess Club |
+
+Mac / Linux:
+
+```bash
+SPRING_PROFILES_ACTIVE=demo DB_PASSWORD="pick-a-local-password" ADMIN_EMAIL="admin@clubcentral.local" ADMIN_PASSWORD="pick-an-admin-password" ./mvnw spring-boot:run
+```
+
+Windows PowerShell: run `$env:SPRING_PROFILES_ACTIVE="demo"` along with the other `$env:` lines, then `.\mvnw.cmd spring-boot:run`. In IntelliJ, add `SPRING_PROFILES_ACTIVE=demo` to the run configuration's environment variables.
+
+The app's window confirms it with `Demo mode: created demo leader ...`. The password is still stored only as a BCrypt hash.
+
+> **Laptop demos only.** This password is public in the code, so never use the `demo` profile on a real deployment. Without it, no demo account is created. An account created earlier stays in your database until you run `reset-demo.sql`.
+
 ## 5. Run the tests
 
 Normal tests use an in-memory database, so they need no MySQL:
@@ -172,7 +192,7 @@ mysql -u root -p club_central < database/sample-data.sql
 
 Your browser gets a new session cookie when you log in, and you're logged out after 30 minutes without activity (SPR-07).
 
-Automated tests: `./mvnw test` should report 90 passing and 1 skipped.
+Automated tests: `./mvnw test` should report 92 passing and 1 skipped.
 
 ## Mailpit (fake email inbox, needed from Phase 3)
 

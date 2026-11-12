@@ -24,6 +24,7 @@ public class AuditLogger {
     public static final String LOGOUT = "LOGOUT";
     public static final String REGISTERED = "REGISTERED";
     public static final String ADMIN_SEEDED = "ADMIN_SEEDED";
+    public static final String DEMO_SEEDED = "DEMO_SEEDED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 

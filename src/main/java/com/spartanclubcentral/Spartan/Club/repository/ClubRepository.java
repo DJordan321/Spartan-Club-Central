@@ -41,4 +41,6 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     Optional<Club> findByClubIdAndActiveTrue(Long clubId);
 
     boolean existsByClubNameIgnoreCase(String clubName);
+
+    Optional<Club> findByClubNameIgnoreCase(String clubName);
 }

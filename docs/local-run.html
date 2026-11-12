@@ -435,6 +435,12 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
           </div>
           <p>The admin password must be 8 to 72 characters. IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr;
             Environment variables</em> &rarr; <code class="inline">DB_PASSWORD=...;ADMIN_EMAIL=...;ADMIN_PASSWORD=...</code>, then press Run.</p>
+          <p><strong>For class demos, turn on demo mode</strong> to get a ready-made club leader account
+            (<code class="inline">demo.leader@clubcentral.local</code> / <code class="inline">spartan-demo-2026</code>, linked to Chess Club).
+            Add this before starting the app:</p>
+          <div data-show="win"><div class="code"><pre>$env:SPRING_PROFILES_ACTIVE="demo"</pre><button type="button">Copy</button></div></div>
+          <div data-show="mac"><div class="code"><pre>export SPRING_PROFILES_ACTIVE=demo</pre><button type="button">Copy</button></div></div>
+          <p class="muted">Demo mode is for your laptop only: the password is public in the code. Without it, no demo account is created.</p>
         </li>
         <li><span class="num" aria-hidden="true">7</span>
           <h3>Open the site and test it</h3>
@@ -463,7 +469,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
           <h3>Optional: run the automated tests</h3>
           <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
           <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
-          <p>Expect <strong>90 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+          <p>Expect <strong>92 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
         </li>
       </ol>
     </section>
@@ -740,6 +746,7 @@ function sentPage(id) {
 
 // ---- Phase 4: accounts, login and roles (same rules as AuthService / SecurityConfig) ----
 const DEMO_ADMIN = { email: "admin@clubcentral.local", password: "demo-admin-pass" };
+const DEMO_LEADER = { email: "demo.leader@clubcentral.local", password: "spartan-demo-2026", name: "Demo Leader", clubId: 1 };   // same as DemoLeaderSeeder.java
 const SESSION_MINUTES = 30;
 
 // The real app stores a BCrypt hash ($2a$12$...). This offline preview uses a
@@ -760,6 +767,14 @@ async function ensureAdmin() {
   if (!state.admin) {
     state.admin = { id: 1, name: "Administrator", email: DEMO_ADMIN.email, hash: await previewHash(DEMO_ADMIN.password) };
     audit("ADMIN", 1, "ADMIN_SEEDED", true);
+    saveState();
+  }
+  if (!state.leaders.some(l => l.email === DEMO_LEADER.email)) {      // like running with SPRING_PROFILES_ACTIVE=demo
+    const id = state.leaders.length + 1;
+    state.leaders.push({ id, name: DEMO_LEADER.name, email: DEMO_LEADER.email, position: "President",
+      hash: await previewHash(DEMO_LEADER.password), clubId: DEMO_LEADER.clubId, enabled: true,
+      createdAt: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) });
+    audit("LEADER", id, "DEMO_SEEDED", true);
     saveState();
   }
 }
@@ -840,6 +855,8 @@ function loginPage(params) {
   });
   const fillAdmin = h("button", { type: "button", class: "button button-outline" }, "Fill in the demo admin");
   fillAdmin.addEventListener("click", () => { email.value = DEMO_ADMIN.email; password.value = DEMO_ADMIN.password; });
+  const fillLeader = h("button", { type: "button", class: "button button-outline" }, "Fill in the demo leader");
+  fillLeader.addEventListener("click", () => { email.value = DEMO_LEADER.email; password.value = DEMO_LEADER.password; });
   return h("div", { class: "container page auth-page" },
     h("div", { class: "card auth-card" },
       h("h1", {}, "Club leader login"),
@@ -850,9 +867,11 @@ function loginPage(params) {
       form,
       h("p", { class: "auth-switch" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))),
     h("div", { class: "demo-creds" },
-      h("p", {}, h("strong", {}, "Preview file only: "), "demo administrator ", h("code", {}, DEMO_ADMIN.email), " / ", h("code", {}, DEMO_ADMIN.password),
+      h("p", {}, h("strong", {}, "Demo club leader: "), h("code", {}, DEMO_LEADER.email), " / ", h("code", {}, DEMO_LEADER.password),
+        " (leads Chess Club). The real app has this account when started in demo mode."),
+      h("p", {}, h("strong", {}, "Preview-only admin: "), h("code", {}, DEMO_ADMIN.email), " / ", h("code", {}, DEMO_ADMIN.password),
         ". On your laptop the admin comes from ADMIN_EMAIL and ADMIN_PASSWORD."),
-      fillAdmin));
+      h("div", { class: "fill-buttons" }, fillLeader, fillAdmin)));
 }
 
 function registerPage(form, errors) {
@@ -917,7 +936,9 @@ function dashboardPage(u) {
     h("p", { class: "muted" }, "You're logged in as a club leader", l.position ? [" (", l.position, ")"] : null, "."),
     h("section", { class: "card dash-card", "aria-labelledby": "club-heading" },
       h("h2", { id: "club-heading" }, "Your club"),
-      h("p", {}, "You haven't created your club's listing yet. Creating and editing your club, and reading the join requests students send you, arrive in the next update.")),
+      h("p", {}, l.clubId == null
+        ? "You haven't created your club's listing yet. Creating and editing your club, and reading the join requests students send you, arrive in the next update."
+        : "Your club listing is set up. Editing it and reading join requests arrive in the next update.")),
     h("section", { class: "card dash-card", "aria-labelledby": "account-heading" },
       h("h2", { id: "account-heading" }, "Your account"),
       h("dl", { class: "account-list" },
