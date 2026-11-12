@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 /**
  * Who may open which page (SPR-01, SPR-07). Replaces the Phase 1 "everything
@@ -29,10 +30,21 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * CSRF protection is ON (Spring's default). Thymeleaf's th:action adds the
  * hidden token to every form automatically, so never disable it.
+ *
+ * Security headers (Phase 7): a strict Content-Security-Policy lets the
+ * browser run only this site's own files, so even if some text slipped past
+ * escaping it could not run as a script. It works because no page uses inline
+ * scripts or styles. Pages also can't be framed by other sites (clickjacking),
+ * and other sites only ever see our origin as the referrer.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    /** Only this site's own scripts, styles, images and forms; nothing inline, no framing. */
+    static final String CONTENT_SECURITY_POLICY = "default-src 'self'; script-src 'self'; style-src 'self'; "
+            + "img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; "
+            + "frame-ancestors 'none'; base-uri 'self'; object-src 'none'";
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, RoleBasedSuccessHandler successHandler) throws Exception {
@@ -60,6 +72,10 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID"))
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                .frameOptions(frame -> frame.deny())
+                .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)))
             .sessionManagement(session -> session
                 // New session ID at login, so a stolen pre-login ID is useless (SPR-07).
                 .sessionFixation(fixation -> fixation.changeSessionId()));

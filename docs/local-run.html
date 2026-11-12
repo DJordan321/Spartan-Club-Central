@@ -285,6 +285,21 @@ textarea {
 .request-message { white-space: pre-line; overflow-wrap: anywhere; margin: 0; }
 .small { font-size: .9rem; margin: 10px 0 0; }
 
+/* ---------- Password reset + administrator (Phase 6) ---------- */
+.auth-switch-tight { margin-top: 8px; }
+.admin-jump { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 0 0; font-weight: 600; }
+/* position: relative keeps the hidden screen-reader text inside the scroll box (it would otherwise widen the page) */
+.table-scroll { overflow-x: auto; position: relative; }
+.data-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .95rem; }
+.data-table th, .data-table td { text-align: left; vertical-align: middle; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table thead th { background: var(--green-tint); color: var(--green-dark); }
+.data-table tbody th { font-weight: 600; }
+.data-table form { margin: 0; }
+.action-cell { display: flex; flex-wrap: wrap; gap: 6px; }
+.button-small { padding: 5px 12px; min-height: 36px; font-size: .9rem; }
+.button-danger-outline { color: #A4161A; border-color: #A4161A; }
+.button-danger-outline:hover { background: #FDF0F0; color: #A4161A; }
+
 
 /* ===== Extra styles for this offline file only ===== */
 .preview-bar { background: #FFF6D6; border-bottom: 1px solid #E3B800; color: #1F2933; font-size: .9rem; }
@@ -352,7 +367,7 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="preview-bar" role="region" aria-label="About this file">
   <div class="container">
-    <p><strong>Offline preview through Phase 5.</strong> Same pages and rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>. Don't type real passwords here.</p>
+    <p><strong>Offline preview of the finished site (Phases 1 to 7).</strong> Same pages and rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>. Don't type real passwords here.</p>
     <nav aria-label="Preview sections">
       <a href="#/" id="nav-preview">Website preview</a>
       <a href="#/mailpit" id="nav-mail">Inbox &amp; database <span id="mail-count"></span></a>
@@ -409,10 +424,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
           <p data-show="win">In PowerShell:</p><p data-show="mac">In Terminal:</p>
           <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
           <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-5-leader-dashboard</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-7-final-polish</pre><button type="button">Copy</button></div>
           <p>Already cloned it for Phase 1? Run these two instead:</p>
           <div class="code"><pre>git fetch origin</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-5-leader-dashboard</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-7-final-polish</pre><button type="button">Copy</button></div>
         </li>
         <li><span class="num" aria-hidden="true">3</span>
           <h3>Create the database and load the 32 sample clubs</h3>
@@ -495,14 +510,21 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <li><strong>Edit club</strong>: enter <code class="inline">javascript:alert(1)</code> as the website: "Enter a full web address starting with https://". Fix it and change the meeting time; the public Chess Club page shows the new time (TC-12).</li>
             <li><strong>Hide club from students</strong>: <code class="inline">localhost:8080/clubs/1</code> now says "Page not found"; <strong>Show club</strong> brings it back (TC-13).</li>
             <li>Register a second leader. While logged in as them, open <code class="inline">localhost:8080/dashboard/clubs/1/requests</code>: "That request wasn't allowed" (TC-19, TC-20). Then create a club for them, and delete it from its confirmation page (TC-11, TC-14).</li>
-            <li>Log out, then log in with your ADMIN_EMAIL: you land on the Administrator page.</li>
+            <li><strong>Phase 6:</strong> log out, <strong>Forgot your password?</strong>, enter the demo leader's email. Open the email in Mailpit, follow the link, choose a new password, and log in with it (TC-15). Opening the link again says it doesn't work (TC-16).</li>
+            <li>Log in with your ADMIN_EMAIL: the Administrator page lists every club and leader. Try <strong>Hide</strong> on a club, <strong>Block</strong> and <strong>Unblock</strong> a leader, <strong>Send reset link</strong>, and read the <strong>Security log</strong>.</li>
           </ul>
         </li>
         <li><span class="num" aria-hidden="true">8</span>
           <h3>Optional: run the automated tests</h3>
           <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
           <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
-          <p>Expect <strong>117 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+          <p>Expect <strong>134 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+        </li>
+        <li><span class="num" aria-hidden="true">9</span>
+          <h3>Optional: performance check (NFR-04)</h3>
+          <p>With the app running, in another window. It sends 500 searches from 100 users at once and prints PASS if 95% finish under 2 seconds:</p>
+          <div class="code"><pre>java scripts/LoadCheck.java</pre><button type="button">Copy</button></div>
+          <p class="muted">On a 4-core test machine: median 282 ms, 95th percentile 706 ms, no failures. Write down your laptop's numbers for the report.</p>
         </li>
       </ol>
     </section>
@@ -514,6 +536,34 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
         <div class="code"><pre>mysql -u root -p club_central &lt; database/reset-demo.sql</pre><button type="button">Copy</button></div>
         <div class="code"><pre>mysql -u root -p club_central &lt; database/sample-data.sql</pre><button type="button">Copy</button></div>
       </div>
+    </section>
+
+    <section class="card">
+      <h2>Demo script (about 10 minutes)</h2>
+      <p>Start Mailpit and the app in <strong>demo mode</strong> with ADMIN_EMAIL and ADMIN_PASSWORD set, after resetting the data. Logins: demo leader
+        <code class="inline">demo.leader@clubcentral.local</code> / <code class="inline">spartan-demo-2026</code>; administrator: your ADMIN_EMAIL / ADMIN_PASSWORD.</p>
+      <div class="trouble-wrap" tabindex="0" aria-label="Demo script, scrolls sideways on small screens">
+        <table class="trouble">
+          <thead><tr><th scope="col">#</th><th scope="col">Do</th><th scope="col">Shows</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Homepage &rarr; click <strong>Sports</strong></td><td>One click to filtered results (FR-02, NFR-03)</td></tr>
+            <tr><td>2</td><td>Search <strong>robotics</strong>; then <strong>club</strong> + Academic</td><td>Description matches; both filters together (FR-01, TC-02, TC-05)</td></tr>
+            <tr><td>3</td><td>Open <strong>Chess Club</strong></td><td>Full profile with links (FR-05, FR-06)</td></tr>
+            <tr><td>4</td><td>Send the join form with email <code class="inline">student@</code></td><td>Field messages, nothing saved (SPR-05)</td></tr>
+            <tr><td>5</td><td>Fix and send; open Mailpit</td><td>Confirmation and the email (FR-03, FR-07)</td></tr>
+            <tr><td>6</td><td>Open <code class="inline">/dashboard</code> logged out</td><td>Sent to login (SPR-01)</td></tr>
+            <tr><td>7</td><td>Log in as the demo leader &rarr; Join requests</td><td>Only Chess Club's requests (NFR-02)</td></tr>
+            <tr><td>8</td><td>Edit the meeting time</td><td>Public page updates (FR-09)</td></tr>
+            <tr><td>9</td><td>Hide, check <code class="inline">/clubs/1</code>, Show</td><td>Hidden from students, nothing lost (FR-12)</td></tr>
+            <tr><td>10</td><td>As a second leader open <code class="inline">/dashboard/clubs/1/requests</code></td><td>"Not allowed": ownership rule (SPR-03)</td></tr>
+            <tr><td>11</td><td>Forgot password &rarr; Mailpit link &rarr; new password</td><td>One-time reset (FR-11)</td></tr>
+            <tr><td>12</td><td>Admin: Block a leader, Security log</td><td>Account control and audit (SPR-08)</td></tr>
+            <tr><td>13</td><td>Workbench: <code class="inline">SELECT email, password_hash FROM club_leader;</code></td><td>Only BCrypt hashes (NFR-01)</td></tr>
+            <tr><td>14</td><td>Shrink the window to phone width</td><td>Everything fits (NFR-08)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">If anything breaks on the day, switch to the <a href="#/">website preview</a> in this file and keep going through the same steps.</p>
     </section>
 
     <section class="card">
@@ -533,7 +583,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <tr><td>"That request wasn't allowed" after sending the form</td><td>The page was open too long or from an old tab. Refresh the club page and send again.</td></tr>
             <tr><td>Admin login says "Invalid email or password"</td><td>ADMIN_EMAIL / ADMIN_PASSWORD weren't set the first time the app started, or the password was under 8 characters (check the app's window for a message). The admin is only created when none exists yet.</td></tr>
             <tr><td>"That request wasn't allowed" on the dashboard</td><td>You're logged in as the administrator. Log out and log in as a leader.</td></tr>
-            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-5-leader-dashboard</code> and restart the app.</td></tr>
+            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-7-final-polish</code> and restart the app.</td></tr>
           </tbody>
         </table>
       </div>
@@ -565,7 +615,7 @@ function findClub(id) { return allClubs().find(c => c.id === id) || null; }
 // ---- Phase 3: what MySQL + Mailpit would hold, kept for this browser tab only ----
 const STATE_KEY = "scc-preview";
 const state = (() => {
-  const fresh = { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null };
+  const fresh = { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null, resetTokens: [] };
   try { const saved = JSON.parse(sessionStorage.getItem(STATE_KEY)); if (saved && Array.isArray(saved.requests)) return Object.assign(fresh, saved); } catch (e) {}
   return fresh;
 })();
@@ -907,8 +957,10 @@ function loginPage(params) {
       params.has("error") ? h("p", { class: "notice notice-error", role: "alert" }, "Invalid email or password.") : null,
       params.has("registered") ? h("p", { class: "notice notice-ok", role: "status" }, "Your account was created. Log in to continue.") : null,
       params.has("logout") ? h("p", { class: "notice notice-ok", role: "status" }, "You've been logged out.") : null,
+      params.has("reset") ? h("p", { class: "notice notice-ok", role: "status" }, "Your password was changed. Log in with your new password.") : null,
       form,
-      h("p", { class: "auth-switch" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))),
+      h("p", { class: "auth-switch" }, h("a", { href: "#/forgot-password" }, "Forgot your password?")),
+      h("p", { class: "auth-switch auth-switch-tight" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))),
     h("div", { class: "demo-creds" },
       h("p", {}, h("strong", {}, "Demo club leader: "), h("code", {}, DEMO_LEADER.email), " / ", h("code", {}, DEMO_LEADER.password),
         " (leads Chess Club). The real app has this account when started in demo mode."),
@@ -1186,13 +1238,150 @@ function leaderInboxPage(u, club) {
           r.status === "FAILED" ? h("p", { class: "muted small" }, "The email to your club couldn't be sent when this arrived, so this page is the only copy.") : null))));
 }
 
-function adminPage(u) {
+// ---- Phase 6: password reset (same rules as AuthService) ----
+async function sha256Hex(text) {
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  return (await previewHash(text, "token")).split("$")[2];
+}
+async function sendResetLink(leader) {
+  state.resetTokens = (state.resetTokens || []);
+  state.resetTokens.filter(t => t.leaderId === leader.id && !t.used).forEach(t => { t.used = true; });   // older links stop working
+  const raw = randomHex(32);
+  state.resetTokens.push({ leaderId: leader.id, hash: await sha256Hex(raw), expires: Date.now() + 30 * 60000, used: false });
+  const link = "#/reset-password?token=" + raw;
+  if (state.mailDown) return false;
+  state.emails.unshift({ from: "no-reply@clubcentral.local", to: leader.email, replyTo: "-", date: new Date().toLocaleString("en-US"),
+    subject: "Reset your Spartan Club Central password", link,
+    body: "Hello " + leader.name + ",\n\nSomeone asked to reset the password for your club leader account.\nTo choose a new password, open this link within 30 minutes:\n\n"
+      + "http://localhost:8080/reset-password?token=" + raw + "\n\nThe link works once. If you didn't ask for this, you can ignore this email;\nyour password stays the same.\n\nSpartan Club Central\n" });
+  return true;
+}
+async function findUsableToken(raw) {
+  if (!raw || raw.length > 100) return null;
+  const hash = await sha256Hex(raw.trim());
+  const t = (state.resetTokens || []).find(x => x.hash === hash);
+  if (!t || t.used || Date.now() > t.expires) return null;
+  const leader = state.leaders.find(l => l.id === t.leaderId);
+  return leader && leader.enabled !== false ? { t, leader } : null;
+}
+
+function forgotPage(params) {
+  document.title = "Forgot password | Spartan Club Central";
+  const email = input("email", "email", 254, "username", "", { required: true });
+  const form = h("form", { class: "stack-form" },
+    h("div", { class: "field" }, h("label", { for: "email" }, "Email"), email),
+    h("button", { type: "submit", class: "button" }, "Email me a reset link"));
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const leader = state.leaders.find(l => l.email === normEmail(email.value) && l.enabled !== false);
+    if (leader) { await sendResetLink(leader); audit("LEADER", leader.id, "PASSWORD_RESET_REQUESTED", true); saveState(); }
+    location.hash = "#/forgot-password?sent";        // same answer for every email (SPR-06)
+  });
+  return h("div", { class: "container page auth-page" }, h("div", { class: "card auth-card" },
+    h("h1", {}, "Reset your password"),
+    params.has("sent")
+      ? [h("p", { class: "notice notice-ok", role: "status" }, "If that email belongs to a club leader account, we've sent a link to reset the password. It works once, for 30 minutes."),
+         h("p", { class: "muted" }, "No email? Check your spam folder, or ask the site administrator to send you a new link."),
+         h("p", {}, h("a", { href: "#/mailpit" }, "Open the pretend Mailpit inbox (preview only)"), " · ", h("a", { href: "#/login" }, "Back to login"))]
+      : [h("p", { class: "muted" }, "Enter the email you log in with. We'll email you a link to choose a new password."), form,
+         h("p", { class: "auth-switch" }, h("a", { href: "#/login" }, "Back to login"))]));
+}
+
+function resetPage(params, errors) {
+  document.title = "Choose a new password | Spartan Club Central";
+  const raw = params.get("token") || "";
+  const holder = h("div", { class: "container page auth-page" }, h("div", { class: "card auth-card" }, h("p", {}, "Checking link…")));
+  findUsableToken(raw).then(found => {
+    errors = errors || {};
+    const card = holder.firstChild;
+    if (!found) {
+      card.replaceChildren(h("h1", {}, "This link doesn't work"),
+        h("p", { class: "notice notice-error", role: "alert" }, "This reset link has expired or was already used."),
+        h("p", {}, "Reset links work once, for 30 minutes. You can ask for a new one."),
+        h("p", {}, h("a", { class: "button", href: "#/forgot-password" }, "Get a new link")));
+      return;
+    }
+    const pw = input("password", "password", 72, "new-password", "", { required: true });
+    const confirm = input("confirmPassword", "password", 72, "new-password", "", { required: true });
+    const form = h("form", { class: "stack-form", novalidate: true },
+      formField("password", "New password", pw, errors, "8 to 72 characters."),
+      formField("confirmPassword", "Confirm new password", confirm, errors),
+      h("button", { type: "submit", class: "button" }, "Save new password"));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const again = await findUsableToken(raw);
+      if (!again) { document.getElementById("main").replaceChildren(resetPage(params)); return; }
+      const errs = validateRegistration({ name: "x", email: "x@example.com", position: "", password: pw.value, confirmPassword: confirm.value });
+      delete errs.name; delete errs.email;
+      if (Object.keys(errs).length) {
+        document.getElementById("main").replaceChildren(resetPage(params, errs));
+        return;
+      }
+      again.leader.hash = await previewHash(pw.value);
+      again.t.used = true;
+      audit("LEADER", again.leader.id, "PASSWORD_RESET_COMPLETED", true); saveState();
+      location.hash = "#/login?reset";
+    });
+    card.replaceChildren(h("h1", {}, "Choose a new password"), errorSummary(errors), form);
+    const sum = document.getElementById("error-summary"); if (sum) sum.focus();
+  });
+  return holder;
+}
+
+// ---- Phase 6: administrator (same rules as AdminService) ----
+const ADMIN_NOTICES = { clubHidden: ["ok", "The club is now hidden from students."], clubShown: ["ok", "The club is visible to students again."],
+  resetSent: ["ok", "A password reset link was emailed to the leader."],
+  resetFailed: ["error", "The reset email couldn't be sent. Check that the mail server (Mailpit) is running, then try again."],
+  leaderDisabled: ["ok", "The leader account is blocked. It can't log in or reset its password."],
+  leaderEnabled: ["ok", "The leader account can log in again."] };
+function adminPage(u, params) {
   document.title = "Administrator | Spartan Club Central";
+  params = params || new URLSearchParams();
+  const key = Object.keys(ADMIN_NOTICES).find(k => params.has(k));
+  const go = k => { saveState(); location.hash = "#/admin?" + k; render(); };
+  const btn = (label, hidden, cls, fn) => { const b = h("button", { type: "button", class: "button button-small " + cls }, label,
+    h("span", { class: "visually-hidden" }, hidden)); b.addEventListener("click", fn); return b; };
+  const leaderOf = id => state.leaders.find(l => l.clubId === id);
+  const clubs = allClubs().slice().sort((a, b) => a.name.localeCompare(b.name));
+  const leaders = state.leaders.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const table = (cols, rows) => h("div", { class: "table-scroll", tabindex: "0" },
+    h("table", { class: "data-table" }, h("thead", {}, h("tr", {}, cols.map(c => h("th", { scope: "col" }, c)))), h("tbody", {}, rows)));
   return h("div", { class: "container page" },
     h("h1", {}, "Administrator"),
     h("p", { class: "muted" }, "Logged in as ", u.name, "."),
-    h("section", { class: "card dash-card" }, h("h2", {}, "Coming next"),
-      h("p", {}, "Lists of all clubs and leader accounts, deactivating a club, and sending a leader a password reset link arrive in a later update.")));
+    key ? h("p", { class: "notice notice-" + ADMIN_NOTICES[key][0], role: ADMIN_NOTICES[key][0] === "ok" ? "status" : "alert" }, ADMIN_NOTICES[key][1]) : null,
+    h("nav", { class: "admin-jump", "aria-label": "Sections on this page" },
+      h("a", { href: "#/admin#clubs" }, "Clubs (" + clubs.length + ")"), h("a", { href: "#/admin#leaders" }, "Leader accounts (" + leaders.length + ")"),
+      h("a", { href: "#/admin#audit" }, "Security log")),
+    h("section", { class: "card dash-card", id: "clubs", "aria-labelledby": "clubs-heading" },
+      h("h2", { id: "clubs-heading" }, "Clubs"),
+      table(["Club", "Category", "Leader", "Requests", "Status", "Action"], clubs.map(c => { const l = leaderOf(c.id); return h("tr", {},
+        h("th", { scope: "row" }, c.active ? h("a", { href: "#/clubs/" + c.id }, c.name) : c.name),
+        h("td", {}, catName(c.categoryId)), h("td", {}, l ? l.name : "None yet"), h("td", {}, requestsFor(c.id).length),
+        h("td", {}, h("span", { class: "status " + (c.active ? "status-DELIVERED" : "status-FAILED") }, c.active ? "Visible" : "Hidden")),
+        h("td", {}, c.active
+          ? btn("Hide", " " + c.name, "button-outline", () => { c.active = false; audit("ADMIN", u.id, "CLUB_DEACTIVATED", true); go("clubHidden"); })
+          : btn("Show", " " + c.name, "", () => { c.active = true; audit("ADMIN", u.id, "CLUB_ACTIVATED", true); go("clubShown"); }))); }))),
+    h("section", { class: "card dash-card", id: "leaders", "aria-labelledby": "leaders-heading" },
+      h("h2", { id: "leaders-heading" }, "Leader accounts"),
+      h("p", { class: "muted" }, "Send a reset link when a leader is locked out; you never see or set their password. Block an account that doesn't belong to a real club leader."),
+      leaders.length === 0 ? h("p", {}, "No leader accounts yet.") :
+      table(["Name", "Email", "Club", "Status", "Actions"], leaders.map(l => { const club = l.clubId != null ? findClub(l.clubId) : null; const on = l.enabled !== false; return h("tr", {},
+        h("th", { scope: "row" }, l.name), h("td", {}, l.email), h("td", {}, club ? club.name : "None yet"),
+        h("td", {}, h("span", { class: "status " + (on ? "status-DELIVERED" : "status-FAILED") }, on ? "Active" : "Blocked")),
+        h("td", { class: "action-cell" }, on
+          ? [btn("Send reset link", " to " + l.name, "button-outline", async () => { const ok = await sendResetLink(l); audit("ADMIN", u.id, "RESET_LINK_SENT", ok); go(ok ? "resetSent" : "resetFailed"); }),
+             btn("Block", " " + l.name, "button-outline button-danger-outline", () => { l.enabled = false; audit("ADMIN", u.id, "LEADER_DISABLED", true);
+               if (state.session && state.session.role === "LEADER" && state.session.id === l.id) state.session = null; go("leaderDisabled"); })]
+          : btn("Unblock", " " + l.name, "", () => { l.enabled = true; audit("ADMIN", u.id, "LEADER_ENABLED", true); go("leaderEnabled"); }))); }))),
+    h("section", { class: "card dash-card", id: "audit", "aria-labelledby": "audit-heading" },
+      h("h2", { id: "audit-heading" }, "Security log"),
+      h("p", { class: "muted" }, "The 50 most recent events (SPR-08). Account numbers only: no passwords, emails or student details."),
+      table(["When", "Who", "Action", "Result"], state.audit.slice(-50).reverse().map(a => h("tr", {},
+        h("td", {}, a.time), h("td", {}, a.actorType + (a.actorId != null ? " #" + a.actorId : "")), h("td", {}, a.action), h("td", {}, a.success ? "OK" : "Denied/failed"))))));
 }
 function forbiddenPage() {
   document.title = "Request not allowed | Spartan Club Central";
@@ -1226,7 +1415,7 @@ function inboxPage() {
   clear.addEventListener("click", () => { state.requests = []; state.emails = []; saveState(); render(); });
   const reset = h("button", { type: "button", class: "button button-outline" }, "Reset everything");
   reset.addEventListener("click", async () => { try { sessionStorage.removeItem(STATE_KEY); } catch (e) {} Object.assign(state,
-    { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null }); await ensureAdmin(); render(); });
+    { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [], clubs: null, resetTokens: [] }); await ensureAdmin(); render(); });
   const table = (cols, rows) => h("div", { class: "db-wrap", tabindex: "0", "aria-label": "Table, scrolls sideways on small screens" },
     h("table", { class: "db-table" }, h("thead", {}, h("tr", {}, cols.map(c => h("th", { scope: "col" }, c)))), h("tbody", {}, rows)));
   return h("div", { class: "container page" },
@@ -1243,7 +1432,8 @@ function inboxPage() {
             h("h2", {}, m.subject),
             h("dl", {}, h("dt", {}, "From"), h("dd", {}, m.from), h("dt", {}, "To"), h("dd", {}, m.to),
               h("dt", {}, "Reply-To"), h("dd", {}, m.replyTo), h("dt", {}, "Date"), h("dd", {}, m.date))),
-          h("pre", {}, m.body)))),
+          h("pre", {}, m.body),
+          m.link ? h("p", { style: "margin:0;padding:0 16px 14px" }, h("a", { class: "button", href: m.link }, "Open the reset link")) : null))),
     h("section", { class: "card", style: "margin-top:24px", "aria-labelledby": "db-heading" },
       h("h2", { id: "db-heading" }, "Behind the scenes: the join_request table"),
       h("p", { class: "muted" }, "What MySQL would store. In the real app only the club's leader can see these (Phase 5, NFR-02)."),
@@ -1321,6 +1511,7 @@ function testPanel() {
       t("TC-09: pretend Mailpit inbox", "#/mailpit"),
       t("TC-17: /dashboard while logged out", "#/dashboard"),
       t("TC-08: create a leader account", "#/register"),
+      t("TC-15: forgot password", "#/forgot-password"),
       t("Inactive club (#17) is hidden", "#/clubs/17"),
       t("Unknown page", "#/nope")));
 }
@@ -1355,10 +1546,12 @@ function render() {
     }
   } else if (path === "/admin" || path.startsWith("/admin/")) {
     const ok = needs("ADMIN"); if (ok === null) return;
-    page = ok ? adminPage(ok) : forbiddenPage();
+    page = ok ? (path === "/admin" ? adminPage(ok, params) : notFoundPage()) : forbiddenPage();
   } else if ((path === "/login" || path === "/register") && u) { location.replace("#" + homeFor(u)); return; }
   else if (path === "/login") page = loginPage(params);
   else if (path === "/register") page = registerPage();
+  else if (path === "/forgot-password") page = forgotPage(params);
+  else if (path === "/reset-password") page = resetPage(params);
   else if (path === "/" ) page = homePage();
   else if (path === "/clubs") page = directoryPage(params);
   else if (/^\/clubs\/\d+$/.test(path)) page = profilePage(Number(path.split("/")[2]));

@@ -10,7 +10,7 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 6 status:** every feature is in: student pages, join requests, leader accounts, the leader dashboard, password reset and the administrator tools:
+> **Phase 7 status (final):** every feature is built, hardened and documented:
 > - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
 > - `/clubs` directory: keyword + category search (FR-01, FR-02)
 > - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
@@ -22,7 +22,7 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 >
 > - Forgot/reset password by emailed one-time link (FR-11) and the administrator page: all clubs and leaders, hide/show any club, block a leader account, send a reset link, recent security log (FR-12)
 >
-> Phase 7 adds the final security hardening, a performance check and the demo script.
+> - Security headers (Content-Security-Policy, no framing), a performance check (`scripts/LoadCheck.java`), [docs/architecture.md](architecture.md), [docs/traceability.md](traceability.md), and the demo script at the end of this file
 >
 > ![Club directory](screenshots/phase2-directory.png)
 
@@ -225,7 +225,17 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | **Send reset link** | "A password reset link was emailed to the leader."; the email is in Mailpit | FR-11 |
 | Scroll to **Security log** | PASSWORD_RESET_REQUESTED/COMPLETED, RESET_LINK_SENT, LEADER_DISABLED, CLUB_DEACTIVATED... | SPR-08, TC-24 |
 
-Automated tests: `./mvnw test` should report 133 passing and 1 skipped.
+Automated tests: `./mvnw test` should report 134 passing and 1 skipped.
+
+## Performance check (NFR-04)
+
+With the app running, in a second window:
+
+```bash
+java scripts/LoadCheck.java
+```
+
+It sends 500 searches from 100 users at the same moment and prints `PASS` if 95% finish in under 2 seconds. On a 4-core test machine: median 282 ms, 95th percentile 706 ms, slowest 1.2 s, no failures. Run it on the demo laptop and note your numbers for the report. It only reads data.
 
 ## Mailpit (fake email inbox, needed from Phase 3)
 
@@ -240,4 +250,42 @@ Leave it running, start the app in a second window, and open the inbox at http:/
 
 ## Demo checklist
 
-Filled in during Phase 7.
+**The day before**
+- [ ] `git pull` and `./mvnw test`: 134 passing, 1 skipped
+- [ ] Practice the script below twice and time it (about 10 minutes)
+- [ ] Record a backup screen video of the full script
+- [ ] Copy `docs/local-run.html` to the desktop as a no-setup backup
+
+**Right before (5 minutes)**
+- [ ] Reset the data (section 6): `reset-demo.sql`, then `sample-data.sql`
+- [ ] Start Mailpit, then the app **in demo mode** with `ADMIN_EMAIL`/`ADMIN_PASSWORD` set
+- [ ] Open tabs: http://localhost:8080, http://localhost:8025 (Mailpit), MySQL Workbench
+- [ ] Browser zoom 100%; close other tabs and notifications
+
+**Logins**
+
+| Account | Email | Password |
+|---|---|---|
+| Demo club leader (demo mode) | `demo.leader@clubcentral.local` | `spartan-demo-2026` |
+| Administrator | your `ADMIN_EMAIL` | your `ADMIN_PASSWORD` |
+
+## Demo script (about 10 minutes)
+
+| # | Do | Say / show | Requirement |
+|---|---|---|---|
+| 1 | Homepage → click **Sports** | One click to filtered results; 8 Sports clubs | FR-02, NFR-03 |
+| 2 | Search **robotics**, then keyword **club** + **Academic** | Found through the description; both filters apply together | FR-01, TC-02, TC-05 |
+| 3 | Open **Chess Club** | Description, meeting time, contact, social links | FR-05, FR-06, TC-06 |
+| 4 | Send the join form with email `student@` and no message | Clear messages next to each field; nothing saved | SPR-05 |
+| 5 | Fix it and send | "Your request was sent"; the email arrives in Mailpit with Reply-To the student | FR-03, FR-07, TC-07, TC-09 |
+| 6 | Open `localhost:8080/dashboard` while logged out | Sent to the login page | SPR-01, TC-17 |
+| 7 | Log in as the demo leader → **Join requests** | The new request plus 3 samples; only Chess Club's; nobody else can see them | NFR-02, SPR-04 |
+| 8 | **Edit club**: change the meeting time | The public page updates immediately | FR-09, TC-12 |
+| 9 | **Hide club**, show `/clubs/1` in another tab, then **Show** | Hidden clubs disappear for students without losing data | FR-12, TC-13 |
+| 10 | Register a second leader; open `/dashboard/clubs/1/requests` | "That request wasn't allowed": the ownership rule | SPR-03, TC-19 |
+| 11 | Log out → **Forgot your password?** → link in Mailpit → new password → log in | One-time, 30-minute link; only a hash is stored | FR-11, TC-15 |
+| 12 | Log in as admin: clubs, leaders, **Block** the second leader, **Security log** | Account recovery, deactivations, audit trail without personal data | FR-12, SPR-08 |
+| 13 | Workbench: `SELECT email, password_hash FROM club_leader;` | Only `$2a$12$...` hashes | NFR-01, TC-18 |
+| 14 | Shrink the browser to phone width | Everything fits | NFR-08 |
+
+**If something breaks:** switch to `docs/local-run.html` (offline preview) or the backup video, and keep talking through the same steps.

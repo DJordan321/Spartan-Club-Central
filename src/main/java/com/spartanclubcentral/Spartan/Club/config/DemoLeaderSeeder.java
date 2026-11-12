@@ -73,7 +73,7 @@ public class DemoLeaderSeeder implements ApplicationRunner {
     @Transactional
     boolean seed() {
         if (authService.isEmailTaken(EMAIL)) {
-            log.info("Demo mode: demo leader already exists ({}).", EMAIL);
+            log.info("Demo mode: the demo leader account already exists.");
             return false;
         }
         ClubLeader leader = new ClubLeader();
@@ -89,8 +89,9 @@ public class DemoLeaderSeeder implements ApplicationRunner {
 
         leader = leaders.save(leader);
         audit.log("LEADER", leader.getLeaderId(), AuditLogger.DEMO_SEEDED, "LEADER", leader.getLeaderId(), true);
-        log.warn("Demo mode: created demo leader {}{}. Never use the demo profile outside local demos.",
-                EMAIL, club.isPresent() ? " (linked to " + CLUB_NAME + ")" : "");
+        // No email in the log (SPR-08); the credentials are in docs/run-locally.md.
+        log.warn("Demo mode: created the demo leader account{}. Never use the demo profile outside local demos.",
+                club.isPresent() ? " (linked to " + CLUB_NAME + ")" : "");
         return true;
     }
 

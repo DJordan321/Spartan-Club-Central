@@ -81,31 +81,45 @@ You can edit and view requests only for your own club.
 
 ## Current Project Status
 
-**Near completion.** Planning and design are finished, the core features are built, and the project is in testing and polish ahead of a pilot.
+**Feature-complete and tested; ready for local demonstrations.** All functional requirements (FR-01 to FR-12) and security requirements (SPR-01 to SPR-08) are built. There are 134 automated tests, and the system has been checked on MySQL 8 in a real browser.
 
 - [x] Requirements, user stories, use cases, and UML diagrams
-- [x] Architecture and class design
-- [x] Security and privacy checklist and security test cases
-- [x] Club directory with keyword search and category filter
-- [x] Club profile pages
-- [x] Join/contact request form with validation
-- [x] Club leader registration, login, and dashboard
-- [x] Create, edit, and deactivate listings
-- [ ] Final run of all security test cases
+- [x] Architecture and class design ([docs/architecture.md](docs/architecture.md))
+- [x] Club directory with keyword search (name and description) and category filter
+- [x] Club profile pages with contact info and social links
+- [x] Join/contact request form with validation, emailed to the club (Mailpit locally)
+- [x] Club leader registration, login, logout, and password reset by email
+- [x] Leader dashboard: create, edit, hide/show, and delete your own club; read its join requests
+- [x] Administrator page: all clubs and leaders, hide clubs, block accounts, send reset links, security log
+- [x] Security: BCrypt passwords, ownership checks, CSRF, session timeout, security headers, audit log
+- [x] Automated tests and requirements traceability ([docs/traceability.md](docs/traceability.md))
+- [x] Performance check: 100 concurrent users, 95% of searches under 1 second on a test machine
+- [ ] Manual screen-reader pass and Firefox/Safari check
 - [ ] Pilot test with a small group of students
 - [ ] Initial club data collection from student organizations
 - [ ] Hosting deployment and campus-wide launch
 
+## Documentation
+
+| Document | What's in it |
+|---|---|
+| [docs/run-locally.md](docs/run-locally.md) | Install, run, test, reset, troubleshoot, and the demo script |
+| [docs/local-run.html](docs/local-run.html) | Open in any browser: clickable offline preview of the whole site plus the setup guide |
+| [docs/architecture.md](docs/architecture.md) | How the code is organized and why |
+| [docs/traceability.md](docs/traceability.md) | Every requirement → code → tests |
+| [docs/requirements.md](docs/requirements.md), [docs/security-privacy-checklist.md](docs/security-privacy-checklist.md) | Requirements and security checklist |
+
 ## Known Issues and Limitations
 
-- Whether keyword search matches club names only, or also descriptions and categories, still needs to be confirmed.
-- Whether a club has one leader or several is still to be finalized.
-- The 30-minute session timeout, minimum password length, and maximum text lengths are placeholder values until the team confirms them.
-- Club information must be collected from leaders by hand, since there is no connection to a university club database.
-- Listings stay accurate only if club leaders keep them updated.
-- Request notifications and password reset emails require mail configuration.
-- A free or low-cost hosting tier may limit performance and uptime.
-- The 2-second search target for 100 concurrent users has not yet been verified with a full load test.
-- The site is web only. There is no native mobile app, though the layout is responsive.
+Decided during the build (were open questions):
+- Keyword search matches club names **and** descriptions, combined with the category filter.
+- Each club has one leader account, and each leader leads one club.
+- Sessions time out after 30 minutes; passwords are 8 to 72 characters; text limits match the database (for example, a 1,000-character message).
+
+Still true:
+- Anyone can register as a leader (an approval workflow was out of scope); the administrator can block a fake account and hide its club.
+- Club information must be entered by leaders, since there is no connection to a university club database.
+- Emails go to Mailpit on the demo laptop; a real deployment needs a real mail server and HTTPS.
+- 99% uptime (NFR-05) can only be measured once the site is hosted.
+- The site is web only. There is no native mobile app, though the layout works on phones down to 320 px wide.
 - Individual club chats and a Student Affairs approval workflow were cut from scope.
-- Long-term maintenance after the founding team graduates will need documentation and a hand-off plan.
