@@ -2,6 +2,7 @@ package com.spartanclubcentral.Spartan.Club.controller;
 
 import com.spartanclubcentral.Spartan.Club.dto.JoinRequestForm;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import com.spartanclubcentral.Spartan.Club.service.RequestService;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
 import org.springframework.stereotype.Controller;
@@ -26,10 +27,12 @@ public class RequestController {
 
     private final RequestService requestService;
     private final ClubService clubService;
+    private final OfficerService officerService;
 
-    public RequestController(RequestService requestService, ClubService clubService) {
+    public RequestController(RequestService requestService, ClubService clubService, OfficerService officerService) {
         this.requestService = requestService;
         this.clubService = clubService;
+        this.officerService = officerService;
     }
 
     @PostMapping("/clubs/{id}/requests")
@@ -42,6 +45,7 @@ public class RequestController {
         } catch (ValidationException e) {
             // Show the club page again with the typed values and one message per field.
             model.addAttribute("club", clubService.getActiveClub(id));
+            model.addAttribute("officers", officerService.listForPublicClub(id));
             model.addAttribute("errors", e.getFieldErrors());
             return "club";
         }

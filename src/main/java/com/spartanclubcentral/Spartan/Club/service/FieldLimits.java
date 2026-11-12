@@ -28,6 +28,10 @@ public final class FieldLimits {
     /** BCrypt ignores everything after 72 bytes, so longer passwords are rejected. */
     public static final int PASSWORD_MAX = 72;
     public static final int SEARCH = 100;
+    /** Officer role, e.g. "President" (FR-13). */
+    public static final int OFFICER_ROLE = 50;
+    /** Most officers one club can list. */
+    public static final int MAX_OFFICERS = 10;
 
     private FieldLimits() {
     }

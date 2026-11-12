@@ -10,11 +10,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.spartanclubcentral.Spartan.Club.model.Category;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
+import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.model.JoinRequest;
 import com.spartanclubcentral.Spartan.Club.repository.AuditLogRepository;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.security.AccountPrincipal;
 import com.spartanclubcentral.Spartan.Club.security.AccountPrincipal.Role;
@@ -43,6 +45,7 @@ class PageRenderWithoutTransactionTest {
     @Autowired private LeaderRepository leaders;
     @Autowired private RequestRepository requests;
     @Autowired private AuditLogRepository auditLogs;
+    @Autowired private OfficerRepository officers;
     @Autowired private TransactionTemplate tx;
 
     private Club club;
@@ -70,17 +73,26 @@ class PageRenderWithoutTransactionTest {
         r.setStudentEmail("render.student@example.com");
         r.setMessage("Hello");
         requests.save(r);
+        officers.save(new ClubOfficer(club, "Render Officer", "President", 1));
     }
 
     @AfterEach
     void cleanUp() {
         tx.executeWithoutResult(status -> {
             requests.deleteByClubId(club.getClubId());
+            officers.deleteByClubId(club.getClubId());
             leaders.deleteById(leader.getLeaderId());
             clubs.deleteById(club.getClubId());
             categories.deleteById(category.getCategoryId());
             auditLogs.deleteAll();
         });
+    }
+
+    @Test
+    void publicClubPageShowsOfficers() throws Exception {
+        mvc.perform(get("/clubs/" + club.getClubId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(containsString("Render Officer"), containsString("</html>"))));
     }
 
     @Test
@@ -96,7 +108,8 @@ class PageRenderWithoutTransactionTest {
     void leaderPagesRenderCompletely() throws Exception {
         AccountPrincipal me = new AccountPrincipal(leader.getLeaderId(), leader.getEmail(), leader.getName(), "x", Role.LEADER, true);
         for (String url : new String[] {"/dashboard", "/dashboard/clubs/" + club.getClubId() + "/edit",
-                "/dashboard/clubs/" + club.getClubId() + "/requests", "/dashboard/clubs/" + club.getClubId() + "/delete"}) {
+                "/dashboard/clubs/" + club.getClubId() + "/requests", "/dashboard/clubs/" + club.getClubId() + "/delete",
+                "/dashboard/clubs/" + club.getClubId() + "/officers"}) {
             mvc.perform(get(url).with(user(me)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(allOf(containsString("Render Test Club"), containsString("</html>"))));

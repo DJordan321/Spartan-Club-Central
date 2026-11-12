@@ -2,10 +2,12 @@ package com.spartanclubcentral.Spartan.Club.config;
 
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
+import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.model.JoinRequest;
 import com.spartanclubcentral.Spartan.Club.model.RequestStatus;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.AuditLogger;
 import com.spartanclubcentral.Spartan.Club.service.AuthService;
@@ -33,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * The password is still stored only as a BCrypt hash (NFR-01). The account
  * is linked to Chess Club (if no other leader has it) so the Phase 5
  * dashboard has a club to edit, plus three made-up join requests so the
- * request inbox isn't empty during a demo.
+ * request inbox isn't empty during a demo, and three officers (FR-13).
  */
 @Component
 @Profile("demo")
@@ -49,16 +51,19 @@ public class DemoLeaderSeeder implements ApplicationRunner {
     private final LeaderRepository leaders;
     private final ClubRepository clubs;
     private final RequestRepository requests;
+    private final OfficerRepository officers;
     private final AuthService authService;
     private final PasswordHasher passwordHasher;
     private final AuditLogger audit;
 
     public DemoLeaderSeeder(LeaderRepository leaders, ClubRepository clubs, RequestRepository requests,
+                            OfficerRepository officers,
                             AuthService authService,
                             PasswordHasher passwordHasher, AuditLogger audit) {
         this.leaders = leaders;
         this.clubs = clubs;
         this.requests = requests;
+        this.officers = officers;
         this.authService = authService;
         this.passwordHasher = passwordHasher;
         this.audit = audit;
@@ -86,6 +91,11 @@ public class DemoLeaderSeeder implements ApplicationRunner {
                 .filter(c -> leaders.findByClub_ClubId(c.getClubId()).isEmpty());
         club.ifPresent(leader::setClub);
         club.filter(c -> requests.countByClub_ClubId(c.getClubId()) == 0).ifPresent(this::addSampleRequests);
+        club.filter(c -> officers.countByClub_ClubId(c.getClubId()) == 0).ifPresent(c -> {
+            officers.save(new ClubOfficer(c, NAME, "President", 1));
+            officers.save(new ClubOfficer(c, "Priya Patel", "Treasurer", 2));
+            officers.save(new ClubOfficer(c, "Marcus Green", "Tournament Director", 3));
+        });
 
         leader = leaders.save(leader);
         audit.log("LEADER", leader.getLeaderId(), AuditLogger.DEMO_SEEDED, "LEADER", leader.getLeaderId(), true);

@@ -5,8 +5,10 @@ import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.security.AccountPrincipal;
 import com.spartanclubcentral.Spartan.Club.service.AuthService;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import com.spartanclubcentral.Spartan.Club.service.RequestService;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,11 +45,14 @@ public class DashboardController {
     private final AuthService authService;
     private final ClubService clubService;
     private final RequestService requestService;
+    private final OfficerService officerService;
 
-    public DashboardController(AuthService authService, ClubService clubService, RequestService requestService) {
+    public DashboardController(AuthService authService, ClubService clubService, RequestService requestService,
+                               OfficerService officerService) {
         this.authService = authService;
         this.clubService = clubService;
         this.requestService = requestService;
+        this.officerService = officerService;
     }
 
     @GetMapping("/dashboard")
@@ -56,6 +61,7 @@ public class DashboardController {
         Optional<Club> club = clubService.findLeaderClub(me.getId());
         model.addAttribute("club", club.orElse(null));
         model.addAttribute("requestCount", club.map(c -> clubService.countRequests(me.getId(), c.getClubId())).orElse(0L));
+        model.addAttribute("officers", club.map(c -> officerService.listForLeader(me.getId(), c.getClubId())).orElse(List.of()));
         return "dashboard/home";
     }
 

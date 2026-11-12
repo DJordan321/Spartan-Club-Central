@@ -20,7 +20,7 @@ Communication: Discord. Meetings: every Wednesday.
 
 - Searchable club directory with keyword search
 - Category filtering (academic, cultural, sports, service, and others)
-- Individual club profile pages with description, meeting times, contact information, and social links
+- Individual club profile pages with description, meeting times, contact information, social links, and the club's officers
 - Join/contact request form that students can use without logging in
 - Club leader registration, login, and password reset
 - Login-protected dashboard where leaders create, edit, and deactivate their own club's listing and view requests sent to their club

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Remove officer')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<main id="main" class="container page narrow">
+  <h1>Remove <span th:text="${officer.name}">Priya Patel</span>?</h1>
+  <div class="card danger-card">
+    <p><span th:text="${officer.name}">Priya Patel</span> (<span th:text="${officer.role}">Treasurer</span>) will no longer be
+      listed on <span th:text="${club.clubName}">Chess Club</span>'s page. You can add them again later.</p>
+    <div class="action-row">
+      <form method="post" th:action="@{/dashboard/clubs/{id}/officers/{oid}/remove(id=${club.clubId},oid=${officer.officerId})}">
+        <button type="submit" class="button button-danger">Yes, remove</button>
+      </form>
+      <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/officers(id=${club.clubId})}">Cancel</a>
+    </div>
+  </div>
+</main>
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

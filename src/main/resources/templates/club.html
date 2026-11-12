@@ -27,6 +27,15 @@
       <aside class="card details" aria-labelledby="details-heading">
         <h2 id="details-heading">Details</h2>
         <dl>
+          <div th:if="${!#lists.isEmpty(officers)}">
+            <dt>Officers</dt>
+            <dd>
+              <ul class="officer-list">
+                <li th:each="o : ${officers}"><span class="officer-name" th:text="${o.name}">Priya Patel</span>,
+                  <span th:text="${o.role}">Treasurer</span></li>
+              </ul>
+            </dd>
+          </div>
           <div th:if="${club.meetingTime}">
             <dt>Meeting time</dt>
             <dd th:text="${club.meetingTime}">Tuesdays 6 PM</dd>

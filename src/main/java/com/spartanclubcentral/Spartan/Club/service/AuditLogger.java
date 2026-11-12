@@ -36,6 +36,7 @@ public class AuditLogger {
     public static final String RESET_LINK_SENT = "RESET_LINK_SENT";
     public static final String LEADER_DISABLED = "LEADER_DISABLED";
     public static final String LEADER_ENABLED = "LEADER_ENABLED";
+    public static final String OFFICERS_UPDATED = "OFFICERS_UPDATED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 

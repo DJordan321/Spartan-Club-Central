@@ -55,3 +55,24 @@ INSERT INTO club (club_name, description, category_id, meeting_time, contact_ema
 ('Blood Drive Committee', 'Organizes campus blood drives with regional blood banks every semester.', 4, 'First Monday of each month 6:00 PM, Health Center', 'blood@example.com', NULL, 'https://example.com/instagram/blood', NULL, NULL, TRUE),
 ('Mentoring Club', 'Upper-class students mentor first-year and transfer students through their first semester.', 4, 'Wednesdays 6:00 PM, Student Center 220', 'mentoring@example.com', NULL, 'https://example.com/instagram/mentoring', NULL, NULL, TRUE),
 ('Animal Shelter Volunteers', 'Weekend volunteering at the local animal shelter: walking dogs, socializing cats and adoption events.', 4, 'Sundays 11:00 AM, carpool from Lot C', 'animals@example.com', NULL, 'https://example.com/instagram/animals', NULL, NULL, TRUE);
+
+-- Officers (FR-13): fictional names and roles for some clubs. Chess Club's
+-- officers are added by demo mode (the demo leader is its President).
+INSERT INTO club_officer (club_id, name, role, display_order)
+SELECT c.club_id, o.name, o.role, o.ord FROM club c JOIN (
+  SELECT 'Engineering Builders Society' AS club, 'Aisha Johnson' AS name, 'President' AS role, 1 AS ord UNION ALL
+  SELECT 'Engineering Builders Society', 'Kevin Tran', 'Build Lead', 2 UNION ALL
+  SELECT 'Computer Science Club', 'Maya Robinson', 'President', 1 UNION ALL
+  SELECT 'Computer Science Club', 'Daniel Brooks', 'Vice President', 2 UNION ALL
+  SELECT 'Computer Science Club', 'Sofia Alvarez', 'Hackathon Coordinator', 3 UNION ALL
+  SELECT 'Debate and Forensics Team', 'Jamal Carter', 'Captain', 1 UNION ALL
+  SELECT 'African Student Union', 'Amara Okafor', 'President', 1 UNION ALL
+  SELECT 'African Student Union', 'Kwame Mensah', 'Events Chair', 2 UNION ALL
+  SELECT 'Gospel Choir', 'Naomi Wright', 'Director', 1 UNION ALL
+  SELECT 'Soccer Club', 'Luis Moreno', 'Captain', 1 UNION ALL
+  SELECT 'Soccer Club', 'Grace Kim', 'Treasurer', 2 UNION ALL
+  SELECT 'Running Club', 'Tyler Evans', 'President', 1 UNION ALL
+  SELECT 'Habitat Builders', 'Hannah Lee', 'President', 1 UNION ALL
+  SELECT 'Habitat Builders', 'Marcus Bell', 'Volunteer Coordinator', 2 UNION ALL
+  SELECT 'Tutoring Corps', 'Olivia Scott', 'Coordinator', 1
+) o ON o.club = c.club_name;

@@ -4,9 +4,11 @@ import com.spartanclubcentral.Spartan.Club.dto.ClubForm;
 import com.spartanclubcentral.Spartan.Club.model.Category;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
+import com.spartanclubcentral.Spartan.Club.model.ClubOfficer;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
@@ -38,16 +40,18 @@ public class ClubService {
     private final CategoryRepository categoryRepository;
     private final LeaderRepository leaderRepository;
     private final RequestRepository requestRepository;
+    private final OfficerRepository officerRepository;
     private final ClubValidator validator;
     private final AuditLogger audit;
 
     public ClubService(ClubRepository clubRepository, CategoryRepository categoryRepository,
                        LeaderRepository leaderRepository, RequestRepository requestRepository,
-                       ClubValidator validator, AuditLogger audit) {
+                       OfficerRepository officerRepository, ClubValidator validator, AuditLogger audit) {
         this.clubRepository = clubRepository;
         this.categoryRepository = categoryRepository;
         this.leaderRepository = leaderRepository;
         this.requestRepository = requestRepository;
+        this.officerRepository = officerRepository;
         this.validator = validator;
         this.audit = audit;
     }
@@ -140,6 +144,9 @@ public class ClubService {
         club = clubRepository.save(club);
         leader.setClub(club);
         leaderRepository.save(leader);
+        // FR-13: the leader is listed as the first officer; they can edit or remove it.
+        String role = leader.getPosition() == null || leader.getPosition().isBlank() ? "Club leader" : leader.getPosition();
+        officerRepository.save(new ClubOfficer(club, leader.getName(), role, 1));
         audit.log("LEADER", leaderId, AuditLogger.CLUB_CREATED, "CLUB", club.getClubId(), true);
         return club;
     }
@@ -178,6 +185,7 @@ public class ClubService {
         leader.setClub(null);
         leaderRepository.saveAndFlush(leader);
         requestRepository.deleteByClubId(clubId);
+        officerRepository.deleteByClubId(clubId);
         clubRepository.delete(club);
         audit.log("LEADER", leaderId, AuditLogger.CLUB_DELETED, "CLUB", clubId, true);
     }

@@ -10,6 +10,7 @@ import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.repository.CategoryRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import java.util.List;
@@ -25,7 +26,7 @@ class ClubServiceTest {
     private final RequestRepository requestRepository = mock(RequestRepository.class);
     private final AuditLogger audit = mock(AuditLogger.class);
     private final ClubService service = new ClubService(clubRepository, categoryRepository, leaderRepository,
-            requestRepository, new ClubValidator(), audit);
+            requestRepository, mock(OfficerRepository.class), new ClubValidator(), audit);
 
     @Test
     void blankKeywordMeansNoKeyword() {

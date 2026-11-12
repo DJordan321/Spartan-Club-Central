@@ -4,6 +4,7 @@ import com.spartanclubcentral.Spartan.Club.dto.JoinRequestForm;
 import com.spartanclubcentral.Spartan.Club.model.Category;
 import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.service.ClubService;
+import com.spartanclubcentral.Spartan.Club.service.OfficerService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -27,9 +28,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ClubController {
 
     private final ClubService clubService;
+    private final OfficerService officerService;
 
-    public ClubController(ClubService clubService) {
+    public ClubController(ClubService clubService, OfficerService officerService) {
         this.clubService = clubService;
+        this.officerService = officerService;
     }
 
     @GetMapping("/")
@@ -56,6 +59,7 @@ public class ClubController {
     @GetMapping("/clubs/{id}")
     public String profile(@PathVariable("id") Long id, Model model) {
         model.addAttribute("club", clubService.getActiveClub(id));
+        model.addAttribute("officers", officerService.listForPublicClub(id));   // FR-13
         model.addAttribute("joinForm", new JoinRequestForm());   // empty join form (FR-03)
         model.addAttribute("errors", Map.of());
         return "club";

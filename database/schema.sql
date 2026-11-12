@@ -64,6 +64,18 @@ CREATE TABLE administrator (
   CONSTRAINT uq_admin_email UNIQUE (email)
 );
 
+-- Club officers shown on the public club page (FR-13). Names and roles only:
+-- no emails or photos of people (NFR-02). Up to 10 per club.
+CREATE TABLE club_officer (
+  officer_id     BIGINT        AUTO_INCREMENT PRIMARY KEY,
+  club_id        BIGINT        NOT NULL,
+  name           VARCHAR(100)  NOT NULL,
+  role           VARCHAR(50)   NOT NULL,
+  display_order  INT           NOT NULL,
+  CONSTRAINT fk_officer_club FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE,
+  INDEX idx_officer_club_order (club_id, display_order)
+);
+
 -- Join/contact requests from students (FR-03). Named join_request, not
 -- "request", so it is never confused with an HTTP request.
 CREATE TABLE join_request (

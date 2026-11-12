@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Edit officer')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<main id="main" class="container page form-page">
+  <p class="back-link"><a th:href="@{/dashboard/clubs/{id}/officers(id=${club.clubId})}">&larr; Officers</a></p>
+  <h1>Edit officer</h1>
+  <div class="error-summary" role="alert" th:if="${!#maps.isEmpty(errors)}" tabindex="-1" id="error-summary">
+    <h2>Please fix the following:</h2>
+    <ul><li th:each="e : ${errors}"><a th:href="'#' + ${e.key}" th:text="${e.value}">Enter a name.</a></li></ul>
+  </div>
+  <form class="card stack-form" method="post" novalidate th:object="${form}"
+        th:action="@{/dashboard/clubs/{id}/officers/{oid}(id=${club.clubId},oid=${officer.officerId})}">
+    <div class="field" th:classappend="${errors.containsKey('name')} ? 'has-error'">
+      <label for="name">Name</label>
+      <p class="field-error" id="name-error" th:if="${errors.containsKey('name')}" th:text="${errors.get('name')}">Error</p>
+      <input id="name" name="name" type="text" maxlength="100" required th:value="*{name}"
+             th:attr="aria-invalid=${errors.containsKey('name')},aria-describedby=${errors.containsKey('name')} ? 'name-error' : null">
+    </div>
+    <div class="field" th:classappend="${errors.containsKey('role')} ? 'has-error'">
+      <label for="role">Role</label>
+      <p class="field-error" id="role-error" th:if="${errors.containsKey('role')}" th:text="${errors.get('role')}">Error</p>
+      <input id="role" name="role" type="text" maxlength="50" required th:value="*{role}"
+             th:attr="aria-invalid=${errors.containsKey('role')},aria-describedby=${errors.containsKey('role')} ? 'role-error' : null">
+    </div>
+    <div class="action-row">
+      <button type="submit" class="button">Save officer</button>
+      <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/officers(id=${club.clubId})}">Cancel</a>
+    </div>
+  </form>
+</main>
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

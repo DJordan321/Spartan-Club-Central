@@ -6,6 +6,7 @@ import com.spartanclubcentral.Spartan.Club.model.ClubLeader;
 import com.spartanclubcentral.Spartan.Club.repository.AuditLogRepository;
 import com.spartanclubcentral.Spartan.Club.repository.ClubRepository;
 import com.spartanclubcentral.Spartan.Club.repository.LeaderRepository;
+import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import java.util.Comparator;
@@ -31,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     /** One row in the admin's club list. */
-    public record ClubRow(Club club, ClubLeader leader, long requestCount) { }
+    public record ClubRow(Club club, ClubLeader leader, long requestCount, long officerCount) { }
 
     /**
      * One row in the admin's leader list. The club name is looked up here,
@@ -43,15 +44,17 @@ public class AdminService {
     private final ClubRepository clubs;
     private final LeaderRepository leaders;
     private final RequestRepository requests;
+    private final OfficerRepository officers;
     private final AuditLogRepository auditLogs;
     private final AuthService authService;
     private final AuditLogger audit;
 
-    public AdminService(ClubRepository clubs, LeaderRepository leaders, RequestRepository requests,
+    public AdminService(ClubRepository clubs, LeaderRepository leaders, RequestRepository requests, OfficerRepository officers,
                         AuditLogRepository auditLogs, AuthService authService, AuditLogger audit) {
         this.clubs = clubs;
         this.leaders = leaders;
         this.requests = requests;
+        this.officers = officers;
         this.auditLogs = auditLogs;
         this.authService = authService;
         this.audit = audit;
@@ -63,7 +66,8 @@ public class AdminService {
                 .collect(Collectors.toMap(ClubLeader::getClubId, Function.identity()));
         return clubs.findAll().stream()
                 .sorted(Comparator.comparing(c -> c.getClubName().toLowerCase()))
-                .map(c -> new ClubRow(c, byClub.get(c.getClubId()), requests.countByClub_ClubId(c.getClubId())))
+                .map(c -> new ClubRow(c, byClub.get(c.getClubId()), requests.countByClub_ClubId(c.getClubId()),
+                        officers.countByClub_ClubId(c.getClubId())))
                 .toList();
     }
 

@@ -43,6 +43,15 @@
       </div>
     </section>
 
+    <section class="card dash-card" aria-labelledby="officers-heading">
+      <h2 id="officers-heading">Officers</h2>
+      <p th:if="${#lists.isEmpty(officers)}">No officers are listed. Students see who runs the club on your club's page.</p>
+      <ul class="officer-list" th:unless="${#lists.isEmpty(officers)}">
+        <li th:each="o : ${officers}"><span class="officer-name" th:text="${o.name}">Priya Patel</span>, <span th:text="${o.role}">Treasurer</span></li>
+      </ul>
+      <p class="action-row"><a class="button button-outline" th:href="@{/dashboard/clubs/{id}/officers(id=${club.clubId})}">Manage officers</a></p>
+    </section>
+
     <section class="card dash-card" aria-labelledby="visibility-heading">
       <h2 id="visibility-heading">Visibility</h2>
       <th:block th:if="${club.active}">

@@ -87,6 +87,16 @@ export DB_PASSWORD="pick-a-local-password"
 $env:DB_PASSWORD="pick-a-local-password"
 ```
 
+## 3b. Upgrading a database from before Phase 8
+
+If you created `club_central` before Phase 8, add the new tables and columns once (your clubs, accounts and requests are kept). As root:
+
+```bash
+mysql -u root -p club_central < database/migrations/002-leaders-events-pictures.sql
+```
+
+In Workbench: *File → Open SQL Script* → `database/migrations/002-leaders-events-pictures.sql` → lightning bolt. Starting fresh instead? `schema.sql` already includes everything. If the app stops with `Schema-validation: missing table`, this step was skipped.
+
 ## 4. Run it
 
 ```bash
@@ -225,7 +235,16 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | **Send reset link** | "A password reset link was emailed to the leader."; the email is in Mailpit | FR-11 |
 | Scroll to **Security log** | PASSWORD_RESET_REQUESTED/COMPLETED, RESET_LINK_SENT, LEADER_DISABLED, CLUB_DEACTIVATED... | SPR-08, TC-24 |
 
-Automated tests: `./mvnw test` should report 134 passing and 1 skipped.
+**Phase 8A: club officers** (demo mode)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Open Chess Club's page | **Officers**: Demo Leader (President), Priya Patel (Treasurer), Marcus Green (Tournament Director) | FR-13 |
+| As the demo leader: Dashboard → **Manage officers**, add a name without a role | "Enter their role, like President or Treasurer." | SPR-05 |
+| Add it properly, then **Move up** | The public page shows the new officer in the new order | FR-13 |
+| Open http://localhost:8080/dashboard/clubs/18/officers | "That request wasn't allowed" (Soccer Club isn't yours) | SPR-03 |
+
+Automated tests: `./mvnw test` should report 144 passing and 1 skipped.
 
 ## Performance check (NFR-04)
 

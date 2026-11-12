@@ -58,7 +58,7 @@ flowchart TB
 | `service` | `ClubService`, `RequestService`, `AuthService`, `AdminService`, `NotificationService`, `AuditLogger`, `PasswordHasher`, validators, `FieldLimits`, `EmailRules` | All business rules |
 | `service.exception` | `NotFoundException`, `ValidationException` | Turned into the 404 page or into field messages |
 | `repository` | 7 Spring Data interfaces | The only code that talks to MySQL |
-| `model` | `Club`, `Category`, `ClubLeader`, `Administrator`, `JoinRequest`, `RequestStatus`, `PasswordResetToken`, `AuditLog` | Tables as Java classes, every column mapped by name |
+| `model` | `Club`, `Category`, `ClubLeader`, `ClubOfficer`, `Administrator`, `JoinRequest`, `RequestStatus`, `PasswordResetToken`, `AuditLog` | Tables as Java classes, every column mapped by name |
 | `dto` | `JoinRequestForm`, `RegistrationForm`, `ClubForm`, `ResetPasswordForm` | What users typed into forms |
 
 Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one stylesheet), `database/` (schema, sample data, reset script), `scripts/LoadCheck.java` (performance check), `docs/` (this file, run guide, traceability, offline preview).
@@ -70,6 +70,7 @@ Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one
 | Everyone | `GET /`, `/clubs`, `/clubs/{id}` | Homepage, directory search, club profile |
 | Everyone | `POST /clubs/{id}/requests`, `GET /clubs/{id}/requests/sent` | Join request and confirmation |
 | Everyone | `/login`, `/register`, `/forgot-password`, `/reset-password` | Accounts |
+| Leaders | `/dashboard/clubs/{id}/officers` (+ `/{oid}/edit`, `/move-up`, `/move-down`, `/remove`) | Officers shown on the club page (FR-13) |
 | Leaders | `/dashboard`, `/dashboard/clubs/new`, `/dashboard/clubs/{id}/edit` · `/deactivate` · `/activate` · `/delete` · `/requests` | Club management and inbox, own club only |
 | Admin | `/admin`, `/admin/clubs/{id}/deactivate` · `/activate`, `/admin/leaders/{id}/send-reset` · `/disable` · `/enable` | Administration |
 

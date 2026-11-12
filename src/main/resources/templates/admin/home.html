@@ -31,7 +31,7 @@
     <div class="table-scroll" tabindex="0" aria-labelledby="clubs-heading">
       <table class="data-table">
         <thead><tr><th scope="col">Club</th><th scope="col">Category</th><th scope="col">Leader</th>
-          <th scope="col">Requests</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+          <th scope="col">Officers</th><th scope="col">Requests</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
         <tbody>
         <tr th:each="row : ${clubs}">
           <th scope="row">
@@ -40,6 +40,7 @@
           </th>
           <td th:text="${row.club.category.categoryName}">Academic</td>
           <td th:text="${row.leader != null} ? ${row.leader.name} : 'None yet'">Demo Leader</td>
+          <td th:text="${row.officerCount}">3</td>
           <td th:text="${row.requestCount}">3</td>
           <td><span class="status" th:classappend="${row.club.active} ? 'status-DELIVERED' : 'status-FAILED'"
                     th:text="${row.club.active} ? 'Visible' : 'Hidden'">Visible</span></td>
