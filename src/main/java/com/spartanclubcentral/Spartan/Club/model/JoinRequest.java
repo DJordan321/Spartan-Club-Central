@@ -52,6 +52,10 @@ public class JoinRequest {
     @Column(name = "status", nullable = false, length = 10)
     private RequestStatus status = RequestStatus.SUBMITTED;
 
+    // The leader ticked "Mark as seen". Only new (unseen) requests are counted on the dashboard.
+    @Column(name = "seen", nullable = false)
+    private boolean seen = false;
+
     @Column(name = "date_submitted", nullable = false, updatable = false)
     private LocalDateTime dateSubmitted;
 
@@ -76,6 +80,8 @@ public class JoinRequest {
     public void setMessage(String message) { this.message = message; }
     public RequestStatus getStatus() { return status; }
     public void setStatus(RequestStatus status) { this.status = status; }
+    public boolean isSeen() { return seen; }
+    public void setSeen(boolean seen) { this.seen = seen; }
     public LocalDateTime getDateSubmitted() { return dateSubmitted; }
     public void setDateSubmitted(LocalDateTime dateSubmitted) { this.dateSubmitted = dateSubmitted; }
 }

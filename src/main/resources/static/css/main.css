@@ -275,6 +275,11 @@ textarea {
 .request-head h2 { margin: 0; font-size: 1.15rem; }
 .request-meta { margin: 6px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
 .request-message { white-space: pre-line; overflow-wrap: anywhere; margin: 0; }
+.new-count { margin: 12px 0 0; }
+.seen-form { margin: 12px 0 0; }
+.seen-tag { display: inline-block; padding: 1px 10px; border-radius: 999px; background: var(--green-tint); color: var(--green-dark); font-size: .85rem; font-weight: 600; }
+.request-seen { background: #F6F7F6; }
+.request-seen .request-name, .request-seen .request-message { color: #4A524C; }
 .small { font-size: .9rem; margin: 10px 0 0; }
 
 /* ---------- Password reset + administrator (Phase 6) ---------- */

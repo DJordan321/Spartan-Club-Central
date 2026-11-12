@@ -5,11 +5,14 @@ import com.spartanclubcentral.Spartan.Club.model.Club;
 import com.spartanclubcentral.Spartan.Club.model.JoinRequest;
 import com.spartanclubcentral.Spartan.Club.model.RequestStatus;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
+import com.spartanclubcentral.Spartan.Club.service.exception.NotFoundException;
 import com.spartanclubcentral.Spartan.Club.service.exception.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service layer: join/contact requests from students (FR-03, FR-07).
@@ -34,10 +37,13 @@ public class RequestService {
     private final RequestValidator validator;
     private final ClubService clubService;
     private final RequestRepository requestRepository;
+    private final AuditLogger audit;
     private final NotificationService notificationService;
 
     public RequestService(RequestValidator validator, ClubService clubService,
-                          RequestRepository requestRepository, NotificationService notificationService) {
+                          RequestRepository requestRepository, NotificationService notificationService,
+                          AuditLogger audit) {
+        this.audit = audit;
         this.validator = validator;
         this.clubService = clubService;
         this.requestRepository = requestRepository;
@@ -81,5 +87,34 @@ public class RequestService {
     public List<JoinRequest> getRequestsForClub(Long leaderId, Long clubId) {
         clubService.requireOwnedClub(leaderId, clubId);
         return requestRepository.findByClub_ClubIdOrderByDateSubmittedDesc(clubId);
+    }
+
+    /**
+     * New (unseen) requests for the leader's own club: the number on the
+     * dashboard's "Join requests" button.
+     */
+    public long countNewRequests(Long leaderId, Long clubId) {
+        clubService.requireOwnedClub(leaderId, clubId);
+        return requestRepository.countByClub_ClubIdAndSeenFalse(clubId);
+    }
+
+    /**
+     * Ticks a request off as seen, or back to new. Same two checks as officers
+     * and events: the leader owns the club, AND the request was sent to that
+     * club, so a request number from another club can't be changed through
+     * your own club's address (SPR-03, SPR-04).
+     */
+    @Transactional
+    public void setSeen(Long leaderId, Long clubId, Long requestId, boolean seen) {
+        clubService.requireOwnedClub(leaderId, clubId);
+        JoinRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Request not found"));
+        Long requestClubId = request.getClub().getClubId();
+        if (!clubId.equals(requestClubId)) {
+            audit.log("LEADER", leaderId, AuditLogger.OWNERSHIP_DENIED, "CLUB", requestClubId, false);
+            throw new AccessDeniedException("Request " + requestId + " is not in club " + clubId);
+        }
+        request.setSeen(seen);
+        requestRepository.save(request);
     }
 }

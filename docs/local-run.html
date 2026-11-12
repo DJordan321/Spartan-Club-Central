@@ -283,6 +283,11 @@ textarea {
 .request-head h2 { margin: 0; font-size: 1.15rem; }
 .request-meta { margin: 6px 0 10px; color: var(--muted); overflow-wrap: anywhere; }
 .request-message { white-space: pre-line; overflow-wrap: anywhere; margin: 0; }
+.new-count { margin: 12px 0 0; }
+.seen-form { margin: 12px 0 0; }
+.seen-tag { display: inline-block; padding: 1px 10px; border-radius: 999px; background: var(--green-tint); color: var(--green-dark); font-size: .85rem; font-weight: 600; }
+.request-seen { background: #F6F7F6; }
+.request-seen .request-name, .request-seen .request-message { color: #4A524C; }
 .small { font-size: .9rem; margin: 10px 0 0; }
 
 /* ---------- Password reset + administrator (Phase 6) ---------- */
@@ -1219,7 +1224,7 @@ function dashboardPage(u, params) {
       h("p", {}, "You haven't created your club's listing yet. Once you do, students can find it in the directory and send you join requests."),
       h("p", {}, h("a", { class: "button", href: "#/dashboard/clubs/new" }, "Create your club")));
   } else {
-    const count = requestsFor(club.id).length;
+    const count = requestsFor(club.id).filter(x => !x.seen).length;     // only new (unseen) requests
     const setActive = active => () => {
       const r = requireOwnedClub(u, club.id); if (!r.club) return;
       r.club.active = active; audit("LEADER", u.id, active ? "CLUB_ACTIVATED" : "CLUB_DEACTIVATED", true); saveState();
@@ -1232,7 +1237,7 @@ function dashboardPage(u, params) {
         h("p", { class: "muted" }, catName(club.categoryId), club.meetingTime ? [" · ", club.meetingTime] : null),
         h("p", {}, abbreviate(club.description, 220)),
         h("div", { class: "action-row" },
-          h("a", { class: "button", href: "#/dashboard/clubs/" + club.id + "/requests" }, "Join requests ", h("span", { class: "count-pill" }, count)),
+          h("a", { class: "button", href: "#/dashboard/clubs/" + club.id + "/requests" }, "Join requests ", h("span", { class: "count-pill" }, count), h("span", { class: "visually-hidden" }, " new")),
           h("a", { class: "button button-outline", href: "#/dashboard/clubs/" + club.id + "/edit" }, "Edit club"),
           club.active ? h("a", { class: "button button-outline", href: "#/clubs/" + club.id }, "View public page") : null)),
       h("section", { class: "card dash-card", "aria-labelledby": "picture-dash-heading" },
@@ -1362,17 +1367,35 @@ function confirmDeletePage(u, club) {
 function leaderInboxPage(u, club) {
   document.title = "Join requests | Spartan Club Central";
   const list = requestsFor(club.id).slice().reverse();
+  const newCount = list.filter(x => !x.seen).length;
+  // Same as POST /dashboard/clubs/{id}/requests/{rid}/seen and /unseen: ownership is checked again on click.
+  const toggle = (r, seen) => {
+    const btn = h("button", { type: "button", class: seen ? "button button-small" : "button button-outline button-small" },
+      seen ? "✓ Mark as seen" : "Mark as new");
+    btn.addEventListener("click", () => {
+      const fresh = currentUser(); const ok = fresh && fresh.role === "LEADER" ? requireOwnedClub(fresh, club.id) : {};
+      if (!ok.club || r.clubId !== club.id) { render(); return; }
+      r.seen = seen; saveState(); render();
+      const el = document.getElementById("request-" + r.id); if (el) el.querySelector("button").focus();
+    });
+    return h("div", { class: "seen-form" }, btn);
+  };
   return h("div", { class: "container page" },
     h("p", { class: "back-link" }, h("a", { href: "#/dashboard" }, "← Dashboard")),
     h("h1", {}, "Join requests for ", h("span", {}, club.name)),
     h("p", { class: "muted" }, "Everyone who asked to join, newest first. Only you can see this list. To reply, email the student from your own email; their address is under their name."),
+    list.length === 0 ? null : h("p", { class: "new-count", role: "status" },
+      h("strong", {}, newCount + (newCount === 1 ? " new request" : " new requests")),
+      h("span", { class: "muted" }, " of " + list.length + " total. Mark a request as seen once you have read it.")),
     list.length === 0
       ? h("div", { class: "card empty-state" }, h("h2", {}, "No requests yet"),
           h("p", {}, "When a student uses the form on your club's page, their name, email and message show up here."))
-      : h("ol", { class: "request-list", reversed: true }, list.map(r => h("li", { class: "card request" },
-          h("h2", { class: "request-name" }, r.name),
+      : h("ol", { class: "request-list", reversed: true }, list.map(r => h("li", { class: "card request" + (r.seen ? " request-seen" : ""), id: "request-" + r.id },
+          h("div", { class: "request-head" }, h("h2", { class: "request-name" }, r.name),
+            r.seen ? h("span", { class: "seen-tag" }, "✓ Seen") : null),
           h("p", { class: "request-meta" }, h("a", { href: "mailto:" + r.email }, r.email), " · ", r.date),
-          h("p", { class: "request-message" }, r.message)))));
+          h("p", { class: "request-message" }, r.message),
+          toggle(r, !r.seen)))));
 }
 
 // ---- Phase 6: password reset (same rules as AuthService) ----

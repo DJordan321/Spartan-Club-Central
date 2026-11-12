@@ -31,7 +31,7 @@ class RequestServiceTest {
     private final RequestRepository repository = mock(RequestRepository.class);
     private final NotificationService notifications = mock(NotificationService.class);
     private final RequestService service =
-            new RequestService(new RequestValidator(), clubService, repository, notifications);
+            new RequestService(new RequestValidator(), clubService, repository, notifications, mock(AuditLogger.class));
 
     private final Club club = new Club();
     /** Status of the request each time it was saved, in order. */

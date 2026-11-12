@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.PostMapping;
  *   GET  /dashboard/clubs/{id}/delete        "are you sure?" page
  *   POST /dashboard/clubs/{id}/delete        delete club and its requests             FR-12
  *   GET  /dashboard/clubs/{id}/requests      request inbox                            NFR-02
+ *   POST /dashboard/clubs/{id}/requests/{rid}/seen     tick a request off as seen
+ *   POST /dashboard/clubs/{id}/requests/{rid}/unseen   put it back to new
  *
  * The club id stays in the address on purpose, so the SPR-03 test (change the
  * number in the address bar) can be run. The leader is always "me" from the
@@ -63,7 +65,7 @@ public class DashboardController {
         model.addAttribute("leader", authService.getLeader(me.getId()));
         Optional<Club> club = clubService.findLeaderClub(me.getId());
         model.addAttribute("club", club.orElse(null));
-        model.addAttribute("requestCount", club.map(c -> clubService.countRequests(me.getId(), c.getClubId())).orElse(0L));
+        model.addAttribute("requestCount", club.map(c -> requestService.countNewRequests(me.getId(), c.getClubId())).orElse(0L));
         model.addAttribute("officers", club.map(c -> officerService.listForLeader(me.getId(), c.getClubId())).orElse(List.of()));
         model.addAttribute("events", club.map(c -> eventService.upcomingForLeader(me.getId(), c.getClubId())).orElse(List.of()));
         return "dashboard/home";
@@ -143,7 +145,22 @@ public class DashboardController {
     public String requests(@AuthenticationPrincipal AccountPrincipal me, @PathVariable("id") Long id, Model model) {
         model.addAttribute("requests", requestService.getRequestsForClub(me.getId(), id));
         model.addAttribute("club", clubService.requireOwnedClub(me.getId(), id));
+        model.addAttribute("newCount", requestService.countNewRequests(me.getId(), id));
         return "dashboard/requests";
+    }
+
+    @PostMapping("/dashboard/clubs/{id}/requests/{rid}/seen")
+    public String markSeen(@AuthenticationPrincipal AccountPrincipal me, @PathVariable("id") Long id,
+                           @PathVariable("rid") Long rid) {
+        requestService.setSeen(me.getId(), id, rid, true);
+        return "redirect:/dashboard/clubs/" + id + "/requests#request-" + rid;
+    }
+
+    @PostMapping("/dashboard/clubs/{id}/requests/{rid}/unseen")
+    public String markNew(@AuthenticationPrincipal AccountPrincipal me, @PathVariable("id") Long id,
+                          @PathVariable("rid") Long rid) {
+        requestService.setSeen(me.getId(), id, rid, false);
+        return "redirect:/dashboard/clubs/" + id + "/requests#request-" + rid;
     }
 
     private String showForm(Model model, ClubForm form, Map<String, String> errors, Club existing) {

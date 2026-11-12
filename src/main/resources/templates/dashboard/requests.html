@@ -9,12 +9,18 @@
   first. Only reachable for the leader's own club: RequestService checks
   ownership before reading any student data. Leaders reply from their own
   email, so the site doesn't track replies or show email status here.
+  "Mark as seen" ticks a request off: it stays in the list, and only new
+  (unseen) requests are counted on the dashboard button.
   Messages are shown with th:text, so anything a student typed is plain text.
 */-->
 <main id="main" class="container page">
   <p class="back-link"><a th:href="@{/dashboard}">&larr; Dashboard</a></p>
   <h1>Join requests for <span th:text="${club.clubName}">Chess Club</span></h1>
   <p class="muted">Everyone who asked to join, newest first. Only you can see this list. To reply, email the student from your own email; their address is under their name.</p>
+  <p class="new-count" th:unless="${#lists.isEmpty(requests)}" role="status">
+    <strong th:text="${newCount} + (${newCount} == 1 ? ' new request' : ' new requests')">2 new requests</strong>
+    <span class="muted" th:text="'of ' + ${#lists.size(requests)} + ' total. Mark a request as seen once you have read it.'">of 3 total.</span>
+  </p>
 
   <div class="card empty-state" th:if="${#lists.isEmpty(requests)}">
     <h2>No requests yet</h2>
@@ -22,13 +28,24 @@
   </div>
 
   <ol class="request-list" th:unless="${#lists.isEmpty(requests)}" reversed>
-    <li class="card request" th:each="r : ${requests}">
-      <h2 class="request-name" th:text="${r.studentName}">Jordan Lee</h2>
+    <li class="card request" th:each="r : ${requests}" th:id="'request-' + ${r.requestId}" th:classappend="${r.seen} ? 'request-seen'">
+      <div class="request-head">
+        <h2 class="request-name" th:text="${r.studentName}">Jordan Lee</h2>
+        <span class="seen-tag" th:if="${r.seen}">&#10003; Seen</span>
+      </div>
       <p class="request-meta">
         <a th:href="'mailto:' + ${r.studentEmail}" th:text="${r.studentEmail}">jordan@example.com</a>
         &middot; <time th:datetime="${r.dateSubmitted}" th:text="${#temporals.format(r.dateSubmitted, 'MMM d, yyyy h:mm a')}">Nov 12, 2026</time>
       </p>
       <p class="request-message" th:text="${r.message}">Message</p>
+      <form class="seen-form" method="post" th:unless="${r.seen}"
+            th:action="@{/dashboard/clubs/{id}/requests/{rid}/seen(id=${club.clubId},rid=${r.requestId})}">
+        <button type="submit" class="button button-small">&#10003; Mark as seen</button>
+      </form>
+      <form class="seen-form" method="post" th:if="${r.seen}"
+            th:action="@{/dashboard/clubs/{id}/requests/{rid}/unseen(id=${club.clubId},rid=${r.requestId})}">
+        <button type="submit" class="button button-outline button-small">Mark as new</button>
+      </form>
     </li>
   </ol>
 </main>

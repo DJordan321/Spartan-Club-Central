@@ -1,6 +1,6 @@
 # Requirements Traceability (as built)
 
-Every requirement, the code that meets it, the automated tests that check it, and how to see it by hand. Automated tests live under `src/test/java/com/spartanclubcentral/Spartan/Club/` and run with `./mvnw test` (172 passing, plus 1 opt-in MySQL check). Manual steps refer to the tables in `docs/run-locally.md`.
+Every requirement, the code that meets it, the automated tests that check it, and how to see it by hand. Automated tests live under `src/test/java/com/spartanclubcentral/Spartan/Club/` and run with `./mvnw test` (174 passing, plus 1 opt-in MySQL check). Manual steps refer to the tables in `docs/run-locally.md`.
 
 ## Functional requirements
 
@@ -20,6 +20,7 @@ Every requirement, the code that meets it, the automated tests that check it, an
 | FR-13 | Club officers on the club page | `ClubOfficer`, `OfficerService` (ownership + officer-belongs-to-club check), `OfficerController`, `club.html`, `dashboard/officers.html` | `OfficerControllerTest` (incl. ownership via another club's officer id), `OfficerValidatorTest`, `PageRenderWithoutTransactionTest` | Met |
 | FR-14 | Club events on the club page | `ClubEvent`, `EventService` (ownership + event-belongs-to-club check), `EventValidator`, `EventController`, `club.html`, `index.html`, `dashboard/events.html` | `EventControllerTest` (incl. ownership via another club's event id), `EventValidatorTest`, `PageRenderWithoutTransactionTest` | Met |
 | FR-15 | A picture on every club page | `static/images/categories/*.svg`, `ClubPictures`, `ClubImageService` (type check by first bytes, 2 MB, re-encode to ≤1200 px JPEG without metadata, alt text), `ImageStorage`, `PictureController` | `ClubImageServiceTest` (incl. GPS stripping), `PictureControllerTest` (ownership, hidden clubs, CSRF, path tricks, admin removal), `PageRenderWithoutTransactionTest` | Met |
+| FR-16 | Leaders tick requests off as seen; the dashboard counts only new ones | `JoinRequest.seen`, `RequestService.setSeen` (ownership + request-belongs-to-club check), `countNewRequests`, `DashboardController`, `dashboard/requests.html`, `migrations/003-request-seen.sql` | `DashboardControllerTest` (count goes down and back up; another club's request denied and logged; CSRF) | Met |
 | FR-12 | Deactivate or delete a listing | `ClubService.setActive/deleteClub`, `AdminService.setClubActive`, `confirm-delete.html` | `DashboardControllerTest` (TC-13, TC-14), `AdminControllerTest`, `ClubRepositoryTest` | Met |
 
 ## Non-functional requirements

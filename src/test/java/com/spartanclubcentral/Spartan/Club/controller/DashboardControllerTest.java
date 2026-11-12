@@ -215,6 +215,60 @@ class DashboardControllerTest {
                         containsString("Can I join?"), not(containsString("soccer.student@example.com")))));
     }
 
+    @Test
+    @DisplayName("Mark as seen lowers the dashboard's new-request number; Mark as new raises it again")
+    void markRequestSeen() throws Exception {
+        requests.saveAndFlush(request(chess, "Second Student", "second@example.com", "Me too!"));
+        JoinRequest first = requests.findByClub_ClubIdOrderByDateSubmittedDesc(chess.getClubId()).stream()
+                .filter(r -> r.getStudentName().equals("Chess Student")).findFirst().orElseThrow();
+        String inbox = "/dashboard/clubs/" + chess.getClubId() + "/requests";
+
+        mvc.perform(get("/dashboard").with(user(me(leaderA))))
+                .andExpect(content().string(containsString("<span class=\"count-pill\">2</span>")));
+        mvc.perform(get(inbox).with(user(me(leaderA))))
+                .andExpect(content().string(allOf(containsString("2 new requests"), containsString("Mark as seen"))));
+
+        mvc.perform(post(inbox + "/" + first.getRequestId() + "/seen").with(csrf()).with(user(me(leaderA))))
+                .andExpect(redirectedUrl(inbox + "#request-" + first.getRequestId()));
+        em.flush();
+        em.clear();
+        assertThat(requests.findById(first.getRequestId()).orElseThrow().isSeen()).isTrue();
+        mvc.perform(get("/dashboard").with(user(me(leaderA))))
+                .andExpect(content().string(containsString("<span class=\"count-pill\">1</span>")));
+        mvc.perform(get(inbox).with(user(me(leaderA))))
+                .andExpect(content().string(allOf(containsString("1 new request"), containsString("Seen"),
+                        containsString("Mark as new"), containsString("Chess Student"))));
+
+        mvc.perform(post(inbox + "/" + first.getRequestId() + "/unseen").with(csrf()).with(user(me(leaderA))))
+                .andExpect(status().is3xxRedirection());
+        em.flush();
+        em.clear();
+        mvc.perform(get("/dashboard").with(user(me(leaderA))))
+                .andExpect(content().string(containsString("<span class=\"count-pill\">2</span>")));
+    }
+
+    @Test
+    @DisplayName("Mark as seen: not on another club's request, not without CSRF, unknown request -> 404")
+    void markSeenGuards() throws Exception {
+        JoinRequest soccerRequest = requests.findByClub_ClubIdOrderByDateSubmittedDesc(soccer.getClubId()).get(0);
+        long deniedBefore = denials();
+        // Another club's request through your own club's address
+        mvc.perform(post("/dashboard/clubs/" + chess.getClubId() + "/requests/" + soccerRequest.getRequestId() + "/seen")
+                .with(csrf()).with(user(me(leaderA)))).andExpect(status().isForbidden());
+        // Another leader's club directly
+        mvc.perform(post("/dashboard/clubs/" + soccer.getClubId() + "/requests/" + soccerRequest.getRequestId() + "/seen")
+                .with(csrf()).with(user(me(leaderA)))).andExpect(status().isForbidden());
+        // No CSRF token
+        mvc.perform(post("/dashboard/clubs/" + soccer.getClubId() + "/requests/" + soccerRequest.getRequestId() + "/seen")
+                .with(user(me(leaderB)))).andExpect(status().isForbidden());
+        mvc.perform(post("/dashboard/clubs/" + chess.getClubId() + "/requests/999999/seen")
+                .with(csrf()).with(user(me(leaderA)))).andExpect(status().isNotFound());
+        em.flush();
+        em.clear();
+        assertThat(requests.findById(soccerRequest.getRequestId()).orElseThrow().isSeen()).isFalse();
+        assertThat(denials() - deniedBefore).isEqualTo(2);
+    }
+
     // ---------- SPR-03 / TC-19: never another leader's club ----------
 
     @Test

@@ -98,6 +98,12 @@ mysql -u root -p club_central < database/migrations/002-leaders-events-pictures.
 
 In Workbench: *File → Open SQL Script* → `database/migrations/002-leaders-events-pictures.sql` → lightning bolt. Starting fresh instead? `schema.sql` already includes everything. If the app stops with `Schema-validation: missing table`, this step was skipped.
 
+**"Mark as seen" update:** if your database was created before the "Mark as seen" button on join requests, also run this one (safe to run more than once). Without it the app stops with `Schema-validation: missing column [seen]`.
+
+```bash
+mysql -u root -p club_central < database/migrations/003-request-seen.sql
+```
+
 ## 4. Run it
 
 ```bash

@@ -18,6 +18,9 @@ public interface RequestRepository extends JpaRepository<JoinRequest, Long> {
 
     long countByClub_ClubId(Long clubId);
 
+    /** New requests: the ones the leader hasn't marked as seen yet. */
+    long countByClub_ClubIdAndSeenFalse(Long clubId);
+
     /** Removes a club's requests before the club itself is deleted (FR-12). */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM JoinRequest r WHERE r.club.clubId = :clubId")

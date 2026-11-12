@@ -78,6 +78,7 @@ Uploaded pictures live in `UPLOAD_DIR` (default `./uploads`, not in Git); catego
 | Everyone | `GET /clubs/{id}/image` | Club picture, visible clubs only (FR-15) |
 | Leaders | `/dashboard/clubs/{id}/picture` (+ `/remove`) | Upload/replace/remove the club picture (FR-15) |
 | Leaders | `/dashboard`, `/dashboard/clubs/new`, `/dashboard/clubs/{id}/edit` · `/deactivate` · `/activate` · `/delete` · `/requests` | Club management and inbox, own club only |
+| Leaders | `POST /dashboard/clubs/{id}/requests/{rid}/seen` · `/unseen` | Tick a request off as seen (or back to new); the dashboard button counts only new requests (FR-16) |
 | Admin | `/admin`, `/admin/clubs/{id}/deactivate` · `/activate`, `/admin/leaders/{id}/send-reset` · `/disable` · `/enable` | Administration |
 
 Every change is a POST with a CSRF token. All other GET pages are public, so a mistyped address shows "Page not found"; any other method that isn't listed is blocked.

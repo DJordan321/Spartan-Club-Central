@@ -102,6 +102,7 @@ CREATE TABLE join_request (
   student_email   VARCHAR(254)  NOT NULL,
   message         VARCHAR(1000) NOT NULL,
   status          VARCHAR(10)   NOT NULL DEFAULT 'SUBMITTED',
+  seen            BOOLEAN       NOT NULL DEFAULT FALSE,           -- leader ticked it off; only unseen ones are counted
   date_submitted  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT chk_request_status CHECK (status IN ('SUBMITTED','DELIVERED','FAILED')),
   CONSTRAINT fk_request_club FOREIGN KEY (club_id) REFERENCES club(club_id) ON DELETE CASCADE,

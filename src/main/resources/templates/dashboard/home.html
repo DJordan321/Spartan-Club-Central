@@ -37,7 +37,8 @@
 
       <div class="action-row">
         <a class="button" th:href="@{/dashboard/clubs/{id}/requests(id=${club.clubId})}">
-          Join requests <span class="count-pill" th:text="${requestCount}">3</span></a>
+          Join requests <span class="count-pill" th:text="${requestCount}">3</span>
+          <span class="visually-hidden">new</span></a>
         <a class="button button-outline" th:href="@{/dashboard/clubs/{id}/edit(id=${club.clubId})}">Edit club</a>
         <a class="button button-outline" th:if="${club.active}" th:href="@{/clubs/{id}(id=${club.clubId})}">View public page</a>
       </div>
