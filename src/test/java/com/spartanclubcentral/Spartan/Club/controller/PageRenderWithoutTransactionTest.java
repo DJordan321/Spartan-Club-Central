@@ -122,7 +122,7 @@ class PageRenderWithoutTransactionTest {
         for (String url : new String[] {"/dashboard", "/dashboard/clubs/" + club.getClubId() + "/edit",
                 "/dashboard/clubs/" + club.getClubId() + "/requests", "/dashboard/clubs/" + club.getClubId() + "/delete",
                 "/dashboard/clubs/" + club.getClubId() + "/officers", "/dashboard/clubs/" + club.getClubId() + "/events",
-                "/dashboard/clubs/" + club.getClubId() + "/events/new"}) {
+                "/dashboard/clubs/" + club.getClubId() + "/events/new", "/dashboard/clubs/" + club.getClubId() + "/picture"}) {
             mvc.perform(get(url).with(user(me)))
                     .andExpect(status().isOk())
                     .andExpect(content().string(allOf(containsString("Render Test Club"), containsString("</html>"))));

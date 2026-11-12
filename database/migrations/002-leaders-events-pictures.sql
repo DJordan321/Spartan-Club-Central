@@ -36,3 +36,18 @@ CREATE TABLE IF NOT EXISTS club_event (
   INDEX idx_event_club_start (club_id, starts_at),
   INDEX idx_event_start (starts_at)
 );
+
+-- ---------- 8C: club pictures (FR-15) ----------
+-- MySQL has no "ADD COLUMN IF NOT EXISTS", so each column is only added when
+-- information_schema says it's missing (keeps this script safe to re-run).
+SET @add_filename = (SELECT IF(COUNT(*) = 0,
+  'ALTER TABLE club ADD COLUMN image_filename VARCHAR(64) NULL AFTER other_social_url', 'DO 0')
+  FROM information_schema.columns
+  WHERE table_schema = DATABASE() AND table_name = 'club' AND column_name = 'image_filename');
+PREPARE stmt FROM @add_filename; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @add_alt = (SELECT IF(COUNT(*) = 0,
+  'ALTER TABLE club ADD COLUMN image_alt VARCHAR(150) NULL AFTER image_filename', 'DO 0')
+  FROM information_schema.columns
+  WHERE table_schema = DATABASE() AND table_name = 'club' AND column_name = 'image_alt');
+PREPARE stmt FROM @add_alt; EXECUTE stmt; DEALLOCATE PREPARE stmt;

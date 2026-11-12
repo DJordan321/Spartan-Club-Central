@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Heart held in hands">
+  <!-- Original illustration for Spartan Club Central (Service). -->
+  <circle cx="60" cy="60" r="58" fill="#E6F0EC"/>
+  <path d="M60 64 C46 52 34 44 40 32 C45 23 56 25 60 33 C64 25 75 23 80 32 C86 44 74 52 60 64 Z" fill="#F2B705"/>
+  <path d="M20 66 Q34 62 46 72 Q54 78 60 78 Q66 78 74 72 Q86 62 100 66 L100 84 Q80 96 60 96 Q40 96 20 84 Z" fill="#00573F"/>
+</svg>

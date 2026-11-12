@@ -32,6 +32,8 @@ CREATE TABLE club (
   instagram_url     VARCHAR(255)  NULL,
   website_url       VARCHAR(255)  NULL,
   other_social_url  VARCHAR(255)  NULL,
+  image_filename    VARCHAR(64)   NULL,                -- uploaded picture (FR-15): server-made name, file in UPLOAD_DIR
+  image_alt         VARCHAR(150)  NULL,                -- its alt text for screen readers (NFR-06)
   is_active         BOOLEAN       NOT NULL DEFAULT TRUE,
   last_updated      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
                                   ON UPDATE CURRENT_TIMESTAMP,

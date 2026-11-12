@@ -24,6 +24,7 @@
     <ul class="category-grid">
       <li th:each="cat : ${categories}">
         <a class="category-card" th:href="@{/clubs(category=${cat.categoryId})}">
+          <img class="category-icon" alt="" th:with="categoryPic=${@clubPictures.categoryImage(cat.categoryName)}" th:src="${categoryPic}">
           <span class="category-name" th:text="${cat.categoryName}">Academic</span>
           <span class="category-count"
                 th:with="n=${counts.get(cat.categoryId) ?: 0}"

@@ -61,7 +61,7 @@ flowchart TB
 | `model` | `Club`, `Category`, `ClubLeader`, `ClubOfficer`, `ClubEvent`, `Administrator`, `JoinRequest`, `RequestStatus`, `PasswordResetToken`, `AuditLog` | Tables as Java classes, every column mapped by name |
 | `dto` | `JoinRequestForm`, `RegistrationForm`, `ClubForm`, `ResetPasswordForm` | What users typed into forms |
 
-Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one stylesheet), `database/` (schema, sample data, reset script), `scripts/LoadCheck.java` (performance check), `docs/` (this file, run guide, traceability, offline preview).
+Uploaded pictures live in `UPLOAD_DIR` (default `./uploads`, not in Git); category pictures are original SVGs in `static/images/categories/`. Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one stylesheet), `database/` (schema, sample data, reset script), `scripts/LoadCheck.java` (performance check), `docs/` (this file, run guide, traceability, offline preview).
 
 ## 4. Routes
 
@@ -72,6 +72,8 @@ Other files: `src/main/resources/templates/` (pages), `static/css/main.css` (one
 | Everyone | `/login`, `/register`, `/forgot-password`, `/reset-password` | Accounts |
 | Leaders | `/dashboard/clubs/{id}/officers` (+ `/{oid}/edit`, `/move-up`, `/move-down`, `/remove`) | Officers shown on the club page (FR-13) |
 | Leaders | `/dashboard/clubs/{id}/events` (+ `/new`, `/{eid}/edit`, `/{eid}/delete`) | Club events (FR-14) |
+| Everyone | `GET /clubs/{id}/image` | Club picture, visible clubs only (FR-15) |
+| Leaders | `/dashboard/clubs/{id}/picture` (+ `/remove`) | Upload/replace/remove the club picture (FR-15) |
 | Leaders | `/dashboard`, `/dashboard/clubs/new`, `/dashboard/clubs/{id}/edit` · `/deactivate` · `/activate` · `/delete` · `/requests` | Club management and inbox, own club only |
 | Admin | `/admin`, `/admin/clubs/{id}/deactivate` · `/activate`, `/admin/leaders/{id}/send-reset` · `/disable` · `/enable` | Administration |
 

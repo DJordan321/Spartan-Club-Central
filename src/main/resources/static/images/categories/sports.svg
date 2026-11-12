@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Ball">
+  <!-- Original illustration for Spartan Club Central (Sports). -->
+  <circle cx="60" cy="60" r="58" fill="#E6F0EC"/>
+  <circle cx="60" cy="60" r="36" fill="#00573F"/>
+  <path d="M60 46 L73 55 L68 70 L52 70 L47 55 Z" fill="#F2B705"/>
+  <g stroke="#E6F0EC" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M60 46 V26 M73 55 L92 49 M68 70 L80 87 M52 70 L40 87 M47 55 L28 49"/>
+  </g>
+</svg>

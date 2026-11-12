@@ -2,6 +2,7 @@ package com.spartanclubcentral.Spartan.Club.controller;
 
 import com.spartanclubcentral.Spartan.Club.security.AccountPrincipal;
 import com.spartanclubcentral.Spartan.Club.service.AdminService;
+import com.spartanclubcentral.Spartan.Club.service.ClubImageService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  *   GET  /admin                              clubs, leaders, recent audit log
  *   POST /admin/clubs/{id}/deactivate        hide any club          FR-12
  *   POST /admin/clubs/{id}/activate          show it again
+ *   POST /admin/clubs/{id}/remove-picture    remove an inappropriate picture (FR-15)
  *   POST /admin/leaders/{id}/send-reset      email a reset link     FR-11
  *   POST /admin/leaders/{id}/disable         block a leader account (conflict C7)
  *   POST /admin/leaders/{id}/enable          unblock it
@@ -23,9 +25,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ClubImageService imageService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, ClubImageService imageService) {
         this.adminService = adminService;
+        this.imageService = imageService;
     }
 
     @GetMapping("/admin")
@@ -46,6 +50,12 @@ public class AdminController {
     public String activateClub(@AuthenticationPrincipal AccountPrincipal me, @PathVariable("id") Long id) {
         adminService.setClubActive(me.getId(), id, true);
         return "redirect:/admin?clubShown#clubs";
+    }
+
+    @PostMapping("/admin/clubs/{id}/remove-picture")
+    public String removePicture(@AuthenticationPrincipal AccountPrincipal me, @PathVariable("id") Long id) {
+        imageService.removeAsAdmin(me.getId(), id);
+        return "redirect:/admin?pictureRemoved#clubs";
     }
 
     @PostMapping("/admin/leaders/{id}/send-reset")

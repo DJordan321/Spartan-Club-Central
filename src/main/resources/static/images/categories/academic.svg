@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Open book">
+  <!-- Original illustration for Spartan Club Central (Academic). -->
+  <circle cx="60" cy="60" r="58" fill="#E6F0EC"/>
+  <path d="M18 38 Q38 30 58 38 L58 88 Q38 80 18 88 Z" fill="#00573F"/>
+  <path d="M102 38 Q82 30 62 38 L62 88 Q82 80 102 88 Z" fill="#00573F"/>
+  <path d="M24 46 Q38 41 52 46 M24 56 Q38 51 52 56 M24 66 Q38 61 52 66 M68 46 Q82 41 96 46 M68 56 Q82 51 96 56 M68 66 Q82 61 96 66"
+        stroke="#E6F0EC" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M84 34 L94 34 L94 56 L89 51 L84 56 Z" fill="#F2B705"/>
+</svg>

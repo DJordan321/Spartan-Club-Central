@@ -43,6 +43,17 @@
       </div>
     </section>
 
+    <section class="card dash-card" aria-labelledby="picture-dash-heading">
+      <h2 id="picture-dash-heading">Picture</h2>
+      <div class="picture-row">
+        <img class="card-thumb" th:if="${club.hasImage()}" th:src="@{/clubs/{id}/image(id=${club.clubId},v=${club.imageFilename.substring(0,8)})}" th:alt="${club.imageAlt}" alt="Club picture">
+        <img class="card-thumb" th:unless="${club.hasImage()}" th:with="categoryPic=${@clubPictures.categoryImage(club.category.categoryName)}" th:src="${categoryPic}" alt="">
+        <p th:text="${club.hasImage()} ? 'Your club shows your uploaded picture.' : 'Your club shows its category picture. Upload your logo or a group photo.'">Picture</p>
+      </div>
+      <p class="action-row"><a class="button button-outline" th:href="@{/dashboard/clubs/{id}/picture(id=${club.clubId})}"
+           th:text="${club.hasImage()} ? 'Change picture' : 'Upload a picture'">Upload a picture</a></p>
+    </section>
+
     <section class="card dash-card" aria-labelledby="events-dash-heading">
       <h2 id="events-dash-heading">Events</h2>
       <p th:if="${#lists.isEmpty(events)}">No upcoming events. Posting events helps students see what joining is like.</p>

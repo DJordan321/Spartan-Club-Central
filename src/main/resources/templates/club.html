@@ -12,6 +12,12 @@
   <p class="back-link"><a th:href="@{/clubs}">&larr; All clubs</a></p>
 
   <article class="profile">
+    <!--/* FR-15: the club's uploaded picture, or its category's picture (decorative, so alt=""). */-->
+    <div class="profile-picture">
+      <img th:if="${club.hasImage()}" class="club-photo" th:src="@{/clubs/{id}/image(id=${club.clubId},v=${club.imageFilename.substring(0,8)})}"
+           th:alt="${club.imageAlt}" alt="Club picture">
+      <img th:unless="${club.hasImage()}" class="category-art" th:with="categoryPic=${@clubPictures.categoryImage(club.category.categoryName)}" th:src="${categoryPic}" alt="">
+    </div>
     <header class="profile-header">
       <a class="tag" th:href="@{/clubs(category=${club.category.categoryId})}"
          th:text="${club.category.categoryName}">Academic</a>

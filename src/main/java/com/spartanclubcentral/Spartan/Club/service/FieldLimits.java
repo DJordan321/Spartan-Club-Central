@@ -38,6 +38,14 @@ public final class FieldLimits {
     public static final int EVENT_LOCATION = 150;
     /** Events can be scheduled at most this many days ahead. */
     public static final int EVENT_MAX_DAYS_AHEAD = 366;
+    /** Club pictures (FR-15). */
+    public static final int IMAGE_FILENAME = 64;
+    public static final int IMAGE_ALT = 150;
+    public static final long IMAGE_MAX_BYTES = 2L * 1024 * 1024;
+    /** Uploaded pictures are resized to at most this width. */
+    public static final int IMAGE_MAX_WIDTH = 1200;
+    /** Refuse images bigger than this before decoding them (protects memory). */
+    public static final int IMAGE_MAX_SOURCE_PIXELS = 40_000_000;
 
     private FieldLimits() {
     }

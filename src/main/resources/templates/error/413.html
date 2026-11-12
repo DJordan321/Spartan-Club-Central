@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('File too large')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<main id="main" class="container page narrow">
+  <h1>That file is too large</h1>
+  <p>Pictures must be 2 MB or smaller. Try a smaller photo, or take a screenshot of it and upload that.</p>
+  <p><a class="button" th:href="@{/dashboard}">Back to the dashboard</a></p>
+</main>
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

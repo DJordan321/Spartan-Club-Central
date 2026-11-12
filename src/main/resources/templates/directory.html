@@ -40,7 +40,12 @@
 
   <ul class="club-grid" th:unless="${#lists.isEmpty(clubs)}">
     <li th:each="club : ${clubs}" class="club-card">
-      <span class="tag" th:text="${club.category.categoryName}">Academic</span>
+      <div class="club-card-top">
+        <img class="card-thumb" alt="" loading="lazy"
+             th:with="categoryPic=${@clubPictures.categoryImage(club.category.categoryName)}"
+             th:src="${club.hasImage()} ? @{/clubs/{id}/image(id=${club.clubId},v=${club.imageFilename.substring(0,8)})} : ${categoryPic}">
+        <span class="tag" th:text="${club.category.categoryName}">Academic</span>
+      </div>
       <h2><a th:href="@{/clubs/{id}(id=${club.clubId})}" th:text="${club.clubName}">Chess Club</a></h2>
       <p th:text="${#strings.abbreviate(club.description, 150)}">Description</p>
       <p class="meta" th:if="${club.meetingTime}">

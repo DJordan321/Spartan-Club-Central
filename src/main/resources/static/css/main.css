@@ -329,3 +329,18 @@ textarea {
   .coming-list { grid-template-columns: repeat(3, 1fr); }
 }
 .all-link-tight { margin-bottom: 28px; }
+
+/* ---------- Pictures (Phase 8C) ---------- */
+.category-icon { width: 56px; height: 56px; margin-bottom: 6px; }
+.club-card-top { display: flex; align-items: center; gap: 10px; }
+.card-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 10px; flex-shrink: 0; background: var(--green-tint); }
+.profile-picture { margin: 0 0 14px; }
+.profile-picture .club-photo { display: block; width: 100%; max-width: 560px; max-height: 320px; object-fit: cover;
+  border-radius: var(--radius); border: 1px solid var(--border); background: var(--green-tint); }
+.profile-picture .category-art { display: block; width: 96px; height: 96px; }
+.picture-preview { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.picture-preview img { display: block; max-width: 100%; max-height: 280px; width: auto; border-radius: var(--radius); }
+.picture-preview .category-art { width: 120px; height: 120px; }
+.picture-row { display: flex; align-items: center; gap: 12px; }
+.picture-row p { margin: 0; }
+input[type=file] { padding: 8px; }

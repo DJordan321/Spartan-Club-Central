@@ -45,11 +45,12 @@ public class ClubService {
     private final EventRepository eventRepository;
     private final ClubValidator validator;
     private final AuditLogger audit;
+    private final ImageStorage imageStorage;
 
     public ClubService(ClubRepository clubRepository, CategoryRepository categoryRepository,
                        LeaderRepository leaderRepository, RequestRepository requestRepository,
                        OfficerRepository officerRepository, EventRepository eventRepository,
-                       ClubValidator validator, AuditLogger audit) {
+                       ClubValidator validator, AuditLogger audit, ImageStorage imageStorage) {
         this.clubRepository = clubRepository;
         this.categoryRepository = categoryRepository;
         this.leaderRepository = leaderRepository;
@@ -58,6 +59,7 @@ public class ClubService {
         this.eventRepository = eventRepository;
         this.validator = validator;
         this.audit = audit;
+        this.imageStorage = imageStorage;
     }
 
     // ===================== Public (students) =====================
@@ -178,7 +180,8 @@ public class ClubService {
     }
 
     /**
-     * FR-12: permanently delete the club AND its join requests (conflict C5:
+     * FR-12: permanently delete the club AND its join requests, officers, events
+     * and picture (conflict C5:
      * the confirmation page warns about this). The leader keeps their account
      * and can create a new club afterwards.
      */
@@ -191,7 +194,9 @@ public class ClubService {
         requestRepository.deleteByClubId(clubId);
         officerRepository.deleteByClubId(clubId);
         eventRepository.deleteByClubId(clubId);
+        String picture = club.getImageFilename();
         clubRepository.delete(club);
+        imageStorage.delete(picture);                  // FR-15: the picture file goes too
         audit.log("LEADER", leaderId, AuditLogger.CLUB_DELETED, "CLUB", clubId, true);
     }
 

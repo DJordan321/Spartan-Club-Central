@@ -15,6 +15,7 @@
 
   <p class="notice notice-ok" role="status" th:if="${param.clubHidden != null}">The club is now hidden from students.</p>
   <p class="notice notice-ok" role="status" th:if="${param.clubShown != null}">The club is visible to students again.</p>
+  <p class="notice notice-ok" role="status" th:if="${param.pictureRemoved != null}">The club's picture was removed. Its category picture shows instead.</p>
   <p class="notice notice-ok" role="status" th:if="${param.resetSent != null}">A password reset link was emailed to the leader.</p>
   <p class="notice notice-error" role="alert" th:if="${param.resetFailed != null}">The reset email couldn't be sent. Check that the mail server (Mailpit) is running, then try again.</p>
   <p class="notice notice-ok" role="status" th:if="${param.leaderDisabled != null}">The leader account is blocked. It can't log in or reset its password.</p>
@@ -31,7 +32,7 @@
     <div class="table-scroll" tabindex="0" aria-labelledby="clubs-heading">
       <table class="data-table">
         <thead><tr><th scope="col">Club</th><th scope="col">Category</th><th scope="col">Leader</th>
-          <th scope="col">Officers</th><th scope="col">Requests</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+          <th scope="col">Picture</th><th scope="col">Officers</th><th scope="col">Requests</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
         <tbody>
         <tr th:each="row : ${clubs}">
           <th scope="row">
@@ -40,11 +41,15 @@
           </th>
           <td th:text="${row.club.category.categoryName}">Academic</td>
           <td th:text="${row.leader != null} ? ${row.leader.name} : 'None yet'">Demo Leader</td>
+          <td th:text="${row.club.hasImage()} ? 'Yes' : 'No'">No</td>
           <td th:text="${row.officerCount}">3</td>
           <td th:text="${row.requestCount}">3</td>
           <td><span class="status" th:classappend="${row.club.active} ? 'status-DELIVERED' : 'status-FAILED'"
                     th:text="${row.club.active} ? 'Visible' : 'Hidden'">Visible</span></td>
-          <td>
+          <td class="action-cell">
+            <form method="post" th:if="${row.club.hasImage()}" th:action="@{/admin/clubs/{id}/remove-picture(id=${row.club.clubId})}">
+              <button type="submit" class="button button-outline button-small button-danger-outline">Remove picture<span class="visually-hidden" th:text="' of ' + ${row.club.clubName}"></span></button>
+            </form>
             <form method="post" th:if="${row.club.active}" th:action="@{/admin/clubs/{id}/deactivate(id=${row.club.clubId})}">
               <button type="submit" class="button button-outline button-small">Hide<span class="visually-hidden" th:text="' ' + ${row.club.clubName}"></span></button>
             </form>

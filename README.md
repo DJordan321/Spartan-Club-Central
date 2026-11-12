@@ -20,7 +20,7 @@ Communication: Discord. Meetings: every Wednesday.
 
 - Searchable club directory with keyword search
 - Category filtering (academic, cultural, sports, service, and others)
-- Individual club profile pages with description, meeting times, contact information, social links, the club's officers, and upcoming events (plus a "Coming up this week" list on the homepage)
+- Individual club profile pages with description, meeting times, contact information, social links, the club's officers, upcoming events, and a picture (the club's own photo or logo, or a picture for its category) (plus a "Coming up this week" list on the homepage)
 - Join/contact request form that students can use without logging in
 - Club leader registration, login, and password reset
 - Login-protected dashboard where leaders create, edit, and deactivate their own club's listing and view requests sent to their club
@@ -81,7 +81,7 @@ You can edit and view requests only for your own club.
 
 ## Current Project Status
 
-**Feature-complete and tested; ready for local demonstrations.** All functional requirements (FR-01 to FR-12) and security requirements (SPR-01 to SPR-08) are built. There are 134 automated tests, and the system has been checked on MySQL 8 in a real browser.
+**Feature-complete and tested; ready for local demonstrations.** All functional requirements (FR-01 to FR-15) and security requirements (SPR-01 to SPR-08) are built. There are 172 automated tests, and the system has been checked on MySQL 8 in a real browser.
 
 - [x] Requirements, user stories, use cases, and UML diagrams
 - [x] Architecture and class design ([docs/architecture.md](docs/architecture.md))
@@ -92,6 +92,7 @@ You can edit and view requests only for your own club.
 - [x] Leader dashboard: create, edit, hide/show, and delete your own club; read its join requests
 - [x] Administrator page: all clubs and leaders, hide clubs, block accounts, send reset links, security log
 - [x] Security: BCrypt passwords, ownership checks, CSRF, session timeout, security headers, audit log
+- [x] Club officers, events and pictures on club pages (Phase 8)
 - [x] Automated tests and requirements traceability ([docs/traceability.md](docs/traceability.md))
 - [x] Performance check: 100 concurrent users, 95% of searches under 1 second on a test machine
 - [ ] Manual screen-reader pass and Firefox/Safari check

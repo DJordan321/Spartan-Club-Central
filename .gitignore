@@ -37,4 +37,5 @@ build/
 *.env
 application-local.properties
 logs/
+uploads/
 *.p12

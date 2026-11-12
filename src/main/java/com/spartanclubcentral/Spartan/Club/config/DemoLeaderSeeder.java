@@ -13,6 +13,7 @@ import com.spartanclubcentral.Spartan.Club.repository.OfficerRepository;
 import com.spartanclubcentral.Spartan.Club.repository.RequestRepository;
 import com.spartanclubcentral.Spartan.Club.service.AuditLogger;
 import com.spartanclubcentral.Spartan.Club.service.AuthService;
+import com.spartanclubcentral.Spartan.Club.service.ClubImageService;
 import com.spartanclubcentral.Spartan.Club.service.PasswordHasher;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,12 +56,13 @@ public class DemoLeaderSeeder implements ApplicationRunner {
     private final RequestRepository requests;
     private final OfficerRepository officers;
     private final EventRepository events;
+    private final ClubImageService images;
     private final AuthService authService;
     private final PasswordHasher passwordHasher;
     private final AuditLogger audit;
 
     public DemoLeaderSeeder(LeaderRepository leaders, ClubRepository clubs, RequestRepository requests,
-                            OfficerRepository officers, EventRepository events,
+                            OfficerRepository officers, EventRepository events, ClubImageService images,
                             AuthService authService,
                             PasswordHasher passwordHasher, AuditLogger audit) {
         this.leaders = leaders;
@@ -68,6 +70,7 @@ public class DemoLeaderSeeder implements ApplicationRunner {
         this.requests = requests;
         this.officers = officers;
         this.events = events;
+        this.images = images;
         this.authService = authService;
         this.passwordHasher = passwordHasher;
         this.audit = audit;
@@ -101,6 +104,8 @@ public class DemoLeaderSeeder implements ApplicationRunner {
             officers.save(new ClubOfficer(c, "Marcus Green", "Tournament Director", 3));
         });
         club.filter(c -> events.countByClub_ClubId(c.getClubId()) == 0).ifPresent(this::addSampleEvents);
+        club.filter(c -> !c.hasImage()).ifPresent(c -> images.setGeneratedImage(c, drawLogo(),
+                "Chess Club logo: a white chess king on a green circle with a gold ring"));
 
         leader = leaders.save(leader);
         audit.log("LEADER", leader.getLeaderId(), AuditLogger.DEMO_SEEDED, "LEADER", leader.getLeaderId(), true);
@@ -148,5 +153,27 @@ public class DemoLeaderSeeder implements ApplicationRunner {
         e.setEndsAt(end);
         e.setLocation(location);
         return e;
+    }
+
+    /** A simple original logo drawn with Java2D (FR-15 demo): green circle, gold ring, white king. */
+    static java.awt.image.BufferedImage drawLogo() {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(600, 600, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = img.createGraphics();
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(new java.awt.Color(0xE6F0EC));
+        g.fillRect(0, 0, 600, 600);
+        g.setColor(new java.awt.Color(0xF2B705));
+        g.fillOval(40, 40, 520, 520);
+        g.setColor(new java.awt.Color(0x00573F));
+        g.fillOval(70, 70, 460, 460);
+        g.setColor(java.awt.Color.WHITE);
+        g.fillRoundRect(190, 420, 220, 40, 16, 16);                       // base
+        g.fillPolygon(new int[] {220, 380, 345, 255}, new int[] {420, 420, 250, 250}, 4);   // body
+        g.fillRoundRect(230, 225, 140, 36, 14, 14);                       // collar
+        g.fillOval(255, 165, 90, 80);                                     // head
+        g.fillRect(290, 105, 20, 70);                                     // cross
+        g.fillRect(268, 125, 64, 18);
+        g.dispose();
+        return img;
     }
 }

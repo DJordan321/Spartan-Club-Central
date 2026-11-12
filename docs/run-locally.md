@@ -71,6 +71,7 @@ mysql -u root -p club_central < database/sample-data.sql
 | `DB_URL` | no | `jdbc:mysql://localhost:3306/club_central` | same |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | from Phase 4 | `admin@clubcentral.local` / 8 to 72 characters | no admin account (created only once, the first time the app starts with both set) |
 | `APP_BASE_URL` | no | `http://192.168.1.20:8080` for phone demos | `http://localhost:8080` |
+| `UPLOAD_DIR` | no | `C:\clubcentral\uploads` | `./uploads` in the project folder (in `.gitignore`) |
 | `MAIL_HOST` / `MAIL_PORT` | no | | `localhost` / `1025` (Mailpit) |
 
 **IntelliJ (easiest):** *Run → Edit Configurations → SpartanClubApplication → Environment variables* → add `DB_PASSWORD=...`.
@@ -142,6 +143,8 @@ RUN_MYSQL_TESTS=true DB_PASSWORD="pick-a-local-password" ./mvnw test -Dtest=MySq
 PowerShell: set `$env:RUN_MYSQL_TESTS="true"` and `$env:DB_PASSWORD="..."`, then `mvnw.cmd test -Dtest=MySqlSampleDataTest`.
 
 ## 6. Reset before every demo
+
+Also delete the `uploads` folder in the project (uploaded club pictures); demo mode recreates Chess Club's logo. Load `sample-data.sql` on the day of the demo, because its events are dated from that day.
 
 This removes all leader accounts, requests and log entries, then reloads the sample clubs, so every demo starts the same:
 
@@ -254,7 +257,20 @@ Your browser gets a new session cookie when you log in, and you're logged out af
 | Fix it and post | It appears on Chess Club's page in date order | FR-14 |
 | Open http://localhost:8080/dashboard/clubs/18/events | "That request wasn't allowed" | SPR-03 |
 
-Automated tests: `./mvnw test` should report 158 passing and 1 skipped.
+**Phase 8C: pictures** (demo mode)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Open the homepage and the directory | A picture for each category on the cards; club cards show small pictures | FR-15 |
+| Open Chess Club | Its logo (made by demo mode) with a text description for screen readers | FR-15, NFR-06 |
+| As the demo leader: **Change picture**, upload a text file renamed `.jpg` | "Upload a JPEG or PNG picture." | SPR-05 |
+| Upload a photo over 2 MB | "The picture must be 2 MB or smaller." | FR-15 |
+| Upload a phone photo with a description | It shows on Chess Club's page; the file in `uploads/` is at most 1200 px wide and has no GPS/EXIF data | FR-15, privacy |
+| **Remove picture** | The Academic category picture comes back | FR-15 |
+| Open http://localhost:8080/dashboard/clubs/18/picture | "That request wasn't allowed" | SPR-03 |
+| As admin: **Remove picture** on a club | The club's picture is removed | FR-15 (moderation) |
+
+Automated tests: `./mvnw test` should report 172 passing and 1 skipped.
 
 ## Performance check (NFR-04)
 

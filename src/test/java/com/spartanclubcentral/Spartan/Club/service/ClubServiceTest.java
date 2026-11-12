@@ -27,7 +27,8 @@ class ClubServiceTest {
     private final RequestRepository requestRepository = mock(RequestRepository.class);
     private final AuditLogger audit = mock(AuditLogger.class);
     private final ClubService service = new ClubService(clubRepository, categoryRepository, leaderRepository,
-            requestRepository, mock(OfficerRepository.class), mock(EventRepository.class), new ClubValidator(), audit);
+            requestRepository, mock(OfficerRepository.class), mock(EventRepository.class), new ClubValidator(), audit,
+            new ImageStorage(System.getProperty("java.io.tmpdir") + "/scc-unit-uploads"));
 
     @Test
     void blankKeywordMeansNoKeyword() {

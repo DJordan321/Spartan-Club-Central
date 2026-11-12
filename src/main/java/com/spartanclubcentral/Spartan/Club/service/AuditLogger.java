@@ -40,6 +40,8 @@ public class AuditLogger {
     public static final String EVENT_CREATED = "EVENT_CREATED";
     public static final String EVENT_EDITED = "EVENT_EDITED";
     public static final String EVENT_DELETED = "EVENT_DELETED";
+    public static final String CLUB_IMAGE_UPLOADED = "CLUB_IMAGE_UPLOADED";
+    public static final String CLUB_IMAGE_REMOVED = "CLUB_IMAGE_REMOVED";
 
     private static final Logger log = LoggerFactory.getLogger(AuditLogger.class);
 
