@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Request sent')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!-- Confirmation after a join request (FR-03). Reached by redirect, so refreshing never resends. -->
+<main id="main" class="container page narrow">
+  <div class="card success-card" role="status">
+    <p class="success-icon" aria-hidden="true">&#10003;</p>
+    <h1>Your request was sent</h1>
+    <p>Thanks! <strong th:text="${club.clubName}">Chess Club</strong> has your message. Their leaders will reply to the
+      email address you gave.</p>
+    <p class="muted">Didn't hear back in a few days? You can also email them at
+      <a th:href="'mailto:' + ${club.contactEmail}" th:text="${club.contactEmail}">chess@example.com</a>.</p>
+  </div>
+  <p class="next-links">
+    <a class="button" th:href="@{/clubs/{id}(id=${club.clubId})}">Back to <span th:text="${club.clubName}">Chess Club</span></a>
+    <a th:href="@{/clubs}">Browse more clubs</a>
+  </p>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

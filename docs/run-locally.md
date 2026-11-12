@@ -1,6 +1,6 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
-> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles) that needs no Java or MySQL.
+> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form and a pretend Mailpit inbox) that needs no Java, MySQL or Mailpit.
 
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
@@ -10,12 +10,13 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 2 status:** the student pages are live:
+> **Phase 3 status:** the student pages and the join request form are live:
 > - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
 > - `/clubs` directory: keyword + category search (FR-01, FR-02)
 > - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
+> - Join/contact form on each club page: validated, saved, then emailed to the club through Mailpit (FR-03, FR-07)
 >
-> The join request form arrives in Phase 3 and leader login in Phase 4.
+> Leader login arrives in Phase 4 and the leader's request inbox in Phase 5.
 >
 > ![Club directory](screenshots/phase2-directory.png)
 
@@ -142,7 +143,28 @@ mysql -u root -p club_central < database/sample-data.sql
 | Go to http://localhost:8080/clubs/17 | "Page not found" (club 17 is inactive) | FR-12, SPR-06 |
 | Shrink the window to phone width | Everything fits, no sideways scrolling | NFR-08 |
 
-Automated tests: `./mvnw test` should report 39 passing and 1 skipped.
+**Phase 3: join requests** (start Mailpit first, see below)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| On any club page, send the form with email `student@` and an empty message | Two red messages next to the fields and in a summary; your name is kept; nothing is sent | SPR-05, TC-21 |
+| Fix the fields and press **Send request** | "Your request was sent" | FR-03, TC-07 |
+| Open http://localhost:8025 | The email, sent to the club's contact address, Reply-To the student | FR-07, TC-09 |
+| Refresh the confirmation page | No second email in Mailpit | No duplicates |
+| Stop Mailpit (Ctrl+C) and send another request | Still "Your request was sent"; in Workbench `SELECT * FROM join_request;` shows it as `FAILED` | TC-10 |
+
+Automated tests: `./mvnw test` should report 60 passing and 1 skipped.
+
+## Mailpit (fake email inbox, needed from Phase 3)
+
+Mailpit catches every email the app sends and shows it in a web inbox. Nothing ever reaches a real mailbox.
+
+- **Mac:** `brew install mailpit`, then run `mailpit` in its own Terminal window.
+- **Windows:** download the `windows-amd64.zip` file from github.com/axllent/mailpit/releases, unzip it, and double-click `mailpit.exe` (or run `.\mailpit.exe` in PowerShell from that folder).
+
+Leave it running, start the app in a second window, and open the inbox at http://localhost:8025. If Mailpit isn't running, the site still works: requests are saved with status `FAILED`, and leaders will still see them on their dashboard from Phase 5.
+
+![An email in Mailpit](screenshots/phase3-mailpit-email.png)
 
 ## Demo checklist
 

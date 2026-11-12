@@ -200,6 +200,34 @@ a.tag:hover { background: #D3E6DD; color: var(--green-dark); }
   .club-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ---------- Join request form (Phase 3) ---------- */
+.join-form { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; max-width: 640px; }
+.join-card > p { margin: 0; }
+textarea {
+  font: inherit; color: var(--text); background: #fff; width: 100%; min-height: 120px; resize: vertical;
+  padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 8px;
+}
+.field-hint { margin: 0; color: var(--muted); font-size: .9rem; }
+.field-error { margin: 0; color: #A4161A; font-weight: 600; font-size: .95rem; }
+.field-error::before { content: "\26A0\FE0E  "; }
+.has-error input, .has-error textarea { border: 2px solid #A4161A; }
+.join-form .button { align-self: flex-start; }
+.error-summary {
+  margin-top: 16px; border: 2px solid #A4161A; border-radius: 8px; padding: 12px 16px; background: #FDF0F0;
+}
+.error-summary h3 { margin: 0 0 6px; font-size: 1rem; color: #A4161A; }
+.error-summary ul { margin: 0; padding-left: 20px; }
+.error-summary a { color: #A4161A; font-weight: 600; }
+
+/* ---------- Request sent ---------- */
+.success-card { border-left: 6px solid var(--green); text-align: left; }
+.success-icon {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--green); color: #fff;
+  display: grid; place-items: center; font-size: 1.4rem; font-weight: 700; margin: 0 0 10px;
+}
+.muted { color: var(--muted); }
+.next-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 20px; }
+
 
 /* ===== Extra styles for this offline file only ===== */
 .preview-bar { background: #FFF6D6; border-bottom: 1px solid #E3B800; color: #1F2933; font-size: .9rem; }
@@ -233,6 +261,28 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 .trouble th, .trouble td { text-align: left; vertical-align: top; padding: 10px; border-bottom: 1px solid var(--border); }
 .trouble thead th { background: var(--green-tint); color: var(--green-dark); }
 .checklist li { margin-bottom: 6px; }
+.mail-toolbar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 12px 0 18px; }
+.mail-toolbar label { font-weight: 600; display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.mail-toolbar input[type=checkbox] { width: 20px; height: 20px; min-height: 0; }
+.button-outline { background: #fff; color: var(--green-dark); border: 1px solid var(--green); }
+.button-outline:hover { background: var(--green-tint); color: var(--green-dark); }
+.mail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.mail { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.mail-head { background: #2C3E50; color: #fff; padding: 12px 16px; }
+.mail-head h2 { color: #fff; font-size: 1.05rem; margin: 0 0 6px; }
+.mail-head dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: .9rem; }
+.mail-head dt { color: #C9D3DC; }
+.mail-head dd { margin: 0; overflow-wrap: anywhere; }
+.mail pre { margin: 0; padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere; font: .92rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.status { display: inline-block; font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.status-DELIVERED { background: var(--green-tint); color: var(--green-dark); }
+.status-FAILED { background: #FDF0F0; color: #A4161A; }
+.db-wrap { overflow-x: auto; }
+.db-table { border-collapse: collapse; width: 100%; min-width: 480px; font-size: .95rem; }
+.db-table th, .db-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.db-table thead th { background: var(--green-tint); color: var(--green-dark); }
+.fill-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.fill-buttons button { font: inherit; font-size: .9rem; cursor: pointer; padding: 6px 10px; border: 1px solid var(--green); border-radius: 999px; background: #fff; color: var(--green-dark); }
 [hidden] { display: none !important; }
 </style>
 </head>
@@ -241,9 +291,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="preview-bar" role="region" aria-label="About this file">
   <div class="container">
-    <p><strong>Offline preview of Phase 2.</strong> Same pages and search rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>.</p>
+    <p><strong>Offline preview through Phase 3.</strong> Same pages, search and form rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>.</p>
     <nav aria-label="Preview sections">
       <a href="#/" id="nav-preview">Website preview</a>
+      <a href="#/mailpit" id="nav-mail">Pretend Mailpit inbox <span id="mail-count"></span></a>
       <a href="#/guide" id="nav-guide">Run the real app</a>
     </nav>
   </div>
@@ -289,6 +340,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
               <span data-show="win">Also install <strong>MySQL Workbench</strong> (included in the Windows installer).</span>
               <span data-show="mac">Or with Homebrew: <code class="inline">brew install mysql</code> then <code class="inline">brew services start mysql</code>.</span></li>
             <li><strong>Git</strong> (git-scm.com) and an editor: IntelliJ IDEA Community or VS Code.</li>
+            <li><strong>Mailpit</strong> (new in Phase 3), a fake email inbox so nothing real is ever sent.
+              <span data-show="win">Download the Windows zip from github.com/axllent/mailpit/releases (the file ending in
+                <code class="inline">windows-amd64.zip</code>), unzip it, and keep <code class="inline">mailpit.exe</code> somewhere easy, like your Downloads folder.</span>
+              <span data-show="mac">Install it with <code class="inline">brew install mailpit</code>.</span></li>
           </ul>
         </li>
         <li><span class="num" aria-hidden="true">2</span>
@@ -296,10 +351,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
           <p data-show="win">In PowerShell:</p><p data-show="mac">In Terminal:</p>
           <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
           <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-2-public-pages</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-3-join-requests</pre><button type="button">Copy</button></div>
           <p>Already cloned it for Phase 1? Run these two instead:</p>
           <div class="code"><pre>git fetch origin</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-2-public-pages</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-3-join-requests</pre><button type="button">Copy</button></div>
         </li>
         <li><span class="num" aria-hidden="true">3</span>
           <h3>Create the database and load the 32 sample clubs</h3>
@@ -328,8 +383,16 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
       <h2>Every time you run it</h2>
       <ol class="steps">
         <li><span class="num" aria-hidden="true">5</span>
+          <h3>Start Mailpit in its own window and leave it running</h3>
+          <div data-show="win"><p>Double-click <code class="inline">mailpit.exe</code>, or in PowerShell from the folder it's in:</p>
+            <div class="code"><pre>.\mailpit.exe</pre><button type="button">Copy</button></div></div>
+          <div data-show="mac"><div class="code"><pre>mailpit</pre><button type="button">Copy</button></div></div>
+          <p>Its inbox is at <a href="http://localhost:8025" target="_blank" rel="noopener">http://localhost:8025</a>.
+            Skipping Mailpit is OK: requests are still saved, just marked <code class="inline">FAILED</code>.</p>
+        </li>
+        <li><span class="num" aria-hidden="true">6</span>
           <h3>Start the app with your database password</h3>
-          <p>From the <code class="inline">Spartan-Club-Central</code> folder. The password stays in this window, never in a file on GitHub.</p>
+          <p>In a second window, from the <code class="inline">Spartan-Club-Central</code> folder. The password stays in this window, never in a file on GitHub.</p>
           <div data-show="win">
             <div class="code"><pre>$env:DB_PASSWORD="pick-a-local-password"</pre><button type="button">Copy</button></div>
             <div class="code"><pre>.\mvnw.cmd spring-boot:run</pre><button type="button">Copy</button></div>
@@ -340,7 +403,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
           <p>IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr; Environment variables</em>
             &rarr; <code class="inline">DB_PASSWORD=...</code>, then press Run.</p>
         </li>
-        <li><span class="num" aria-hidden="true">6</span>
+        <li><span class="num" aria-hidden="true">7</span>
           <h3>Open the site and test it</h3>
           <p>Wait for <code class="inline">Started SpartanClubApplication</code>, then open
             <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>. Press <strong>Ctrl+C</strong> to stop.</p>
@@ -351,13 +414,17 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <li>Keyword <strong>club</strong> + category <strong>Academic</strong>: 5 Academic clubs only (TC-05).</li>
             <li>Open a club: meeting time, contact email, contact info and social links are filled in (TC-06).</li>
             <li>Go to <code class="inline">localhost:8080/clubs/17</code> (the inactive club): friendly "Page not found".</li>
+            <li><strong>Phase 3:</strong> on a club page, send the form with email <code class="inline">student@</code> and no message: two error messages, nothing sent (TC-21).</li>
+            <li>Fix it and send: "Your request was sent" (TC-07), then the email appears in Mailpit at <code class="inline">localhost:8025</code> (TC-09).</li>
+            <li>Refresh the confirmation page: no second email arrives.</li>
+            <li>Stop Mailpit (Ctrl+C) and send another request: still "Your request was sent"; in Workbench, <code class="inline">SELECT * FROM join_request;</code> shows it as <code class="inline">FAILED</code> (TC-10).</li>
           </ul>
         </li>
-        <li><span class="num" aria-hidden="true">7</span>
+        <li><span class="num" aria-hidden="true">8</span>
           <h3>Optional: run the automated tests</h3>
           <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
           <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
-          <p>Expect <strong>39 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+          <p>Expect <strong>60 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
         </li>
       </ol>
     </section>
@@ -384,7 +451,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <tr><td><code class="inline">Schema-validation: missing column</code></td><td>Old database. Run <code class="inline">DROP DATABASE club_central;</code> as root, then redo steps 3 and 4.</td></tr>
             <tr><td><code class="inline">Port 8080 was already in use</code></td><td>The app is already running in another window. Stop it with Ctrl+C.</td></tr>
             <tr><td>Homepage says 0 clubs</td><td>Load <code class="inline">database/sample-data.sql</code> (step 3).</td></tr>
-            <tr><td>You still see the Phase 1 checkpoint page</td><td>You're on the old branch. Run <code class="inline">git checkout phase-2-public-pages</code> and restart the app.</td></tr>
+            <tr><td>Requests say "sent" but no email in Mailpit</td><td>Mailpit isn't running. Start it (step 5); requests sent while it was off are saved as FAILED.</td></tr>
+            <tr><td>"That request wasn't allowed" after sending the form</td><td>The page was open too long or from an old tab. Refresh the club page and send again.</td></tr>
+            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-3-join-requests</code> and restart the app.</td></tr>
           </tbody>
         </table>
       </div>
@@ -410,6 +479,45 @@ function search(rawKeyword, categoryId) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 function getActiveClub(id) { return CLUBS.find(c => c.id === id && c.active) || null; }
+
+// ---- Phase 3: what MySQL + Mailpit would hold, kept for this browser tab only ----
+const STATE_KEY = "scc-phase3";
+const state = (() => {
+  try { const saved = JSON.parse(sessionStorage.getItem(STATE_KEY)); if (saved && Array.isArray(saved.requests)) return saved; } catch (e) {}
+  return { requests: [], emails: [], mailDown: false };
+})();
+function saveState() { try { sessionStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (e) {} updateMailCount(); }
+function updateMailCount() { const n = state.emails.length; document.getElementById("mail-count").textContent = n ? "(" + n + ")" : ""; }
+
+// Same rules and messages as RequestValidator.java
+const isEmail = e => e.length <= 254 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+function validateJoin(f) {
+  const errors = {}; const name = f.name.trim(), email = f.email.trim(), message = f.message.trim();
+  if (!name) errors.name = "Enter your name.";
+  else if (name.length > 100) errors.name = "Name must be 100 characters or fewer.";
+  if (!email) errors.email = "Enter your email address.";
+  else if (!isEmail(email)) errors.email = "Enter a valid email address, like name@example.com.";
+  if (!message) errors.message = "Enter a message for the club.";
+  else if (message.length > 1000) errors.message = "Message must be 1,000 characters or fewer (yours is " + message.length.toLocaleString("en-US") + ").";
+  return errors;
+}
+
+// Same order as RequestService.submit: validate, save SUBMITTED, email, save DELIVERED/FAILED
+function submitJoin(club, f) {
+  const req = { id: state.requests.length + 1, clubId: club.id, clubName: club.name, name: f.name.trim(),
+    email: f.email.trim(), message: f.message.trim(), status: "SUBMITTED", date: new Date().toLocaleString("en-US") };
+  state.requests.push(req);
+  if (state.mailDown) { req.status = "FAILED"; }
+  else {
+    state.emails.unshift({ from: "no-reply@clubcentral.local", to: club.contactEmail, replyTo: req.email,
+      subject: "New join request for " + club.name, date: req.date,
+      body: "Hello " + club.name + ",\n\nA student sent a join/contact request through Spartan Club Central.\n\n"
+        + "Name:  " + req.name + "\nEmail: " + req.email + "\n\nMessage:\n" + req.message
+        + "\n\nReply to this email to answer the student directly.\n\nSpartan Club Central\n" });
+    req.status = "DELIVERED";
+  }
+  saveState();
+}
 
 // ---- Tiny DOM helper: text always goes in via textContent (like Thymeleaf th:text) ----
 function h(tag, attrs, ...children) {
@@ -486,16 +594,18 @@ function directoryPage(params) {
   return h("div", { class: "container page" }, h("h1", {}, "Browse clubs"), form, summary, results, testPanel());
 }
 
-function profilePage(id) {
+function profilePage(id, form, errors) {
   const c = getActiveClub(id);
   if (!c) return notFoundPage();
+  form = form || { name: "", email: "", message: "" };
+  errors = errors || {};
   document.title = c.name + " | Spartan Club Central";
   const ext = (label, url) => url ? h("li", {}, h("a", { href: url, target: "_blank", rel: "noopener noreferrer" },
     label, h("span", { class: "visually-hidden" }, " (opens in a new tab)"))) : null;
   const detail = (label, content) => content ? h("div", {}, h("dt", {}, label), h("dd", {}, content)) : null;
   const hasLinks = c.instagramUrl || c.websiteUrl || c.otherSocialUrl;
   return h("div", { class: "container page" },
-    h("p", { class: "back-link" }, h("a", { href: "#/clubs" }, "← All clubs")),
+    h("p", { class: "back-link" }, h("a", { href: "#/clubs" }, "\u2190 All clubs")),
     h("article", { class: "profile" },
       h("header", { class: "profile-header" },
         h("a", { class: "tag", href: clubsUrl(null, c.categoryId) }, catName(c.categoryId)),
@@ -512,10 +622,132 @@ function profilePage(id) {
             detail("Find us online", hasLinks ? h("ul", { class: "social-links" },
               ext("Instagram", c.instagramUrl), ext("Website", c.websiteUrl), ext("Other link", c.otherSocialUrl)) : null),
             detail("Last updated", TODAY)))),
-      h("section", { class: "card join-card", "aria-labelledby": "join-heading" },
-        h("h2", { id: "join-heading" }, "Interested in joining?"),
-        h("p", {}, "A join request form is coming in the next update. For now, email the club at ",
-          h("a", { href: "mailto:" + c.contactEmail }, c.contactEmail), "."))));
+      joinSection(c, form, errors)),
+    profileTestPanel());
+}
+
+// Mirrors the join form in club.html
+function joinSection(c, form, errors) {
+  const has = k => Object.prototype.hasOwnProperty.call(errors, k);
+  const field = (key, label, hint, control) => {
+    const ids = [hint ? key + "-hint" : null, has(key) ? key + "-error" : null].filter(Boolean).join(" ");
+    control.setAttribute("aria-invalid", has(key) ? "true" : "false");
+    if (ids) control.setAttribute("aria-describedby", ids);
+    return h("div", { class: "field" + (has(key) ? " has-error" : "") },
+      h("label", { for: key }, label),
+      hint ? h("p", { class: "field-hint", id: key + "-hint" }, hint) : null,
+      has(key) ? h("p", { class: "field-error", id: key + "-error" }, errors[key]) : null,
+      control);
+  };
+  const name = h("input", { id: "name", name: "name", type: "text", maxlength: "100", autocomplete: "name", required: true });
+  const email = h("input", { id: "email", name: "email", type: "email", maxlength: "254", autocomplete: "email", required: true });
+  const message = h("textarea", { id: "message", name: "message", rows: "5", maxlength: "1000", required: true });
+  name.value = form.name; email.value = form.email; message.value = form.message;
+
+  const formEl = h("form", { class: "join-form", novalidate: true },
+    field("name", "Your name", null, name),
+    field("email", "Your email", "The club will reply to this address.", email),
+    field("message", "Message", "Say hello, ask a question, or tell them why you'd like to join. Up to 1,000 characters.", message),
+    h("button", { type: "submit", class: "button" }, "Send request"));
+  formEl.addEventListener("submit", e => {
+    e.preventDefault();
+    const f = { name: name.value, email: email.value, message: message.value };
+    const errs = validateJoin(f);
+    if (Object.keys(errs).length) {
+      const main = document.getElementById("main");
+      main.replaceChildren(profilePage(c.id, f, errs));
+      const summary = document.getElementById("error-summary");
+      summary.scrollIntoView({ block: "start" }); summary.focus();
+      return;
+    }
+    submitJoin(c, f);
+    location.hash = "#/clubs/" + c.id + "/requests/sent";
+  });
+
+  const keys = Object.keys(errors);
+  return h("section", { class: "card join-card", id: "join", "aria-labelledby": "join-heading" },
+    h("h2", { id: "join-heading" }, "Interested in joining?"),
+    h("p", {}, "Send a message to ", c.name, ". Your name and email go only to this club's leaders, never on the public site."),
+    keys.length ? h("div", { class: "error-summary", role: "alert", tabindex: "-1", id: "error-summary" },
+      h("h3", {}, "Please fix the following:"),
+      h("ul", {}, keys.map(k => h("li", {}, h("a", { href: "#" + k, "data-focus": k }, errors[k]))))) : null,
+    formEl);
+}
+
+function sentPage(id) {
+  const c = getActiveClub(id);
+  if (!c) return notFoundPage();
+  document.title = "Request sent | Spartan Club Central";
+  return h("div", { class: "container page narrow" },
+    h("div", { class: "card success-card", role: "status" },
+      h("p", { class: "success-icon", "aria-hidden": "true" }, "\u2713"),
+      h("h1", {}, "Your request was sent"),
+      h("p", {}, "Thanks! ", h("strong", {}, c.name), " has your message. Their leaders will reply to the email address you gave."),
+      h("p", { class: "muted" }, "Didn't hear back in a few days? You can also email them at ",
+        h("a", { href: "mailto:" + c.contactEmail }, c.contactEmail), ".")),
+    h("p", { class: "next-links" },
+      h("a", { class: "button", href: "#/clubs/" + c.id }, "Back to ", c.name),
+      h("a", { href: "#/clubs" }, "Browse more clubs")),
+    h("section", { class: "card test-panel" },
+      h("h2", {}, "Preview file only"),
+      h("p", {}, state.mailDown
+        ? "The pretend mail server is down, so this request was saved as FAILED and no email was sent (TC-10)."
+        : "An email was sent to the club. See it in the pretend Mailpit inbox (TC-09)."),
+      h("ul", {}, h("li", {}, h("a", { href: "#/mailpit" }, "Open the pretend Mailpit inbox")))));
+}
+
+function inboxPage() {
+  document.title = "Pretend Mailpit inbox | Spartan Club Central";
+  const toggle = h("input", { type: "checkbox", id: "mail-down", checked: state.mailDown });
+  toggle.addEventListener("change", () => { state.mailDown = toggle.checked; saveState(); });
+  const clear = h("button", { type: "button", class: "button button-outline" }, "Clear inbox and requests");
+  clear.addEventListener("click", () => { state.requests = []; state.emails = []; saveState(); render(); });
+  return h("div", { class: "container page" },
+    h("h1", {}, "Pretend Mailpit inbox"),
+    h("p", {}, "On your laptop, emails go to Mailpit at http://localhost:8025. This page shows the same emails for this offline preview. Nothing is really sent."),
+    h("div", { class: "mail-toolbar" },
+      h("label", { for: "mail-down" }, toggle, "Pretend the mail server is down (TC-10)"), clear),
+    state.emails.length === 0
+      ? h("div", { class: "card empty-state" }, h("h2", {}, "No emails yet"),
+          h("p", {}, "Open any club, fill in the form at the bottom and press Send request. ", h("a", { href: "#/clubs/1" }, "Try Chess Club"), "."))
+      : h("ul", { class: "mail-list", "aria-label": "Emails" }, state.emails.map(m => h("li", { class: "mail" },
+          h("div", { class: "mail-head" },
+            h("h2", {}, m.subject),
+            h("dl", {}, h("dt", {}, "From"), h("dd", {}, m.from), h("dt", {}, "To"), h("dd", {}, m.to),
+              h("dt", {}, "Reply-To"), h("dd", {}, m.replyTo), h("dt", {}, "Date"), h("dd", {}, m.date))),
+          h("pre", {}, m.body)))),
+    h("section", { class: "card", style: "margin-top:24px", "aria-labelledby": "db-heading" },
+      h("h2", { id: "db-heading" }, "Behind the scenes: the join_request table"),
+      h("p", { class: "muted" }, "What MySQL would store. In the real app only the club's leader can see these (Phase 5, NFR-02)."),
+      state.requests.length === 0 ? h("p", {}, "No requests yet.") :
+      h("div", { class: "db-wrap", tabindex: "0", "aria-label": "Saved requests, scrolls sideways on small screens" },
+        h("table", { class: "db-table" },
+          h("thead", {}, h("tr", {}, ["request_id", "club", "student_name", "status", "date_submitted"].map(t => h("th", { scope: "col" }, t)))),
+          h("tbody", {}, state.requests.slice().reverse().map(r => h("tr", {},
+            h("td", {}, r.id), h("td", {}, r.clubName), h("td", {}, r.name),
+            h("td", {}, h("span", { class: "status status-" + r.status }, r.status)), h("td", {}, r.date))))))));
+}
+
+// Buttons that fill the form with test data (preview file only).
+function profileTestPanel() {
+  const fill = (label, f) => {
+    const b = h("button", { type: "button" }, label);
+    b.addEventListener("click", () => {
+      document.getElementById("name").value = f.name; document.getElementById("email").value = f.email;
+      document.getElementById("message").value = f.message; document.getElementById("join").scrollIntoView({ block: "start" });
+    });
+    return b;
+  };
+  return h("section", { class: "card test-panel", "aria-labelledby": "ptests-heading" },
+    h("h2", { id: "ptests-heading" }, "Test the form (preview file only)"),
+    h("p", {}, "Fill the form with example data, then press Send request."),
+    h("div", { class: "fill-buttons" },
+      fill("Valid request (TC-07)", { name: "Jordan Lee", email: "jordan.lee@example.com", message: "Hi! I'd love to join. When is the next meeting?" }),
+      fill("Bad email + empty message (TC-21)", { name: "Jordan Lee", email: "student@", message: "" }),
+      fill("Message too long", { name: "Jordan Lee", email: "jordan.lee@example.com", message: "x".repeat(1001) }),
+      fill("Script text (shown as plain text)", { name: "<b>Test</b>", email: "test@example.com", message: "<script>alert(1)<\/script>" })),
+    h("ul", {}, h("li", {}, h("a", { href: "#/mailpit" }, "Open the pretend Mailpit inbox")),
+      h("li", {}, h("a", { href: "#/clubs" }, "Back to search test cases"))));
 }
 
 function notFoundPage() {
@@ -545,28 +777,34 @@ function testPanel() {
       t("TC-04: Sports only", clubsUrl(null, 3)),
       t("TC-05: “club” + Academic", clubsUrl("club", 1)),
       t("TC-06: club profile", "#/clubs/2"),
+      t("TC-07: join form (Chess Club)", "#/clubs/1#join"),
+      t("TC-09: pretend Mailpit inbox", "#/mailpit"),
       t("Inactive club (#17) is hidden", "#/clubs/17"),
       t("Unknown page", "#/nope")));
 }
 
 // ---- Router ----
 function render() {
-  const hash = location.hash.replace(/^#/, "") || "/";
+  const raw = location.hash.replace(/^#/, "") || "/";
+  const [hash, anchor] = raw.split("#");   // e.g. #/clubs/1#join
   const [path, query] = hash.split("?");
   const params = new URLSearchParams(query || "");
   let page, isGuide = false;
   if (path === "/" ) page = homePage();
   else if (path === "/clubs") page = directoryPage(params);
   else if (/^\/clubs\/\d+$/.test(path)) page = profilePage(Number(path.split("/")[2]));
+  else if (/^\/clubs\/\d+\/requests\/sent$/.test(path)) page = sentPage(Number(path.split("/")[2]));
+  else if (path === "/mailpit") page = inboxPage();
   else if (path === "/guide") { page = guidePage(); isGuide = true; }
   else page = notFoundPage();
   const main = document.getElementById("main");
   main.replaceChildren(...[].concat(page));
-  const navPreview = document.getElementById("nav-preview"), navGuide = document.getElementById("nav-guide");
-  navPreview.removeAttribute("aria-current"); navGuide.removeAttribute("aria-current");
-  (isGuide ? navGuide : navPreview).setAttribute("aria-current", "page");
+  const navs = { preview: "nav-preview", mail: "nav-mail", guide: "nav-guide" };
+  Object.values(navs).forEach(n => document.getElementById(n).removeAttribute("aria-current"));
+  document.getElementById(isGuide ? navs.guide : path === "/mailpit" ? navs.mail : navs.preview).setAttribute("aria-current", "page");
   if (isGuide) selectOs(savedOs());
-  window.scrollTo(0, 0);
+  const target = anchor && document.getElementById(anchor);
+  if (target) target.scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
 }
 
 function savedOs() {
@@ -585,6 +823,11 @@ async function copy(b) {
   b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500);
 }
 
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-focus]");
+  if (a) { e.preventDefault(); const f = document.getElementById(a.dataset.focus); if (f) { f.scrollIntoView({ block: "center" }); f.focus(); } }
+});
+updateMailCount();
 window.addEventListener("hashchange", render);
 render();
 </script>
