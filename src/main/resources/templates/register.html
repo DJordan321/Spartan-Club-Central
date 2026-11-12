@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Create a leader account')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!--
+  Club leader registration (FR-04). Checked on the server by
+  RegistrationValidator and AuthService (SPR-05); only a BCrypt hash of the
+  password is stored (SPR-02). Password fields are never filled back in.
+-->
+<main id="main" class="container page auth-page">
+  <div class="card auth-card">
+    <h1>Create a leader account</h1>
+    <p class="muted">For club presidents and officers who manage a club listing. After you log in you'll be able to
+      create your club's page (coming in the next update).</p>
+
+    <div class="error-summary" role="alert" th:if="${!#maps.isEmpty(errors)}" tabindex="-1" id="error-summary">
+      <h2>Please fix the following:</h2>
+      <ul>
+        <li th:each="e : ${errors}"><a th:href="'#' + ${e.key}" th:text="${e.value}">Enter your name.</a></li>
+      </ul>
+    </div>
+
+    <form class="stack-form" method="post" novalidate th:action="@{/register}" th:object="${form}">
+      <div class="field" th:classappend="${errors.containsKey('name')} ? 'has-error'">
+        <label for="name">Your name</label>
+        <p class="field-error" id="name-error" th:if="${errors.containsKey('name')}" th:text="${errors.get('name')}">Enter your name.</p>
+        <input id="name" name="name" type="text" maxlength="100" autocomplete="name" required th:value="*{name}"
+               th:attr="aria-invalid=${errors.containsKey('name')},aria-describedby=${errors.containsKey('name')} ? 'name-error' : null">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('email')} ? 'has-error'">
+        <label for="email">Email</label>
+        <p class="field-hint" id="email-hint">You'll log in with this.</p>
+        <p class="field-error" id="email-error" th:if="${errors.containsKey('email')}" th:text="${errors.get('email')}">Enter a valid email.</p>
+        <input id="email" name="email" type="email" maxlength="254" autocomplete="username" required th:value="*{email}"
+               th:attr="aria-invalid=${errors.containsKey('email')},aria-describedby=${errors.containsKey('email')} ? 'email-hint email-error' : 'email-hint'">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('position')} ? 'has-error'">
+        <label for="position">Your position in the club <span class="optional">(optional)</span></label>
+        <p class="field-error" id="position-error" th:if="${errors.containsKey('position')}" th:text="${errors.get('position')}">Too long.</p>
+        <input id="position" name="position" type="text" maxlength="50" autocomplete="organization-title" th:value="*{position}"
+               placeholder="e.g. President"
+               th:attr="aria-invalid=${errors.containsKey('position')},aria-describedby=${errors.containsKey('position')} ? 'position-error' : null">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('password')} ? 'has-error'">
+        <label for="password">Password</label>
+        <p class="field-hint" id="password-hint">8 to 72 characters.</p>
+        <p class="field-error" id="password-error" th:if="${errors.containsKey('password')}" th:text="${errors.get('password')}">Too short.</p>
+        <input id="password" name="password" type="password" maxlength="72" autocomplete="new-password" required
+               th:attr="aria-invalid=${errors.containsKey('password')},aria-describedby=${errors.containsKey('password')} ? 'password-hint password-error' : 'password-hint'">
+      </div>
+      <div class="field" th:classappend="${errors.containsKey('confirmPassword')} ? 'has-error'">
+        <label for="confirmPassword">Confirm password</label>
+        <p class="field-error" id="confirmPassword-error" th:if="${errors.containsKey('confirmPassword')}" th:text="${errors.get('confirmPassword')}">Don't match.</p>
+        <input id="confirmPassword" name="confirmPassword" type="password" maxlength="72" autocomplete="new-password" required
+               th:attr="aria-invalid=${errors.containsKey('confirmPassword')},aria-describedby=${errors.containsKey('confirmPassword')} ? 'confirmPassword-error' : null">
+      </div>
+      <button type="submit" class="button">Create account</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a th:href="@{/login}">Log in</a></p>
+  </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

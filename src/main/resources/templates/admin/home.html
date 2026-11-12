@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Administrator')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!-- Administrator area (ROLE_ADMIN only). Phase 6 adds the club and leader tools. -->
+<main id="main" class="container page">
+  <h1>Administrator</h1>
+  <p class="muted">Logged in as <span th:text="${currentUser.displayName}">Administrator</span>.</p>
+  <section class="card dash-card">
+    <h2>Coming next</h2>
+    <p>Lists of all clubs and leader accounts, deactivating a club, and sending a leader a password reset link arrive
+      in a later update.</p>
+  </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

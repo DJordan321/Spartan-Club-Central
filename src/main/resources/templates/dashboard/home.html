@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<!-- Leader dashboard (ROLE_LEADER only). Phase 5 adds club management and the request inbox. -->
+<main id="main" class="container page">
+  <h1>Welcome, <span th:text="${leader.name}">Jordan</span></h1>
+  <p class="muted">You're logged in as a club leader<span th:if="${leader.position}">
+    (<span th:text="${leader.position}">President</span>)</span>.</p>
+
+  <section class="card dash-card" aria-labelledby="club-heading">
+    <h2 id="club-heading">Your club</h2>
+    <p th:if="${leader.clubId == null}">You haven't created your club's listing yet. Creating and editing your club,
+      and reading the join requests students send you, arrive in the next update.</p>
+    <p th:if="${leader.clubId != null}">Your club listing is set up. Editing it and reading join requests arrive in the
+      next update.</p>
+  </section>
+
+  <section class="card dash-card" aria-labelledby="account-heading">
+    <h2 id="account-heading">Your account</h2>
+    <dl class="account-list">
+      <div><dt>Name</dt><dd th:text="${leader.name}">Jordan Lee</dd></div>
+      <div><dt>Email</dt><dd th:text="${leader.email}">jordan@example.com</dd></div>
+      <div><dt>Member since</dt><dd th:text="${#temporals.format(leader.createdAt, 'MMMM d, yyyy')}">November 12, 2026</dd></div>
+    </dl>
+    <p class="muted">For your security you'll be logged out automatically after 30 minutes without activity.</p>
+  </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

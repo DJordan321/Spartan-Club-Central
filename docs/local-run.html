@@ -228,6 +228,34 @@ textarea {
 .muted { color: var(--muted); }
 .next-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 20px; }
 
+/* ---------- Login state in the header (Phase 4) ---------- */
+.nav-links { align-items: center; }
+.logout-form { margin: 0; }
+.nav-button {
+  font: inherit; font-weight: 600; color: #fff; background: transparent; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .7); border-radius: 6px; padding: 7px 10px; min-height: 40px;
+}
+.nav-button:hover { background: var(--green-dark); }
+
+/* ---------- Login and registration ---------- */
+.auth-page { max-width: 560px; }
+.auth-card h1 { font-size: 1.7rem; }
+.stack-form { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+.stack-form .button { align-self: flex-start; }
+.auth-switch { margin: 20px 0 0; }
+.optional { font-weight: 400; color: var(--muted); }
+.notice { border-radius: 8px; padding: 10px 14px; margin: 12px 0 0; font-weight: 600; }
+.notice-error { background: #FDF0F0; border: 2px solid #A4161A; color: #A4161A; }
+.notice-ok { background: var(--green-tint); border: 1px solid var(--green); color: var(--green-dark); }
+.error-summary h2 { margin: 0 0 6px; font-size: 1rem; color: #A4161A; }
+
+/* ---------- Dashboard ---------- */
+.dash-card { margin-top: 16px; }
+.dash-card p:last-child { margin-bottom: 0; }
+.account-list { margin: 0 0 12px; display: grid; gap: 10px; }
+.account-list dt { font-size: .85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.account-list dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+
 
 /* ===== Extra styles for this offline file only ===== */
 .preview-bar { background: #FFF6D6; border-bottom: 1px solid #E3B800; color: #1F2933; font-size: .9rem; }
@@ -283,6 +311,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 .db-table thead th { background: var(--green-tint); color: var(--green-dark); }
 .fill-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .fill-buttons button { font: inherit; font-size: .9rem; cursor: pointer; padding: 6px 10px; border: 1px solid var(--green); border-radius: 999px; background: #fff; color: var(--green-dark); }
+.demo-creds { background: #FFF6D6; border: 1px solid #E3B800; border-radius: 8px; padding: 10px 14px; margin-top: 16px; }
+.demo-creds p { margin: 0 0 6px; }
+.demo-creds code { background: #fff; }
+.hash { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; overflow-wrap: anywhere; }
 [hidden] { display: none !important; }
 </style>
 </head>
@@ -291,10 +323,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="preview-bar" role="region" aria-label="About this file">
   <div class="container">
-    <p><strong>Offline preview through Phase 3.</strong> Same pages, search and form rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>.</p>
+    <p><strong>Offline preview through Phase 4.</strong> Same pages and rules as the Java app, using the 32 clubs from <code class="inline">sample-data.sql</code>. Don't type real passwords here.</p>
     <nav aria-label="Preview sections">
       <a href="#/" id="nav-preview">Website preview</a>
-      <a href="#/mailpit" id="nav-mail">Pretend Mailpit inbox <span id="mail-count"></span></a>
+      <a href="#/mailpit" id="nav-mail">Inbox &amp; database <span id="mail-count"></span></a>
       <a href="#/guide" id="nav-guide">Run the real app</a>
     </nav>
   </div>
@@ -304,10 +336,7 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
   <div class="container header-inner">
     <a class="site-name" href="#/">Spartan Club Central</a>
     <nav aria-label="Main">
-      <ul class="nav-links">
-        <li><a href="#/">Home</a></li>
-        <li><a href="#/clubs">Browse clubs</a></li>
-      </ul>
+      <ul class="nav-links" id="nav-links"></ul>
     </nav>
   </div>
 </header>
@@ -351,10 +380,10 @@ code.inline { background: var(--green-tint); padding: 1px 5px; border-radius: 4p
           <p data-show="win">In PowerShell:</p><p data-show="mac">In Terminal:</p>
           <div class="code"><pre>git clone https://github.com/DJordan321/Spartan-Club-Central.git</pre><button type="button">Copy</button></div>
           <div class="code"><pre>cd Spartan-Club-Central</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-3-join-requests</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-4-authentication</pre><button type="button">Copy</button></div>
           <p>Already cloned it for Phase 1? Run these two instead:</p>
           <div class="code"><pre>git fetch origin</pre><button type="button">Copy</button></div>
-          <div class="code"><pre>git checkout phase-3-join-requests</pre><button type="button">Copy</button></div>
+          <div class="code"><pre>git checkout phase-4-authentication</pre><button type="button">Copy</button></div>
         </li>
         <li><span class="num" aria-hidden="true">3</span>
           <h3>Create the database and load the 32 sample clubs</h3>
@@ -391,17 +420,21 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             Skipping Mailpit is OK: requests are still saved, just marked <code class="inline">FAILED</code>.</p>
         </li>
         <li><span class="num" aria-hidden="true">6</span>
-          <h3>Start the app with your database password</h3>
-          <p>In a second window, from the <code class="inline">Spartan-Club-Central</code> folder. The password stays in this window, never in a file on GitHub.</p>
+          <h3>Start the app with your passwords</h3>
+          <p>In a second window, from the <code class="inline">Spartan-Club-Central</code> folder. <code class="inline">ADMIN_EMAIL</code> and
+            <code class="inline">ADMIN_PASSWORD</code> (new in Phase 4) create the administrator account the first time the app starts.
+            These passwords stay in this window, never in a file on GitHub.</p>
           <div data-show="win">
             <div class="code"><pre>$env:DB_PASSWORD="pick-a-local-password"</pre><button type="button">Copy</button></div>
+            <div class="code"><pre>$env:ADMIN_EMAIL="admin@clubcentral.local"</pre><button type="button">Copy</button></div>
+            <div class="code"><pre>$env:ADMIN_PASSWORD="pick-an-admin-password"</pre><button type="button">Copy</button></div>
             <div class="code"><pre>.\mvnw.cmd spring-boot:run</pre><button type="button">Copy</button></div>
           </div>
           <div data-show="mac">
-            <div class="code"><pre>DB_PASSWORD="pick-a-local-password" ./mvnw spring-boot:run</pre><button type="button">Copy</button></div>
+            <div class="code"><pre>DB_PASSWORD="pick-a-local-password" ADMIN_EMAIL="admin@clubcentral.local" ADMIN_PASSWORD="pick-an-admin-password" ./mvnw spring-boot:run</pre><button type="button">Copy</button></div>
           </div>
-          <p>IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr; Environment variables</em>
-            &rarr; <code class="inline">DB_PASSWORD=...</code>, then press Run.</p>
+          <p>The admin password must be 8 to 72 characters. IntelliJ alternative: <em>Run &rarr; Edit Configurations &rarr; SpartanClubApplication &rarr;
+            Environment variables</em> &rarr; <code class="inline">DB_PASSWORD=...;ADMIN_EMAIL=...;ADMIN_PASSWORD=...</code>, then press Run.</p>
         </li>
         <li><span class="num" aria-hidden="true">7</span>
           <h3>Open the site and test it</h3>
@@ -418,13 +451,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <li>Fix it and send: "Your request was sent" (TC-07), then the email appears in Mailpit at <code class="inline">localhost:8025</code> (TC-09).</li>
             <li>Refresh the confirmation page: no second email arrives.</li>
             <li>Stop Mailpit (Ctrl+C) and send another request: still "Your request was sent"; in Workbench, <code class="inline">SELECT * FROM join_request;</code> shows it as <code class="inline">FAILED</code> (TC-10).</li>
+            <li><strong>Phase 4:</strong> go to <code class="inline">localhost:8080/dashboard</code> while logged out: you're sent to the login page (TC-17).</li>
+            <li>Click <strong>Leader login &rarr; Create a leader account</strong>; try a 5-character password: error message. Then register properly: "Your account was created" (TC-08).</li>
+            <li>Log in with a wrong password: "Invalid email or password." Log in correctly: your dashboard, and the header shows <strong>Dashboard</strong> and <strong>Log out</strong>.</li>
+            <li>While logged in as a leader, open <code class="inline">localhost:8080/admin</code>: "That request wasn't allowed".</li>
+            <li>In Workbench: <code class="inline">SELECT email, password_hash FROM club_leader;</code> shows only <code class="inline">$2a$12$...</code> hashes (TC-18), and <code class="inline">SELECT * FROM audit_log;</code> shows REGISTERED, LOGIN_SUCCESS, LOGIN_FAILED with no emails (TC-24).</li>
+            <li>Log out, then log in with your ADMIN_EMAIL: you land on the Administrator page.</li>
           </ul>
         </li>
         <li><span class="num" aria-hidden="true">8</span>
           <h3>Optional: run the automated tests</h3>
           <div data-show="win"><div class="code"><pre>.\mvnw.cmd test</pre><button type="button">Copy</button></div></div>
           <div data-show="mac"><div class="code"><pre>./mvnw test</pre><button type="button">Copy</button></div></div>
-          <p>Expect <strong>60 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
+          <p>Expect <strong>90 passing, 1 skipped</strong> (the MySQL check is opt-in; see docs/run-locally.md).</p>
         </li>
       </ol>
     </section>
@@ -453,7 +492,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON club_central.* TO 'club_app'@'localhost'
             <tr><td>Homepage says 0 clubs</td><td>Load <code class="inline">database/sample-data.sql</code> (step 3).</td></tr>
             <tr><td>Requests say "sent" but no email in Mailpit</td><td>Mailpit isn't running. Start it (step 5); requests sent while it was off are saved as FAILED.</td></tr>
             <tr><td>"That request wasn't allowed" after sending the form</td><td>The page was open too long or from an old tab. Refresh the club page and send again.</td></tr>
-            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-3-join-requests</code> and restart the app.</td></tr>
+            <tr><td>Admin login says "Invalid email or password"</td><td>ADMIN_EMAIL / ADMIN_PASSWORD weren't set the first time the app started, or the password was under 8 characters (check the app's window for a message). The admin is only created when none exists yet.</td></tr>
+            <tr><td>"That request wasn't allowed" on the dashboard</td><td>You're logged in as the administrator. Log out and log in as a leader.</td></tr>
+            <tr><td>You still see an older version of the site</td><td>You're on the old branch. Run <code class="inline">git checkout phase-4-authentication</code> and restart the app.</td></tr>
           </tbody>
         </table>
       </div>
@@ -481,10 +522,11 @@ function search(rawKeyword, categoryId) {
 function getActiveClub(id) { return CLUBS.find(c => c.id === id && c.active) || null; }
 
 // ---- Phase 3: what MySQL + Mailpit would hold, kept for this browser tab only ----
-const STATE_KEY = "scc-phase3";
+const STATE_KEY = "scc-preview";
 const state = (() => {
-  try { const saved = JSON.parse(sessionStorage.getItem(STATE_KEY)); if (saved && Array.isArray(saved.requests)) return saved; } catch (e) {}
-  return { requests: [], emails: [], mailDown: false };
+  const fresh = { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [] };
+  try { const saved = JSON.parse(sessionStorage.getItem(STATE_KEY)); if (saved && Array.isArray(saved.requests)) return Object.assign(fresh, saved); } catch (e) {}
+  return fresh;
 })();
 function saveState() { try { sessionStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (e) {} updateMailCount(); }
 function updateMailCount() { const n = state.emails.length; document.getElementById("mail-count").textContent = n ? "(" + n + ")" : ""; }
@@ -696,17 +738,243 @@ function sentPage(id) {
       h("ul", {}, h("li", {}, h("a", { href: "#/mailpit" }, "Open the pretend Mailpit inbox")))));
 }
 
+// ---- Phase 4: accounts, login and roles (same rules as AuthService / SecurityConfig) ----
+const DEMO_ADMIN = { email: "admin@clubcentral.local", password: "demo-admin-pass" };
+const SESSION_MINUTES = 30;
+
+// The real app stores a BCrypt hash ($2a$12$...). This offline preview uses a
+// salted SHA-256 hash from the browser instead. Either way, no plain passwords.
+function randomHex(bytes) { const a = new Uint8Array(bytes); crypto.getRandomValues(a); return [...a].map(b => b.toString(16).padStart(2, "0")).join(""); }
+async function previewHash(password, salt) {
+  salt = salt || randomHex(8);
+  const data = new TextEncoder().encode(salt + ":" + password);
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return "sha256$" + salt + "$" + [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  let h1 = 0x811c9dc5; for (const b of data) { h1 ^= b; h1 = Math.imul(h1, 0x01000193) >>> 0; }   // fallback only
+  return "fnv$" + salt + "$" + h1.toString(16);
+}
+async function checkPassword(password, stored) { return (await previewHash(password, stored.split("$")[1])) === stored; }
+async function ensureAdmin() {
+  if (!state.admin) {
+    state.admin = { id: 1, name: "Administrator", email: DEMO_ADMIN.email, hash: await previewHash(DEMO_ADMIN.password) };
+    audit("ADMIN", 1, "ADMIN_SEEDED", true);
+    saveState();
+  }
+}
+function audit(actorType, actorId, action, success) {
+  state.audit.push({ id: state.audit.length + 1, time: new Date().toLocaleString("en-US"), actorType, actorId, action, success });
+}
+const normEmail = e => (e || "").trim().toLowerCase();
+const utf8Length = s => new TextEncoder().encode(s).length;
+function isEmailTaken(email) { const e = normEmail(email); return state.leaders.some(l => l.email === e) || (state.admin && state.admin.email === e); }
+
+function currentUser() {
+  const sess = state.session;
+  if (!sess) return null;
+  if (Date.now() - sess.lastActive > SESSION_MINUTES * 60000) { state.session = null; saveState(); return null; }   // SPR-07
+  sess.lastActive = Date.now(); saveState();
+  if (sess.role === "ADMIN") return { id: state.admin.id, name: state.admin.name, role: "ADMIN" };
+  const l = state.leaders.find(x => x.id === sess.id);
+  return l ? { id: l.id, name: l.name, role: "LEADER", leader: l } : null;
+}
+const homeFor = u => u.role === "ADMIN" ? "/admin" : "/dashboard";
+
+// Same rules and messages as RegistrationValidator.java
+function validateRegistration(f) {
+  const e = {}; const name = f.name.trim(), email = f.email.trim(), position = f.position.trim();
+  if (!name) e.name = "Enter your name."; else if (name.length > 100) e.name = "Name must be 100 characters or fewer.";
+  if (!email) e.email = "Enter your email address."; else if (!isEmail(email)) e.email = "Enter a valid email address, like name@example.com.";
+  if (position.length > 50) e.position = "Position must be 50 characters or fewer.";
+  if (!f.password) e.password = "Choose a password.";
+  else if (f.password.length < 8) e.password = "Password must be at least 8 characters.";
+  else if (utf8Length(f.password) > 72) e.password = "Password must be 72 characters or fewer.";
+  if (!e.password && f.password !== f.confirmPassword) e.confirmPassword = "The two passwords don't match.";
+  return e;
+}
+
+function errorSummary(errors) {
+  const keys = Object.keys(errors);
+  return keys.length ? h("div", { class: "error-summary", role: "alert", tabindex: "-1", id: "error-summary" },
+    h("h2", {}, "Please fix the following:"),
+    h("ul", {}, keys.map(k => h("li", {}, h("a", { href: "#" + k, "data-focus": k }, errors[k]))))) : null;
+}
+function formField(key, label, control, errors, hint, optional) {
+  const has = Object.prototype.hasOwnProperty.call(errors, key);
+  const ids = [hint ? key + "-hint" : null, has ? key + "-error" : null].filter(Boolean).join(" ");
+  control.setAttribute("aria-invalid", has ? "true" : "false");
+  if (ids) control.setAttribute("aria-describedby", ids);
+  return h("div", { class: "field" + (has ? " has-error" : "") },
+    h("label", { for: key }, label, optional ? h("span", { class: "optional" }, " (optional)") : null),
+    hint ? h("p", { class: "field-hint", id: key + "-hint" }, hint) : null,
+    has ? h("p", { class: "field-error", id: key + "-error" }, errors[key]) : null,
+    control);
+}
+function input(id, type, maxlength, autocomplete, value, extra) {
+  const el = h("input", Object.assign({ id, name: id, type, maxlength: String(maxlength), autocomplete }, extra || {}));
+  el.value = value || ""; return el;
+}
+
+function loginPage(params) {
+  document.title = "Leader login | Spartan Club Central";
+  const email = input("email", "email", 254, "username", "", { required: true });
+  const password = input("password", "password", 72, "current-password", "", { required: true });
+  const form = h("form", { class: "stack-form" },
+    h("div", { class: "field" }, h("label", { for: "email" }, "Email"), email),
+    h("div", { class: "field" }, h("label", { for: "password" }, "Password"), password),
+    h("button", { type: "submit", class: "button" }, "Log in"));
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const em = normEmail(email.value);
+    const leader = state.leaders.find(l => l.email === em);
+    let account = null;
+    if (leader && leader.enabled !== false && await checkPassword(password.value, leader.hash)) account = { role: "LEADER", id: leader.id };
+    else if (!leader && state.admin && state.admin.email === em && await checkPassword(password.value, state.admin.hash)) account = { role: "ADMIN", id: state.admin.id };
+    if (!account) { audit("ANONYMOUS", null, "LOGIN_FAILED", false); saveState(); location.hash = "#/login?error"; render(); return; }
+    state.session = Object.assign(account, { lastActive: Date.now() });
+    audit(account.role, account.id, "LOGIN_SUCCESS", true);
+    const home = account.role === "ADMIN" ? "/admin" : "/dashboard";
+    const saved = state.saved; state.saved = null; saveState();
+    location.hash = "#" + (saved && (saved === home || saved.startsWith(home + "/")) ? saved : home);
+  });
+  const fillAdmin = h("button", { type: "button", class: "button button-outline" }, "Fill in the demo admin");
+  fillAdmin.addEventListener("click", () => { email.value = DEMO_ADMIN.email; password.value = DEMO_ADMIN.password; });
+  return h("div", { class: "container page auth-page" },
+    h("div", { class: "card auth-card" },
+      h("h1", {}, "Club leader login"),
+      h("p", { class: "muted" }, "Students don't need an account: ", h("a", { href: "#/clubs" }, "browse clubs"), " and use the form on any club page."),
+      params.has("error") ? h("p", { class: "notice notice-error", role: "alert" }, "Invalid email or password.") : null,
+      params.has("registered") ? h("p", { class: "notice notice-ok", role: "status" }, "Your account was created. Log in to continue.") : null,
+      params.has("logout") ? h("p", { class: "notice notice-ok", role: "status" }, "You've been logged out.") : null,
+      form,
+      h("p", { class: "auth-switch" }, "Lead a club and don't have an account? ", h("a", { href: "#/register" }, "Create a leader account"))),
+    h("div", { class: "demo-creds" },
+      h("p", {}, h("strong", {}, "Preview file only: "), "demo administrator ", h("code", {}, DEMO_ADMIN.email), " / ", h("code", {}, DEMO_ADMIN.password),
+        ". On your laptop the admin comes from ADMIN_EMAIL and ADMIN_PASSWORD."),
+      fillAdmin));
+}
+
+function registerPage(form, errors) {
+  document.title = "Create a leader account | Spartan Club Central";
+  form = form || { name: "", email: "", position: "", password: "", confirmPassword: "" };
+  errors = errors || {};
+  const name = input("name", "text", 100, "name", form.name, { required: true });
+  const email = input("email", "email", 254, "username", form.email, { required: true });
+  const position = input("position", "text", 50, "organization-title", form.position, { placeholder: "e.g. President" });
+  const password = input("password", "password", 72, "new-password", "", { required: true });          // never filled back in
+  const confirm = input("confirmPassword", "password", 72, "new-password", "", { required: true });
+  const el = h("form", { class: "stack-form", novalidate: true },
+    formField("name", "Your name", name, errors),
+    formField("email", "Email", email, errors, "You'll log in with this."),
+    formField("position", "Your position in the club", position, errors, null, true),
+    formField("password", "Password", password, errors, "8 to 72 characters."),
+    formField("confirmPassword", "Confirm password", confirm, errors),
+    h("button", { type: "submit", class: "button" }, "Create account"));
+  el.addEventListener("submit", async e => {
+    e.preventDefault();
+    const f = { name: name.value, email: email.value, position: position.value, password: password.value, confirmPassword: confirm.value };
+    let errs = validateRegistration(f);
+    if (!Object.keys(errs).length && isEmailTaken(f.email)) errs = { email: "That email already has an account. Log in instead." };
+    if (Object.keys(errs).length) {
+      document.getElementById("main").replaceChildren(registerPage(f, errs));
+      const summary = document.getElementById("error-summary"); summary.scrollIntoView({ block: "start" }); summary.focus();
+      return;
+    }
+    const leader = { id: state.leaders.length + 1, name: f.name.trim(), email: normEmail(f.email),
+      position: f.position.trim() || null, hash: await previewHash(f.password), clubId: null, enabled: true,
+      createdAt: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) };
+    state.leaders.push(leader);
+    audit("LEADER", leader.id, "REGISTERED", true);
+    saveState();
+    location.hash = "#/login?registered";
+  });
+  return h("div", { class: "container page auth-page" },
+    h("div", { class: "card auth-card" },
+      h("h1", {}, "Create a leader account"),
+      h("p", { class: "muted" }, "For club presidents and officers who manage a club listing. After you log in you'll be able to create your club's page (coming in the next update)."),
+      errorSummary(errors), el,
+      h("p", { class: "auth-switch" }, "Already have an account? ", h("a", { href: "#/login" }, "Log in"))),
+    h("section", { class: "card test-panel" },
+      h("h2", {}, "Test registration (preview file only)"),
+      h("div", { class: "fill-buttons" },
+        fillButton("Valid leader (TC-08)", { name: "Sam Rivera", email: "sam.rivera@example.com", position: "President", password: "tennis-lover-9", confirmPassword: "tennis-lover-9" }),
+        fillButton("Bad email + short password", { name: "Sam Rivera", email: "sam@", position: "", password: "short", confirmPassword: "short" }),
+        fillButton("Passwords don't match", { name: "Sam Rivera", email: "sam.rivera@example.com", position: "", password: "tennis-lover-9", confirmPassword: "tennis-lover-8" }),
+        fillButton("Admin's email (already taken)", { name: "Sneaky", email: DEMO_ADMIN.email, position: "", password: "tennis-lover-9", confirmPassword: "tennis-lover-9" }))));
+}
+function fillButton(label, f) {
+  const b = h("button", { type: "button" }, label);
+  b.addEventListener("click", () => { for (const [k, v] of Object.entries(f)) { const el = document.getElementById(k); if (el) el.value = v; } });
+  return b;
+}
+
+function dashboardPage(u) {
+  document.title = "Dashboard | Spartan Club Central";
+  const l = u.leader;
+  return h("div", { class: "container page" },
+    h("h1", {}, "Welcome, ", h("span", {}, l.name)),
+    h("p", { class: "muted" }, "You're logged in as a club leader", l.position ? [" (", l.position, ")"] : null, "."),
+    h("section", { class: "card dash-card", "aria-labelledby": "club-heading" },
+      h("h2", { id: "club-heading" }, "Your club"),
+      h("p", {}, "You haven't created your club's listing yet. Creating and editing your club, and reading the join requests students send you, arrive in the next update.")),
+    h("section", { class: "card dash-card", "aria-labelledby": "account-heading" },
+      h("h2", { id: "account-heading" }, "Your account"),
+      h("dl", { class: "account-list" },
+        h("div", {}, h("dt", {}, "Name"), h("dd", {}, l.name)),
+        h("div", {}, h("dt", {}, "Email"), h("dd", {}, l.email)),
+        h("div", {}, h("dt", {}, "Member since"), h("dd", {}, l.createdAt))),
+      h("p", { class: "muted" }, "For your security you'll be logged out automatically after 30 minutes without activity.")));
+}
+function adminPage(u) {
+  document.title = "Administrator | Spartan Club Central";
+  return h("div", { class: "container page" },
+    h("h1", {}, "Administrator"),
+    h("p", { class: "muted" }, "Logged in as ", u.name, "."),
+    h("section", { class: "card dash-card" }, h("h2", {}, "Coming next"),
+      h("p", {}, "Lists of all clubs and leader accounts, deactivating a club, and sending a leader a password reset link arrive in a later update.")));
+}
+function forbiddenPage() {
+  document.title = "Request not allowed | Spartan Club Central";
+  return h("div", { class: "container page narrow" }, h("h1", {}, "That request wasn't allowed"),
+    h("p", {}, "Your page may have been open too long. Go back, refresh the page, and try again."),
+    h("p", {}, h("a", { class: "button", href: "#/clubs" }, "Browse clubs")));
+}
+function logout() {
+  const s = state.session;
+  if (s) audit(s.role, s.id, "LOGOUT", true);
+  state.session = null; saveState();
+  location.hash = "#/login?logout";
+}
+function renderNav(u) {
+  const li = (text, href) => h("li", {}, h("a", { href }, text));
+  const out = h("button", { type: "button", class: "nav-button" }, "Log out");
+  out.addEventListener("click", logout);
+  document.getElementById("nav-links").replaceChildren(...[
+    li("Home", "#/"), li("Browse clubs", "#/clubs"),
+    !u ? li("Leader login", "#/login") : null,
+    u && u.role === "LEADER" ? li("Dashboard", "#/dashboard") : null,
+    u && u.role === "ADMIN" ? li("Admin", "#/admin") : null,
+    u ? h("li", {}, out) : null].filter(Boolean));
+}
+
 function inboxPage() {
   document.title = "Pretend Mailpit inbox | Spartan Club Central";
   const toggle = h("input", { type: "checkbox", id: "mail-down", checked: state.mailDown });
   toggle.addEventListener("change", () => { state.mailDown = toggle.checked; saveState(); });
   const clear = h("button", { type: "button", class: "button button-outline" }, "Clear inbox and requests");
   clear.addEventListener("click", () => { state.requests = []; state.emails = []; saveState(); render(); });
+  const reset = h("button", { type: "button", class: "button button-outline" }, "Reset everything");
+  reset.addEventListener("click", async () => { try { sessionStorage.removeItem(STATE_KEY); } catch (e) {} Object.assign(state,
+    { requests: [], emails: [], mailDown: false, leaders: [], admin: null, session: null, saved: null, audit: [] }); await ensureAdmin(); render(); });
+  const table = (cols, rows) => h("div", { class: "db-wrap", tabindex: "0", "aria-label": "Table, scrolls sideways on small screens" },
+    h("table", { class: "db-table" }, h("thead", {}, h("tr", {}, cols.map(c => h("th", { scope: "col" }, c)))), h("tbody", {}, rows)));
   return h("div", { class: "container page" },
-    h("h1", {}, "Pretend Mailpit inbox"),
+    h("h1", {}, "Inbox & database"),
     h("p", {}, "On your laptop, emails go to Mailpit at http://localhost:8025. This page shows the same emails for this offline preview. Nothing is really sent."),
     h("div", { class: "mail-toolbar" },
-      h("label", { for: "mail-down" }, toggle, "Pretend the mail server is down (TC-10)"), clear),
+      h("label", { for: "mail-down" }, toggle, "Pretend the mail server is down (TC-10)"), clear, reset),
+    h("h2", {}, "Pretend Mailpit inbox"),
     state.emails.length === 0
       ? h("div", { class: "card empty-state" }, h("h2", {}, "No emails yet"),
           h("p", {}, "Open any club, fill in the form at the bottom and press Send request. ", h("a", { href: "#/clubs/1" }, "Try Chess Club"), "."))
@@ -725,7 +993,19 @@ function inboxPage() {
           h("thead", {}, h("tr", {}, ["request_id", "club", "student_name", "status", "date_submitted"].map(t => h("th", { scope: "col" }, t)))),
           h("tbody", {}, state.requests.slice().reverse().map(r => h("tr", {},
             h("td", {}, r.id), h("td", {}, r.clubName), h("td", {}, r.name),
-            h("td", {}, h("span", { class: "status status-" + r.status }, r.status)), h("td", {}, r.date))))))));
+            h("td", {}, h("span", { class: "status status-" + r.status }, r.status)), h("td", {}, r.date))))))),
+    h("section", { class: "card", style: "margin-top:16px", "aria-labelledby": "leaders-heading" },
+      h("h2", { id: "leaders-heading" }, "Behind the scenes: club_leader and administrator tables"),
+      h("p", { class: "muted" }, "Only password hashes are stored, never passwords (NFR-01, TC-18). The real app uses BCrypt hashes starting $2a$12$; this preview uses salted SHA-256."),
+      table(["account", "email", "password_hash", "club_id"], [
+        ...(state.admin ? [h("tr", {}, h("td", {}, "admin #" + state.admin.id), h("td", {}, state.admin.email), h("td", { class: "hash" }, state.admin.hash), h("td", {}, "-"))] : []),
+        ...state.leaders.map(l => h("tr", {}, h("td", {}, "leader #" + l.id), h("td", {}, l.email), h("td", { class: "hash" }, l.hash), h("td", {}, l.clubId == null ? "NULL" : l.clubId)))])),
+    h("section", { class: "card", style: "margin-top:16px", "aria-labelledby": "audit-heading" },
+      h("h2", { id: "audit-heading" }, "Behind the scenes: audit_log table"),
+      h("p", { class: "muted" }, "Security events with account ids only: no emails or passwords (SPR-08, TC-24)."),
+      table(["log_id", "time", "actor_type", "actor_id", "action", "success"], state.audit.slice().reverse().map(a =>
+        h("tr", {}, h("td", {}, a.id), h("td", {}, a.time), h("td", {}, a.actorType), h("td", {}, a.actorId == null ? "NULL" : a.actorId),
+          h("td", {}, a.action), h("td", {}, a.success ? "1" : "0"))))));
 }
 
 // Buttons that fill the form with test data (preview file only).
@@ -779,6 +1059,8 @@ function testPanel() {
       t("TC-06: club profile", "#/clubs/2"),
       t("TC-07: join form (Chess Club)", "#/clubs/1#join"),
       t("TC-09: pretend Mailpit inbox", "#/mailpit"),
+      t("TC-17: /dashboard while logged out", "#/dashboard"),
+      t("TC-08: create a leader account", "#/register"),
       t("Inactive club (#17) is hidden", "#/clubs/17"),
       t("Unknown page", "#/nope")));
 }
@@ -790,7 +1072,22 @@ function render() {
   const [path, query] = hash.split("?");
   const params = new URLSearchParams(query || "");
   let page, isGuide = false;
-  if (path === "/" ) page = homePage();
+  const u = currentUser();
+  renderNav(u);
+  const needs = role => {                       // like SecurityConfig: protected areas
+    if (!u) { state.saved = path; saveState(); location.replace("#/login"); return null; }
+    return u.role === role ? u : false;
+  };
+  if (path === "/dashboard" || path.startsWith("/dashboard/")) {
+    const ok = needs("LEADER"); if (ok === null) return;
+    page = ok ? dashboardPage(ok) : forbiddenPage();
+  } else if (path === "/admin" || path.startsWith("/admin/")) {
+    const ok = needs("ADMIN"); if (ok === null) return;
+    page = ok ? adminPage(ok) : forbiddenPage();
+  } else if ((path === "/login" || path === "/register") && u) { location.replace("#" + homeFor(u)); return; }
+  else if (path === "/login") page = loginPage(params);
+  else if (path === "/register") page = registerPage();
+  else if (path === "/" ) page = homePage();
   else if (path === "/clubs") page = directoryPage(params);
   else if (/^\/clubs\/\d+$/.test(path)) page = profilePage(Number(path.split("/")[2]));
   else if (/^\/clubs\/\d+\/requests\/sent$/.test(path)) page = sentPage(Number(path.split("/")[2]));
@@ -829,7 +1126,7 @@ document.addEventListener("click", e => {
 });
 updateMailCount();
 window.addEventListener("hashchange", render);
-render();
+ensureAdmin().then(render);
 </script>
 </body>
 </html>

@@ -219,3 +219,31 @@ textarea {
 }
 .muted { color: var(--muted); }
 .next-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 20px; }
+
+/* ---------- Login state in the header (Phase 4) ---------- */
+.nav-links { align-items: center; }
+.logout-form { margin: 0; }
+.nav-button {
+  font: inherit; font-weight: 600; color: #fff; background: transparent; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .7); border-radius: 6px; padding: 7px 10px; min-height: 40px;
+}
+.nav-button:hover { background: var(--green-dark); }
+
+/* ---------- Login and registration ---------- */
+.auth-page { max-width: 560px; }
+.auth-card h1 { font-size: 1.7rem; }
+.stack-form { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+.stack-form .button { align-self: flex-start; }
+.auth-switch { margin: 20px 0 0; }
+.optional { font-weight: 400; color: var(--muted); }
+.notice { border-radius: 8px; padding: 10px 14px; margin: 12px 0 0; font-weight: 600; }
+.notice-error { background: #FDF0F0; border: 2px solid #A4161A; color: #A4161A; }
+.notice-ok { background: var(--green-tint); border: 1px solid var(--green); color: var(--green-dark); }
+.error-summary h2 { margin: 0 0 6px; font-size: 1rem; color: #A4161A; }
+
+/* ---------- Dashboard ---------- */
+.dash-card { margin-top: 16px; }
+.dash-card p:last-child { margin-bottom: 0; }
+.account-list { margin: 0 0 12px; display: grid; gap: 10px; }
+.account-list dt { font-size: .85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.account-list dd { margin: 2px 0 0; overflow-wrap: anywhere; }

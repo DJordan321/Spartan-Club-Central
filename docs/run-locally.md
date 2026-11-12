@@ -1,6 +1,6 @@
 # Running Spartan Club Central Locally (Demo Setup)
 
-> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form and a pretend Mailpit inbox) that needs no Java, MySQL or Mailpit.
+> Prefer a web page? Open [`docs/local-run.html`](local-run.html) in any browser. It has these steps with Windows/Mac tabs and copy buttons, plus a clickable offline preview of the student pages (homepage, directory, club profiles, join form, pretend Mailpit inbox, leader registration and login) that needs no Java, MySQL or Mailpit.
 
 The whole system runs on one laptop. Nothing is hosted online and no real emails are sent.
 
@@ -10,13 +10,15 @@ The whole system runs on one laptop. Nothing is hosted online and no real emails
 | Database | MySQL 8 Community Server | localhost:3306, database `club_central` |
 | Email | Mailpit (fake mail server with a web inbox) | SMTP localhost:1025, inbox http://localhost:8025 |
 
-> **Phase 3 status:** the student pages and the join request form are live:
+> **Phase 4 status:** the student pages, the join request form, and leader accounts are live:
 > - `/` homepage: search box plus one card per category (one click to filtered results, NFR-03)
 > - `/clubs` directory: keyword + category search (FR-01, FR-02)
 > - `/clubs/{id}` club profile: description, meeting time, contact, social links (FR-05, FR-06)
 > - Join/contact form on each club page: validated, saved, then emailed to the club through Mailpit (FR-03, FR-07)
 >
-> Leader login arrives in Phase 4 and the leader's request inbox in Phase 5.
+> - Leader registration and login (`/register`, `/login`), a leader dashboard (`/dashboard`) and an administrator page (`/admin`), each open only to the right role (FR-04, SPR-01)
+>
+> Creating and editing your club and the request inbox arrive in Phase 5; password reset and admin tools in Phase 6.
 >
 > ![Club directory](screenshots/phase2-directory.png)
 
@@ -63,7 +65,7 @@ mysql -u root -p club_central < database/sample-data.sql
 | `DB_PASSWORD` | **Yes** | your `club_app` password | none (startup fails) |
 | `DB_USER` | no | `club_app` | `club_app` |
 | `DB_URL` | no | `jdbc:mysql://localhost:3306/club_central` | same |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | from Phase 4 | `admin@clubcentral.local` | admin not created |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | from Phase 4 | `admin@clubcentral.local` / 8 to 72 characters | no admin account (created only once, the first time the app starts with both set) |
 | `APP_BASE_URL` | no | `http://192.168.1.20:8080` for phone demos | `http://localhost:8080` |
 | `MAIL_HOST` / `MAIL_PORT` | no | | `localhost` / `1025` (Mailpit) |
 
@@ -126,6 +128,7 @@ mysql -u root -p club_central < database/sample-data.sql
 | `Communications link failure` | MySQL isn't running. Start the MySQL service (Windows *Services*, Mac System Settings → MySQL, or `brew services start mysql`). |
 | `Schema-validation: missing column [...]` or `missing table` | Your database is from an older schema. Drop it (`DROP DATABASE club_central;`) and redo step 2. |
 | `Unknown database 'club_central'` | Step 2 wasn't run. |
+| Admin login says "Invalid email or password" | `ADMIN_EMAIL`/`ADMIN_PASSWORD` weren't set when the app started, or the password was under 8 characters (the app's window says why). Set them and restart; the admin is only created if none exists. |
 | `Port 8080 was already in use` | Another copy of the app is running. Stop it, or run with `--server.port=8081`. |
 | `./mvnw: Permission denied` (Mac/Linux) | `chmod +x mvnw` |
 | Emails don't appear (Phase 3+) | Start Mailpit and open http://localhost:8025. |
@@ -153,7 +156,23 @@ mysql -u root -p club_central < database/sample-data.sql
 | Refresh the confirmation page | No second email in Mailpit | No duplicates |
 | Stop Mailpit (Ctrl+C) and send another request | Still "Your request was sent"; in Workbench `SELECT * FROM join_request;` shows it as `FAILED` | TC-10 |
 
-Automated tests: `./mvnw test` should report 60 passing and 1 skipped.
+**Phase 4: leader accounts** (start the app with `ADMIN_EMAIL` and `ADMIN_PASSWORD` set, see section 3)
+
+| Do this | You should see | Proves |
+|---|---|---|
+| Logged out, open http://localhost:8080/dashboard | Sent to the login page | SPR-01, TC-17 |
+| **Leader login → Create a leader account**, password `short` | "Password must be at least 8 characters."; the password boxes are emptied | SPR-05 |
+| Register properly | "Your account was created. Log in to continue." | FR-04, TC-08 |
+| Log in with a wrong password | "Invalid email or password." (the same message for unknown emails) | SPR-06 |
+| Log in correctly | Your dashboard; header shows **Dashboard** and **Log out** | FR-04 |
+| As a leader, open http://localhost:8080/admin | "That request wasn't allowed" | Roles |
+| Workbench: `SELECT email, password_hash FROM club_leader;` | Only 60-character hashes starting `$2a$12$` | NFR-01, SPR-02, TC-18 |
+| Workbench: `SELECT * FROM audit_log;` | ADMIN_SEEDED, REGISTERED, LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT with account ids, no emails | SPR-08, TC-24 |
+| **Log out**, then log in with your `ADMIN_EMAIL` | The Administrator page | FR-04 (admin) |
+
+Your browser gets a new session cookie when you log in, and you're logged out after 30 minutes without activity (SPR-07).
+
+Automated tests: `./mvnw test` should report 90 passing and 1 skipped.
 
 ## Mailpit (fake email inbox, needed from Phase 3)
 

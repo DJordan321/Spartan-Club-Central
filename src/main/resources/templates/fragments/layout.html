@@ -3,7 +3,7 @@
 <!--
   Shared pieces used by every page (NFR-06, NFR-07):
     head(title)  page <head> with title, viewport and stylesheet
-    header       skip link + site header and navigation
+    header       skip link + site header and navigation (changes when logged in)
     footer       site footer
   Usage in a page:
     <head th:replace="~{fragments/layout :: head('Browse clubs')}"></head>
@@ -26,6 +26,16 @@
         <ul class="nav-links">
           <li><a th:href="@{/}">Home</a></li>
           <li><a th:href="@{/clubs}">Browse clubs</a></li>
+          <!--/* Logged out: one link for club leaders. Students never need an account. */-->
+          <li th:if="${currentUser == null}"><a th:href="@{/login}">Leader login</a></li>
+          <li th:if="${currentUser != null and currentUser.leader}"><a th:href="@{/dashboard}">Dashboard</a></li>
+          <li th:if="${currentUser != null and currentUser.admin}"><a th:href="@{/admin}">Admin</a></li>
+          <!--/* The log-out button is a POST with a CSRF token, so another site can't log you out. */-->
+          <li th:if="${currentUser != null}">
+            <form class="logout-form" method="post" th:action="@{/logout}">
+              <button type="submit" class="nav-button">Log out</button>
+            </form>
+          </li>
         </ul>
       </nav>
     </div>
